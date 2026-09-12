@@ -1,0 +1,5 @@
+
+{% extends 'base.html' %}{% block body %}<main><div class="adminnav"><a href="{{url_for('admin')}}">{{T.admin}}</a><a href="{{url_for('admin_agencies')}}">{{T.agencies}}</a></div>
+<h1>{{T.agencies}}</h1><form><input name="q" value="{{q}}" placeholder="{{T.search}}"><button class="btn gold">{{T.search}}</button></form>
+<div class="tablewrap"><table><tr><th>{{T.agency_name}}</th><th>{{T.country}}</th><th>{{T.contact_name}}</th><th>{{T.whatsapp}}</th><th>{{T.email}}</th><th>{{T.category}}</th><th>{{T.verified}}</th><th>{{T.request_count}}</th><th>{{T.last_request}}</th></tr>
+{% for a in agencies %}<tr><td>{{a.agency_name}}</td><td>{{a.country}}</td><td>{{a.contact_name}}</td><td><a href="https://wa.me/{{a.whatsapp|replace('+','')|replace(' ','')}}" target="_blank">{{a.whatsapp}}</a></td><td>{{a.email}}</td><td>{{a.category}}</td><td>{{'✓' if a.verified else '—'}}</td><td>{{a.request_count}}</td><td>{{a.last_request or '—'}}</td></tr>{% endfor %}</table></div></main>{% endblock %}

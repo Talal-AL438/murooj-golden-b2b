@@ -1,0 +1,7 @@
+
+{% extends 'base.html' %}{% block body %}<main><h1>{{T.welcome}} — {{agency.agency_name}}</h1>
+<div class="grid"><div class="card"><h3>{{T.account}}</h3><p>{{agency.contact_name}}</p><p>{{agency.country}}</p><p>{{agency.whatsapp}}</p></div>
+<div class="card"><h3>{{T.quick_request}}</h3><a class="btn gold" href="{{url_for('new_request')}}">{{T.send_request}}</a></div></div>
+<h2>{{T.quick_request}}</h2><div class="tablewrap"><table><tr><th>{{T.hotel}}</th><th>{{T.date}}</th><th>{{T.rooms}}</th><th>{{T.persons}}</th><th>{{T.status}}</th><th>{{T.actions}}</th></tr>
+{% for r in reqs %}<tr><td>{{T.any_hotel if r.any_hotel else (r.name_ar if lang=='ar' else r.name_en)}}</td><td>{{r.checkin}} → {{r.checkout}}</td><td>{{r.rooms}}</td><td>{{r.persons}}</td>
+<td>{{T[r.status]}}</td><td><a class="btn small gold" href="{{url_for('new_request')}}">{{T.repeat}}</a></td></tr>{% else %}<tr><td colspan="6">—</td></tr>{% endfor %}</table></div></main>{% endblock %}

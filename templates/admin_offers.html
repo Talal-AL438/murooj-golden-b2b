@@ -1,0 +1,10 @@
+
+{% extends 'base.html' %}{% block body %}<main><div class="adminnav"><a href="{{url_for('admin')}}">{{T.admin}}</a><a href="{{url_for('admin_offers')}}">{{T.offers}}</a></div>
+<h1>{{T.offers}}</h1><form method="post" class="card form"><input name="title" placeholder="Offer title" required>
+<select name="hotel_id"><option value="">Any hotel</option>{% for h in hotels %}<option value="{{h.id}}">{{h.name_en}}</option>{% endfor %}</select>
+<input type="date" name="start_date"><input type="date" name="end_date"><input name="meal" placeholder="RO / F.B Indo / F.B Malaysian"><input name="note" placeholder="Short note">
+<select name="audience"><option value="all">All agencies</option><option value="indonesia">Indonesia only</option><option value="malaysia">Malaysia only</option><option value="selected">Selected agencies</option></select>
+<select name="language_mode"><option value="auto">Auto language by agency</option><option value="manual">Manual language</option></select>
+<select name="manual_language"><option value="ar">العربية</option><option value="en">English</option><option value="id">Bahasa Indonesia</option><option value="ms">Bahasa Melayu</option></select>
+<label class="check"><input type="checkbox" name="pinned"> Pin offer</label><input type="number" name="sort_order" value="0"><button class="btn gold">{{T.add}}</button></form>
+<div class="tablewrap"><table><tr><th>Title</th><th>{{T.hotel}}</th><th>{{T.date}}</th><th>Audience</th><th>Language</th></tr>{% for o in offers %}<tr><td>{{o.title}}</td><td>{{o.name_en or T.any_hotel}}</td><td>{{o.start_date}}→{{o.end_date}}</td><td>{{o.audience}}</td><td>{{o.language_mode}} {{o.manual_language if o.language_mode=='manual' else ''}}</td></tr>{% endfor %}</table></div></main>{% endblock %}

@@ -1,0 +1,3 @@
+
+{% extends 'base.html' %}{% block body %}<main><div class="adminnav"><a href="{{url_for('admin')}}">{{T.admin}}</a><a href="{{url_for('admin_audit')}}">{{T.audit}}</a></div>
+<h1>{{T.audit}}</h1><div class="tablewrap"><table><tr><th>User</th><th>Action</th><th>Details</th><th>{{T.date}}</th></tr>{% for r in rows %}<tr><td>{{r.email or 'system'}}</td><td>{{r.action}}</td><td>{{r.details}}</td><td>{{r.created_at}}</td></tr>{% endfor %}</table></div></main>{% endblock %}

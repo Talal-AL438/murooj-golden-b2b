@@ -1,0 +1,5 @@
+
+{% extends 'base.html' %}{% block body %}<main><h1>Super Admin Setup</h1><div class="notice">This page only works once, before a Super Admin exists.</div>
+<form method="post" class="card form narrow"><label>Name<input name="name" required></label>
+<label>Email<input type="email" name="email" value="talal_alaqely@icloud.com" required></label>
+<label>Create password<input type="password" name="password" minlength="10" required></label><button class="btn gold">Create Super Admin</button></form></main>{% endblock %}

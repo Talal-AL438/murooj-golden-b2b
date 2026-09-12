@@ -1,0 +1,8 @@
+
+{% extends 'base.html' %}{% block body %}<main><h1>{{T.quick_request}}</h1><form method="post" class="card form">
+<label>{{T.city}}<select name="city"><option>Makkah</option><option>Madinah</option></select></label>
+<label>{{T.hotel}}<select name="hotel_id"><option value="any">{{T.any_hotel}}</option>{% for h in hotels %}<option value="{{h.id}}" {{'selected' if request.args.get('hotel')==h.id|string}}>{{h.name_en}}</option>{% endfor %}</select></label>
+<label>{{T.checkin}}<input type="date" name="checkin" required></label><label>{{T.checkout}}<input type="date" name="checkout" required></label>
+<label>{{T.rooms}}<input type="number" min="1" name="rooms" required></label><label>{{T.persons}}<input type="number" min="1" name="persons" required></label>
+<label>{{T.nationality}}<input name="nationality" required></label><label>{{T.meal}}<select name="meal"><option value="RO">{{T.room_only}}</option><option value="F.B Indo">{{T.indo_fb}}</option><option value="F.B Malaysian">{{T.malay_fb}}</option></select></label>
+<label class="full">{{T.notes}}<textarea name="notes" rows="5"></textarea></label><button class="btn gold">{{T.submit}}</button></form></main>{% endblock %}

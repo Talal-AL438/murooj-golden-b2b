@@ -1,0 +1,21 @@
+
+<!doctype html><html lang="{{lang}}" dir="{{'rtl' if lang=='ar' else 'ltr'}}"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{T.portal}}</title><link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+</head><body>
+<header><a class="brand" href="{{url_for('home')}}">MUROOJ GOLDEN</a><nav>
+<a href="{{url_for('home')}}">{{T.home}}</a><a href="{{url_for('home')}}#hotels">{{T.hotels}}</a>
+{% if user %}
+  {% if user['role']=='agency' %}<a href="{{url_for('account')}}">{{T.account}}</a><a href="{{url_for('new_request')}}">{{T.quick_request}}</a>
+  {% else %}<a href="{{url_for('admin')}}">{{T.admin}}</a>{% endif %}
+  <a href="{{url_for('logout')}}">{{T.logout}}</a>
+{% else %}<a href="{{url_for('login')}}">{{T.login}}</a><a class="pill" href="{{url_for('register')}}">{{T.register}}</a>{% endif %}
+<select onchange="location.href='/lang/'+this.value">
+<option value="ar" {{'selected' if lang=='ar'}}>العربية</option><option value="en" {{'selected' if lang=='en'}}>English</option>
+<option value="id" {{'selected' if lang=='id'}}>Bahasa Indonesia</option><option value="ms" {{'selected' if lang=='ms'}}>Bahasa Melayu</option></select>
+</nav></header>
+{% with messages=get_flashed_messages() %}{% if messages %}<main class="flashwrap">{% for m in messages %}<div class="flash">{{m}}</div>{% endfor %}</main>{% endif %}{% endwith %}
+{% block body %}{% endblock %}
+<a class="wa" target="_blank" href="https://wa.me/966550558014">WhatsApp</a>
+<footer>MUROOJ GOLDEN — مروج الذهبية للاستثمار</footer>
+</body></html>

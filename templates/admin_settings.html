@@ -1,0 +1,4 @@
+
+{% extends 'base.html' %}{% block body %}<main><div class="adminnav"><a href="{{url_for('admin')}}">{{T.admin}}</a><a href="{{url_for('admin_settings')}}">{{T.settings}}</a></div>
+<h1>{{T.settings}}</h1><form method="post" class="card form"><label>Company<input name="company_name" value="{{settings.company_name}}"></label><label>Brand<input name="brand" value="{{settings.brand}}"></label><label>WhatsApp<input name="whatsapp" value="{{settings.whatsapp}}"></label><label>Email<input name="email" value="{{settings.email}}"></label>
+<label class="full">Announcement<input name="announcement" value="{{settings.announcement}}"></label><label class="check"><input type="checkbox" name="announcement_active" value="1" {{'checked' if settings.announcement_active=='1'}}> Show announcement</label><button class="btn gold">{{T.save}}</button></form></main>{% endblock %}

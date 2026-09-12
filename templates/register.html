@@ -1,0 +1,9 @@
+
+{% extends 'base.html' %}{% block body %}<main><h1>{{T.register}}</h1><form method="post" class="card form">
+<label>{{T.agency_name}}<input name="agency_name" required></label><label>{{T.country}}<input name="country" required></label>
+<label>{{T.contact_name}}<input name="contact_name" required></label><label>{{T.whatsapp}}<input name="whatsapp" required></label>
+<label>{{T.email}}<input type="email" name="email" required></label><label>{{T.password}}<input type="password" name="password" minlength="8" required></label>
+<label>{{T.language}}<select name="language"><option value="ar">العربية</option><option value="en">English</option><option value="id">Bahasa Indonesia</option><option value="ms">Bahasa Melayu</option></select></label>
+<label class="check"><input type="checkbox" name="privacy" required> {{T.privacy}}</label>
+<label class="check"><input type="checkbox" name="marketing" required> {{T.marketing}} *</label>
+<button class="btn gold">{{T.create_account}}</button></form></main>{% endblock %}

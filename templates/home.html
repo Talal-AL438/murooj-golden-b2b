@@ -1,0 +1,16 @@
+
+{% extends 'base.html' %}{% block body %}
+<main><section class="hero"><small>MUROOJ GOLDEN B2B</small><h1>{{T.hero}}</h1><p>{{T.sub}}</p>
+<div class="actions"><a class="btn gold" href="#hotels">{{T.makkah}}</a><span class="btn dark">{{T.madinah}} — Soon</span>
+{% if user and user['role']=='agency' %}<a class="btn outline" href="{{url_for('new_request')}}">{{T.quick_request}}</a>{% endif %}</div></section>
+{% if settings.announcement_active=='1' and settings.announcement %}<div class="notice">{{settings.announcement}}</div>{% endif %}
+<section><h2>{{T.special_offers}}</h2><div class="grid">{% for o in offers %}
+<div class="card"><h3>{{o.title}}</h3><p>{{o.note}}</p><p>{{o.start_date}} — {{o.end_date}}</p>
+{% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request')}}">{{T.send_request}}</a>{% endif %}</div>
+{% else %}<div class="card">No active offers yet.</div>{% endfor %}</div></section>
+<section id="hotels"><h2>{{T.hotels}} — {{T.makkah}}</h2><div class="grid">{% for h in hotels %}
+<div class="card"><div class="hotelpic">{{h.name_en}}</div><h3>{{h.name_ar}}<br><span>{{h.name_en}}</span></h3>
+<div>{% for s in h.services.split('|') %}<span class="tag">{{s}}</span>{% endfor %}</div>
+<p><a class="btn dark" target="_blank" href="{{h.map_url}}">{{T.location}}</a>
+{% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request')}}?hotel={{h.id}}">{{T.send_request}}</a>{% endif %}</p></div>
+{% endfor %}</div></section></main>{% endblock %}
