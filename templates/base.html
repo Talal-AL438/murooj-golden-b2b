@@ -3,7 +3,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{T.portal}}</title><link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
 </head><body>
-<header><a class="brand" href="{{url_for('home')}}">MUROOJ GOLDEN</a><nav>
+<header><a class="brand" href="{{url_for('home')}}"><img src="{{url_for('static', filename='WhatsApp Image 2026-09-12 at 12.20.29 PM.jpeg')}}" alt="MUROOJ GOLDEN" class="brand-logo"></a><nav>
 <a href="{{url_for('home')}}">{{T.home}}</a><a href="{{url_for('home')}}#hotels">{{T.hotels}}</a>
 {% if user %}
   {% if user['role']=='agency' %}<a href="{{url_for('account')}}">{{T.account}}</a><a href="{{url_for('new_request')}}">{{T.quick_request}}</a>
