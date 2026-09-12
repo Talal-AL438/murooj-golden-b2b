@@ -28,7 +28,7 @@ LANGS = {
         "success_request":"تم إرسال طلبك إلى مروج الذهبية بنجاح. سيتواصل معك فريق الحجوزات عبر WhatsApp لتأكيد التوفر والسعر.",
         "welcome":"مرحبًا","special_offers":"العروض الخاصة","city":"المدينة","hotel":"الفندق","actions":"الإجراءات","date":"التاريخ",
         "job_title":"المسمى الوظيفي","mobile":"رقم الجوال","role":"الدور","active":"نشط","suspended":"موقوف","verified":"موثقة",
-        "category":"التصنيف","last_request":"آخر طلب","request_count":"عدد الطلبات","registration_date":"تاريخ التسجيل"
+        "category":"التصنيف","last_request":"آخر طلب","request_count":"عدد الطلبات","registration_date":"تاريخ التسجيل","no_active_offers":"لا توجد عروض نشطة حالياً"
     },
     "en": {
         "portal":"Murooj Golden B2B Portal","home":"Home","hotels":"Hotels","offers":"Offers","quick_request":"Quick Request",
