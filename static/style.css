@@ -1,0 +1,417 @@
+:root{
+  --gold:#c79a32;
+  --gold-light:#e7bd55;
+  --black:#0b0b0b;
+  --dark:#151515;
+  --muted:#6b6b6b;
+  --white:#ffffff;
+  --bg:#f7f5f0;
+  --border:#e6dfd2;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:#171717;
+  font-family:Arial,Tahoma,sans-serif;
+  line-height:1.7;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:rgba(10,10,10,.97);
+  color:var(--white);
+  padding:14px 5%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  border-bottom:2px solid var(--gold);
+  box-shadow:0 4px 18px rgba(0,0,0,.15);
+}
+
+.brand{
+  color:var(--gold-light);
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:1px;
+  white-space:nowrap;
+}
+
+nav{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+nav a{
+  padding:8px 12px;
+  border-radius:8px;
+  font-size:14px;
+  transition:.2s;
+}
+
+nav a:hover{
+  background:var(--gold);
+  color:#111;
+}
+
+nav select{
+  background:#1d1d1d;
+  color:#fff;
+  border:1px solid var(--gold);
+  border-radius:8px;
+  padding:8px 10px;
+  cursor:pointer;
+}
+
+.pill{
+  background:var(--gold);
+  color:#111 !important;
+  font-weight:800;
+}
+
+main{
+  width:min(1180px,92%);
+  margin:auto;
+  padding:32px 0;
+}
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  text-align:center;
+  padding:75px 25px;
+  margin-bottom:35px;
+  border-radius:24px;
+  color:#fff;
+  background:
+    radial-gradient(circle at top right,rgba(199,154,50,.32),transparent 35%),
+    linear-gradient(135deg,#080808,#1b1b1b);
+  border:1px solid rgba(199,154,50,.55);
+  box-shadow:0 18px 45px rgba(0,0,0,.18);
+}
+
+.hero::after{
+  content:"";
+  position:absolute;
+  width:260px;
+  height:260px;
+  border:1px solid rgba(231,189,85,.18);
+  border-radius:50%;
+  right:-90px;
+  bottom:-120px;
+}
+
+.hero h1{
+  position:relative;
+  z-index:1;
+  margin:0 0 12px;
+  color:var(--gold-light);
+  font-size:clamp(32px,5vw,58px);
+  line-height:1.2;
+}
+
+.hero h2{
+  position:relative;
+  z-index:1;
+  margin:10px 0;
+  font-size:clamp(22px,3vw,36px);
+}
+
+.hero p{
+  position:relative;
+  z-index:1;
+  max-width:760px;
+  margin:15px auto 0;
+  color:#e8e8e8;
+  font-size:17px;
+}
+
+h1,h2,h3{
+  line-height:1.35;
+}
+
+h2{
+  margin-top:35px;
+}
+
+section{
+  margin:30px 0;
+}
+
+.card,
+.hotel,
+.offer,
+.panel{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:24px;
+  box-shadow:0 8px 28px rgba(0,0,0,.06);
+}
+
+.hotels,
+.cards,
+.offers{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:22px;
+  margin-top:20px;
+}
+
+.hotel{
+  position:relative;
+  overflow:hidden;
+  transition:transform .2s,box-shadow .2s;
+}
+
+.hotel:hover{
+  transform:translateY(-4px);
+  box-shadow:0 14px 34px rgba(0,0,0,.12);
+}
+
+.hotel h3{
+  margin:0 0 5px;
+  color:#171717;
+  font-size:24px;
+}
+
+.hotel h3 + h3{
+  color:var(--gold);
+  font-size:18px;
+}
+
+.hotel p{
+  color:var(--muted);
+}
+
+.hotel a,
+.btn,
+button,
+input[type="submit"]{
+  display:inline-block;
+  background:var(--gold);
+  color:#111;
+  border:0;
+  border-radius:10px;
+  padding:11px 18px;
+  font-weight:800;
+  cursor:pointer;
+  margin:4px 3px;
+  transition:.2s;
+}
+
+.hotel a:hover,
+.btn:hover,
+button:hover,
+input[type="submit"]:hover{
+  background:var(--gold-light);
+  transform:translateY(-1px);
+}
+
+form{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 8px 28px rgba(0,0,0,.06);
+}
+
+.form{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+}
+
+label{
+  display:block;
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:12px 13px;
+  border:1px solid #d8d2c8;
+  border-radius:9px;
+  background:#fff;
+  font:inherit;
+  outline:none;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(199,154,50,.12);
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 6px 20px rgba(0,0,0,.05);
+}
+
+th,
+td{
+  padding:13px;
+  border-bottom:1px solid #eee;
+  text-align:start;
+}
+
+th{
+  background:#151515;
+  color:var(--gold-light);
+}
+
+tr:hover td{
+  background:#faf8f3;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:15px;
+  margin:20px 0;
+}
+
+.stat{
+  background:#111;
+  color:#fff;
+  border-radius:15px;
+  padding:20px;
+  border-bottom:3px solid var(--gold);
+}
+
+.stat strong{
+  display:block;
+  color:var(--gold-light);
+  font-size:28px;
+}
+
+.flashwrap{
+  width:min(1180px,92%);
+  margin:15px auto;
+}
+
+.flash{
+  background:#fff7dc;
+  color:#5b4700;
+  border:1px solid #ead17b;
+  border-radius:10px;
+  padding:12px 16px;
+  margin-bottom:8px;
+}
+
+.wa{
+  position:fixed;
+  right:22px;
+  bottom:22px;
+  z-index:200;
+  background:#171717;
+  color:var(--gold-light);
+  border:2px solid var(--gold);
+  padding:13px 18px;
+  border-radius:50px;
+  font-weight:900;
+  box-shadow:0 8px 25px rgba(0,0,0,.2);
+}
+
+.wa:hover{
+  background:var(--gold);
+  color:#111;
+}
+
+footer{
+  margin-top:45px;
+  background:#111;
+  color:#ddd;
+  text-align:center;
+  padding:28px 20px;
+  border-top:3px solid var(--gold);
+}
+
+@media(max-width:900px){
+  .hotels,
+  .cards,
+  .offers{
+    grid-template-columns:1fr;
+  }
+
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:760px){
+  header{
+    align-items:flex-start;
+    flex-direction:column;
+    padding:14px 18px;
+  }
+
+  nav{
+    justify-content:flex-start;
+    width:100%;
+  }
+
+  main{
+    width:94%;
+    padding:18px 0;
+  }
+
+  .hero{
+    padding:48px 18px;
+    border-radius:18px;
+  }
+
+  .form{
+    grid-template-columns:1fr;
+  }
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  table{
+    font-size:13px;
+  }
+
+  th,
+  td{
+    padding:9px;
+  }
+
+  .wa{
+    right:14px;
+    bottom:14px;
+  }
+}
