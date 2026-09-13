@@ -6,9 +6,39 @@
 
 {% if settings.announcement_active=='1' and settings.announcement %}<div class="notice">{{settings.announcement}}</div>{% endif %}
 
-<section><h2>{{T.special_offers}}</h2><div class="grid">{% for o in offers %}
-<div class="card"><h3>{{o.title}}</h3><p>{{o.note}}</p><p>{{o.start_date}} — {{o.end_date}}</p>
-{% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request')}}?hotel={{o.hotel_id or 'any'}}">{{T.send_request}}</a>{% endif %}</div>
+<section id="offers"><h2>{{T.special_offers}}</h2><div class="grid">{% for o in offers %}
+<article class="card offer-card" id="offer-{{o.id}}">
+  {% if o.name_en == 'NADA AJYAD HOTEL' %}<img class="hotel-image" src="{{ url_for('static', filename='ندى.jfif') }}" alt="{{o.title}}">
+  {% elif o.name_en == 'SAWAEED AL KHAIR HOTEL' %}<img class="hotel-image" src="{{ url_for('static', filename='سواعد الخير.jfif') }}" alt="{{o.title}}">{% endif %}
+  <div class="hotel-card-body">
+    {% if o.pinned %}<span class="tag">★</span>{% endif %}
+    <h3>{{o.title}}</h3>
+    {% if o.name_en %}<p><b>{{o.name_ar if lang=='ar' else o.name_en}}</b></p>{% endif %}
+    <p>{{o.note}}</p>
+    <div class="hotel-tags">
+      {% if o.start_date or o.end_date %}<span class="tag">{{o.start_date}} — {{o.end_date}}</span>{% endif %}
+      {% if o.meal %}<span class="tag">{{o.meal}}</span>{% endif %}
+    </div>
+    <details class="hotel-details" {% if request.args.get('offer') == o.id|string %}open{% endif %}>
+      <summary class="btn outline">{{T.view}}</summary>
+      <div class="hotel-detail-content">
+        <h4>{{o.title}}</h4>
+        {% if o.note %}<p>{{o.note}}</p>{% endif %}
+        {% if o.name_en %}<p>{{T.hotel}}: {{o.name_ar if lang=='ar' else o.name_en}}</p>{% endif %}
+        <p>{{T.date}}: {{o.start_date or '—'}} → {{o.end_date or '—'}}</p>
+        {% if o.meal %}<p>{{T.meal}}: {{o.meal}}</p>{% endif %}
+        <div class="hotel-actions">
+          <a class="btn dark" href="{{url_for('home', offer=o.id)}}#offer-{{o.id}}">Share / {{T.view}}</a>
+          {% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request', hotel=(o.hotel_id or 'any'), checkin=o.start_date, checkout=o.end_date, meal=o.meal)}}">{{T.send_request}}</a>{% else %}<a class="btn gold" href="{{url_for('login')}}">{{T.login}}</a>{% endif %}
+        </div>
+      </div>
+    </details>
+    <div class="hotel-actions">
+      <a class="btn outline" href="{{url_for('home', offer=o.id)}}#offer-{{o.id}}">{{T.view}}</a>
+      {% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request', hotel=(o.hotel_id or 'any'), checkin=o.start_date, checkout=o.end_date, meal=o.meal)}}">{{T.send_request}}</a>{% endif %}
+    </div>
+  </div>
+</article>
 {% else %}<div class="card">{{T.no_active_offers}}</div>{% endfor %}</div></section>
 
 <section id="hotels"><h2>{{T.hotels}} — {{T.makkah}}</h2><div class="grid hotel-grid">{% for h in hotels %}
