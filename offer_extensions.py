@@ -30,6 +30,28 @@ def register_offer_extensions(app, db, current_user):
             lang=manual_language if language_mode=='manual' else (row['language'] or 'en');head,prefix=labels.get(lang,labels['en'])
             c.execute("INSERT INTO notifications(user_id,type,ref_id,title,body,link,created_at) VALUES(?,?,?,?,?,?,?)",(row['user_id'],'offer',oid,head,prefix+title,f'/offer/{oid}',datetime.utcnow().isoformat()))
 
+    def home_extended():
+        ensure_schema();c=db();u=current_user();today=datetime.utcnow().date().isoformat()
+        hotels=c.execute("SELECT h.*,(SELECT image_url FROM hotel_images i WHERE i.hotel_id=h.id ORDER BY i.sort_order,i.id LIMIT 1) cover_image FROM hotels h WHERE h.active=1 ORDER BY h.sort_order,h.id").fetchall()
+        base="""SELECT o.*,h.name_ar,h.name_en FROM offers o LEFT JOIN hotels h ON h.id=o.hotel_id WHERE o.active=1 AND (o.end_date='' OR o.end_date IS NULL OR o.end_date>=?)"""
+        params=[today]
+        if u and u['role']=='agency':
+            agency=c.execute("SELECT id,country FROM agencies WHERE user_id=?",(u['id'],)).fetchone()
+            if agency:
+                country=(agency['country'] or '').lower();allowed=['all']
+                if 'indonesia' in country:allowed.append('indonesia')
+                if 'malaysia' in country:allowed.append('malaysia')
+                placeholders=','.join('?' for _ in allowed)
+                base+=f" AND (o.audience IN ({placeholders}) OR (o.audience='selected' AND EXISTS (SELECT 1 FROM offer_targets ot WHERE ot.offer_id=o.id AND ot.agency_id=?)))"
+                params.extend(allowed);params.append(agency['id'])
+            else:
+                base+=" AND o.audience='all'"
+        else:
+            base+=" AND o.audience='all'"
+        offers=c.execute(base+" ORDER BY o.pinned DESC,o.sort_order,o.id DESC LIMIT 6",params).fetchall()
+        settings={r['key']:r['value'] for r in c.execute("SELECT * FROM settings").fetchall()};c.close()
+        return render_template('home.html',hotels=hotels,offers=offers,settings=settings,user=u)
+
     def admin_offers_extended():
         ensure_schema();u=current_user()
         if not u or u['role'] not in ('super_admin','staff'):return redirect(url_for('login'))
@@ -66,5 +88,6 @@ def register_offer_extensions(app, db, current_user):
         if not offer:return 'offer not found',404
         return render_template('offer.html',offer=offer,user=current_user())
 
+    app.view_functions['home']=home_extended
     app.view_functions['admin_offers']=admin_offers_extended
     app.view_functions['offer_detail']=offer_detail_extended
