@@ -6,27 +6,35 @@
     <a class="btn gold" href="{{ url_for('new_request') }}">{{ T.quick_request }}</a>
   </div>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <section class="card" style="margin-bottom:18px">
-        {% for message in messages %}<h3>{{ message }}</h3>{% endfor %}
-        {% if reqs %}
-          {% set latest = reqs[0] %}
-          {% set hotel_name = T.any_hotel if latest.any_hotel else (latest.name_ar if lang == 'ar' else latest.name_en) %}
-          {% set wa_text = 'MUROOJ GOLDEN B2B\nAgency: ' ~ agency.agency_name ~ '\nRequest: #' ~ latest.id ~ '\nCity: ' ~ latest.city ~ '\nHotel: ' ~ hotel_name ~ '\nCheck-in: ' ~ latest.checkin ~ '\nCheck-out: ' ~ latest.checkout ~ '\nRooms: ' ~ latest.rooms ~ '\nPersons: ' ~ latest.persons ~ '\nNationality: ' ~ latest.nationality ~ '\nMeal: ' ~ latest.meal ~ '\nNotes: ' ~ (latest.notes or '-') %}
-          <a class="btn gold" target="_blank" rel="noopener" href="https://wa.me/966550558014?text={{ wa_text|urlencode }}">WhatsApp</a>
-        {% endif %}
-      </section>
-    {% endif %}
-  {% endwith %}
+  {% with messages = get_flashed_messages() %}{% if messages %}<section class="card" style="margin-bottom:18px">{% for message in messages %}<p><b>{{ message }}</b></p>{% endfor %}</section>{% endif %}{% endwith %}
 
   <div class="grid">
-    <div class="card">
-      <h3>{{ T.account }}</h3><p><b>{{ agency.contact_name }}</b></p><p>{{ agency.country }}</p><p dir="ltr">{{ agency.whatsapp }}</p>
-    </div>
-    <div class="card">
-      <h3>{{ T.quick_request }}</h3><p>Hotel availability and prices are confirmed through WhatsApp.</p><a class="btn gold" href="{{ url_for('new_request') }}">{{ T.send_request }}</a>
-    </div>
+    <section class="card form">
+      <h3>{{ T.account }}</h3>
+      <form method="post">
+        <input type="hidden" name="action" value="profile">
+        <label>{{ T.agency_name }}<input value="{{ agency.agency_name }}" disabled></label>
+        <label>{{ T.contact_name }}<input name="contact_name" value="{{ agency.contact_name }}" autocomplete="name" required></label>
+        <label>{{ T.country }}<input name="country" value="{{ agency.country }}" autocomplete="country-name" required></label>
+        <label>{{ T.whatsapp }}<input type="tel" name="whatsapp" value="{{ agency.whatsapp }}" autocomplete="tel" required></label>
+        <label>{{ T.email }}<input value="{{ user.email }}" disabled></label>
+        <button class="btn gold" type="submit">{{ T.save }}</button>
+      </form>
+    </section>
+
+    <section class="card form">
+      <h3>{{ T.password }}</h3>
+      <form method="post">
+        <input type="hidden" name="action" value="password">
+        <label>{% if lang=='ar' %}كلمة المرور الحالية{% elif lang=='id' %}Kata sandi saat ini{% elif lang=='ms' %}Kata laluan semasa{% else %}Current Password{% endif %}<input type="password" name="current_password" autocomplete="current-password" required></label>
+        <label>{% if lang=='ar' %}كلمة المرور الجديدة{% elif lang=='id' %}Kata sandi baru{% elif lang=='ms' %}Kata laluan baharu{% else %}New Password{% endif %}<input type="password" name="new_password" minlength="8" autocomplete="new-password" required></label>
+        <button class="btn gold" type="submit">{{ T.save }}</button>
+      </form>
+      <hr>
+      <h3>{{ T.quick_request }}</h3>
+      <p>{% if lang=='ar' %}يتم تأكيد التوفر والأسعار عبر WhatsApp.{% elif lang=='id' %}Ketersediaan dan harga dikonfirmasi melalui WhatsApp.{% elif lang=='ms' %}Ketersediaan dan harga disahkan melalui WhatsApp.{% else %}Hotel availability and prices are confirmed through WhatsApp.{% endif %}</p>
+      <a class="btn outline" href="{{ url_for('new_request') }}">{{ T.send_request }}</a>
+    </section>
   </div>
 
   <h2>{{ T.quick_request }}</h2>
