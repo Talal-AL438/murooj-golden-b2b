@@ -1,1 +1,50 @@
-{% extends 'base.html' %}{% block body %}<main><div class="adminnav"><a href="{{url_for('admin')}}">{{T.admin}}</a><a href="{{url_for('admin_hotels')}}">{{T.hotels}}</a><a href="{{url_for('admin_offers')}}">{{T.offers}}</a></div><h1>{{T.hotels}}</h1><form method="post" class="card form"><input name="name_ar" placeholder="الاسم العربي" required><input name="name_en" placeholder="English name" required><select name="city"><option>Makkah</option><option>Madinah</option></select><input name="map_url" placeholder="Google Maps URL"><input class="full" name="services" placeholder="Service 1|Service 2|Service 3"><input name="meals" value="RO|F.B Indo|F.B Malaysian"><input type="number" name="sort_order" value="0"><button class="btn gold">{{T.add}}</button></form><div class="tablewrap"><table><tr><th>{{T.hotel}}</th><th>{{T.city}}</th><th>{{T.status}}</th><th>{{T.actions}}</th></tr>{% for h in hotels %}<tr><td>{{h.name_ar}}<br><span translate="no">{{h.name_en}}</span></td><td>{{h.city}}</td><td>{{T.active if h.active else T.hide}}</td><td><form class="inline" method="post" action="{{url_for('hotel_toggle',hid=h.id)}}"><button class="btn small dark">{{T.hide if h.active else T.show}}</button></form></td></tr>{% endfor %}</table></div></main>{% endblock %}
+{% extends 'base.html' %}
+{% block body %}
+<main class="page-shell">
+  <div class="adminnav"><a href="{{url_for('admin')}}">{{T.admin}}</a><a class="active" href="{{url_for('admin_hotels')}}">{{T.hotels}}</a><a href="{{url_for('admin_offers')}}">{{T.offers}}</a></div>
+  <div class="section-head"><div><span class="eyebrow">MUROOJ GOLDEN B2B</span><h1>{{T.hotels}}</h1></div></div>
+
+  <section class="card form" style="margin-bottom:22px">
+    <h2>{{T.add}} {{T.hotel}}</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="add">
+      <div class="form-grid">
+        <label>الاسم العربي<input name="name_ar" required></label>
+        <label>English name<input name="name_en" required></label>
+        <label>{{T.city}}<select name="city"><option value="Makkah">Makkah</option><option value="Madinah">Madinah</option></select></label>
+        <label>Google Maps URL<input name="map_url"></label>
+        <label>{{T.meal}}<input name="meals" value="RO|F.B Indo|F.B Malaysian"></label>
+        <label>Sort order<input type="number" name="sort_order" value="0"></label>
+      </div>
+      <label class="full">Services<input name="services" placeholder="Wi-Fi|24h reception|Elevators|AC|Restaurant"></label>
+      <button class="btn gold" type="submit">{{T.add}}</button>
+    </form>
+  </section>
+
+  <div class="grid">
+  {% for h in hotels %}
+    <article class="card">
+      {% if h.name_en == 'NADA AJYAD HOTEL' %}<img class="hotel-image" src="{{url_for('static',filename='ندى.jfif')}}" alt="{{h.name_ar}}">
+      {% elif h.name_en == 'SAWAEED AL KHAIR HOTEL' %}<img class="hotel-image" src="{{url_for('static',filename='سواعد الخير.jfif')}}" alt="{{h.name_ar}}">{% endif %}
+      <form method="post" class="form">
+        <input type="hidden" name="action" value="edit"><input type="hidden" name="hid" value="{{h.id}}">
+        <div class="form-grid">
+          <label>الاسم العربي<input name="name_ar" value="{{h.name_ar}}" required></label>
+          <label>English name<input name="name_en" value="{{h.name_en}}" required></label>
+          <label>{{T.city}}<select name="city"><option value="Makkah" {{'selected' if h.city=='Makkah'}}>Makkah</option><option value="Madinah" {{'selected' if h.city=='Madinah'}}>Madinah</option></select></label>
+          <label>Google Maps URL<input name="map_url" value="{{h.map_url or ''}}"></label>
+          <label>{{T.meal}}<input name="meals" value="{{h.meals or ''}}"></label>
+          <label>Sort order<input type="number" name="sort_order" value="{{h.sort_order or 0}}"></label>
+        </div>
+        <label class="full">Services<input name="services" value="{{h.services or ''}}"></label>
+        <div class="hotel-actions"><button class="btn gold" type="submit">{{T.save}}</button></div>
+      </form>
+      <div class="hotel-actions" style="margin-top:10px">
+        <span class="status {{'active' if h.active else 'suspended'}}">{{T.active if h.active else T.hide}}</span>
+        <form class="inline" method="post" action="{{url_for('hotel_toggle',hid=h.id)}}"><button class="btn small dark">{{T.hide if h.active else T.show}}</button></form>
+      </div>
+    </article>
+  {% endfor %}
+  </div>
+</main>
+{% endblock %}
