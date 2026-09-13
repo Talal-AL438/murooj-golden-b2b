@@ -2,13 +2,15 @@ from datetime import datetime
 from flask import request, redirect, url_for, render_template
 
 
-def register_offer_extensions(mod):
-    app,db,current_user=mod.app,mod.db,mod.current_user
+def register_offer_extensions(app, db, current_user):
     c=db()
     cols=[r['name'] for r in c.execute('PRAGMA table_info(offers)').fetchall()]
     if 'image_url' not in cols:c.execute("ALTER TABLE offers ADD COLUMN image_url TEXT DEFAULT ''")
     c.execute("CREATE TABLE IF NOT EXISTS offer_targets (offer_id INTEGER NOT NULL,agency_id INTEGER NOT NULL,PRIMARY KEY(offer_id,agency_id),FOREIGN KEY(offer_id) REFERENCES offers(id),FOREIGN KEY(agency_id) REFERENCES agencies(id))")
     c.commit();c.close()
+
+    def audit(action,details=''):
+        u=current_user();c=db();c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(u['id'] if u else None,action,details,datetime.utcnow().isoformat()));c.commit();c.close()
 
     def send_offer_notifications(c,oid,title,audience,selected,language_mode,manual_language):
         rows=c.execute("SELECT a.id agency_id,u.id user_id,u.language,a.country FROM agencies a JOIN users u ON u.id=a.user_id WHERE u.active=1").fetchall()
@@ -29,7 +31,7 @@ def register_offer_extensions(mod):
             if action=='toggle':
                 oid=int(request.form['oid']);row=c.execute('SELECT active FROM offers WHERE id=?',(oid,)).fetchone()
                 if not row:c.close();return 'offer not found',404
-                c.execute('UPDATE offers SET active=? WHERE id=?',(0 if row['active'] else 1,oid));c.commit();c.close();mod.log('offer_toggle',f'offer={oid}');return redirect(url_for('admin_offers'))
+                c.execute('UPDATE offers SET active=? WHERE id=?',(0 if row['active'] else 1,oid));c.commit();c.close();audit('offer_toggle',f'offer={oid}');return redirect(url_for('admin_offers'))
             title=request.form.get('title','').strip();hotel_id=request.form.get('hotel_id') or None;start=request.form.get('start_date','');end=request.form.get('end_date','');meal=request.form.get('meal','').strip();note=request.form.get('note','').strip();image_url=request.form.get('image_url','').strip();audience=request.form.get('audience','all');language_mode=request.form.get('language_mode','auto');manual_language=request.form.get('manual_language','ar');pinned=1 if request.form.get('pinned') else 0
             try:sort_order=int(request.form.get('sort_order',0))
             except ValueError:sort_order=0
@@ -43,10 +45,10 @@ def register_offer_extensions(mod):
             if action=='edit':
                 oid=int(request.form['oid']);c.execute("UPDATE offers SET title=?,hotel_id=?,start_date=?,end_date=?,meal=?,note=?,image_url=?,audience=?,language_mode=?,manual_language=?,pinned=?,sort_order=? WHERE id=?",(title,hotel_id,start,end,meal,note,image_url,audience,language_mode,manual_language,pinned,sort_order,oid));c.execute('DELETE FROM offer_targets WHERE offer_id=?',(oid,))
                 if audience=='selected':c.executemany('INSERT OR IGNORE INTO offer_targets(offer_id,agency_id) VALUES(?,?)',[(oid,a) for a in selected])
-                c.commit();c.close();mod.log('offer_edit',f'offer={oid}');return redirect(url_for('admin_offers'))
+                c.commit();c.close();audit('offer_edit',f'offer={oid}');return redirect(url_for('admin_offers'))
             cur=c.execute("INSERT INTO offers(title,hotel_id,start_date,end_date,meal,note,audience,language_mode,manual_language,active,pinned,sort_order,created_at,image_url) VALUES(?,?,?,?,?,?,?,?,?,1,?,?,?,?)",(title,hotel_id,start,end,meal,note,audience,language_mode,manual_language,pinned,sort_order,datetime.utcnow().isoformat(),image_url));oid=cur.lastrowid
             if audience=='selected':c.executemany('INSERT OR IGNORE INTO offer_targets(offer_id,agency_id) VALUES(?,?)',[(oid,a) for a in selected])
-            send_offer_notifications(c,oid,title,audience,selected,language_mode,manual_language);c.commit();c.close();mod.log('offer_add',title);return redirect(url_for('admin_offers'))
+            send_offer_notifications(c,oid,title,audience,selected,language_mode,manual_language);c.commit();c.close();audit('offer_add',title);return redirect(url_for('admin_offers'))
         offers=c.execute("SELECT o.*,h.name_en FROM offers o LEFT JOIN hotels h ON h.id=o.hotel_id ORDER BY o.pinned DESC,o.sort_order,o.id DESC").fetchall();hotels=c.execute('SELECT * FROM hotels WHERE active=1 ORDER BY sort_order,id').fetchall();agencies=c.execute("SELECT a.id,a.agency_name,a.country,u.email FROM agencies a JOIN users u ON u.id=a.user_id WHERE u.active=1 ORDER BY a.agency_name").fetchall();targets={}
         for r in c.execute('SELECT offer_id,agency_id FROM offer_targets').fetchall():targets.setdefault(r['offer_id'],set()).add(r['agency_id'])
         c.close();return render_template('admin_offers.html',user=u,offers=offers,hotels=hotels,agencies=agencies,offer_targets=targets)
