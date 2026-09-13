@@ -26,16 +26,13 @@ def register_reports(app, admin_required, db, current_user):
     @app.before_request
     def portal_extensions_and_staff_access():
         c=db();ensure_permissions_table(c);c.commit();c.close()
-
         if request.path=='/request' and request.method=='POST':
             u=current_user()
             if not u or u['role']!='agency':return None
             lang=u['language'] or 'ar';c=db();agency=c.execute("SELECT id FROM agencies WHERE user_id=?",(u['id'],)).fetchone()
             if not agency:c.close();return None
-            hv=request.form.get('hotel_id','').strip();city=request.form.get('city','').strip();checkin=request.form.get('checkin','').strip();checkout=request.form.get('checkout','').strip();nationality=request.form.get('nationality','').strip();meal=request.form.get('meal','').strip();notes=request.form.get('notes','').strip()
-            valid=True;hotel_id=None;any_hotel=(hv=='any')
-            try:
-                rooms=int(request.form.get('rooms','0'));persons=int(request.form.get('persons','0'))
+            hv=request.form.get('hotel_id','').strip();city=request.form.get('city','').strip();checkin=request.form.get('checkin','').strip();checkout=request.form.get('checkout','').strip();nationality=request.form.get('nationality','').strip();meal=request.form.get('meal','').strip();notes=request.form.get('notes','').strip();valid=True;hotel_id=None;any_hotel=(hv=='any')
+            try:rooms=int(request.form.get('rooms','0'));persons=int(request.form.get('persons','0'))
             except (TypeError,ValueError):rooms=0;persons=0;valid=False
             if rooms<1 or rooms>500 or persons<1 or persons>5000:valid=False
             if city not in ('Makkah','Madinah'):valid=False
@@ -45,23 +42,14 @@ def register_reports(app, admin_required, db, current_user):
             except ValueError:valid=False
             if not nationality or len(nationality)>100 or len(notes)>2000:valid=False
             if meal not in ('RO','F.B Indo','F.B Malaysian'):valid=False
-            if any_hotel:
-                hotel_id=None
-            else:
+            if not any_hotel:
                 try:hotel_id=int(hv)
                 except (TypeError,ValueError):valid=False
                 if hotel_id:
                     hotel=c.execute("SELECT id,city,active FROM hotels WHERE id=?",(hotel_id,)).fetchone()
                     if not hotel or not hotel['active'] or hotel['city']!=city:valid=False
-            if not valid:
-                c.close();flash(msg(lang,'request_bad'));return redirect(url_for('new_request'))
-            cur=c.execute("INSERT INTO requests(agency_id,hotel_id,any_hotel,city,checkin,checkout,rooms,persons,nationality,meal,notes,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",(agency['id'],hotel_id,1 if any_hotel else 0,city,checkin,checkout,rooms,persons,nationality,meal,notes,'sent',datetime.utcnow().isoformat()))
-            rid=cur.lastrowid
-            c.execute("INSERT INTO notifications(user_id,type,ref_id,title,body,link,created_at) VALUES(?,?,?,?,?,?,?)",(u['id'],'request',rid,'تحديث الطلب' if lang=='ar' else 'Request update',f'#{rid}','/account',datetime.utcnow().isoformat()))
-            audit(c,u['id'],'request_submit',f"request={rid}, agency={agency['id']}");c.commit();c.close()
-            success={'ar':'تم إرسال طلبك إلى مروج الذهبية بنجاح. سيتواصل معك فريق الحجوزات عبر WhatsApp لتأكيد التوفر والسعر.','en':'Your request was sent to Murooj Golden successfully. Our reservations team will contact you on WhatsApp to confirm availability and price.','id':'Permintaan Anda berhasil dikirim ke Murooj Golden. Tim reservasi akan menghubungi Anda melalui WhatsApp untuk mengonfirmasi ketersediaan dan harga.','ms':'Permintaan anda berjaya dihantar kepada Murooj Golden. Pasukan tempahan akan menghubungi anda melalui WhatsApp untuk mengesahkan ketersediaan dan harga.'}
-            flash(success.get(lang,success['en']));return redirect(url_for('account'))
-
+            if not valid:c.close();flash(msg(lang,'request_bad'));return redirect(url_for('new_request'))
+            cur=c.execute("INSERT INTO requests(agency_id,hotel_id,any_hotel,city,checkin,checkout,rooms,persons,nationality,meal,notes,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",(agency['id'],hotel_id,1 if any_hotel else 0,city,checkin,checkout,rooms,persons,nationality,meal,notes,'sent',datetime.utcnow().isoformat()));rid=cur.lastrowid;c.execute("INSERT INTO notifications(user_id,type,ref_id,title,body,link,created_at) VALUES(?,?,?,?,?,?,?)",(u['id'],'request',rid,'تحديث الطلب' if lang=='ar' else 'Request update',f'#{rid}','/account',datetime.utcnow().isoformat()));audit(c,u['id'],'request_submit',f"request={rid}, agency={agency['id']}");c.commit();c.close();flash({'ar':'تم إرسال طلبك إلى مروج الذهبية بنجاح. سيتواصل معك فريق الحجوزات عبر WhatsApp لتأكيد التوفر والسعر.','en':'Your request was sent to Murooj Golden successfully. Our reservations team will contact you on WhatsApp to confirm availability and price.','id':'Permintaan Anda berhasil dikirim ke Murooj Golden. Tim reservasi akan menghubungi Anda melalui WhatsApp untuk mengonfirmasi ketersediaan dan harga.','ms':'Permintaan anda berjaya dihantar kepada Murooj Golden. Pasukan tempahan akan menghubungi anda melalui WhatsApp untuk mengesahkan ketersediaan dan harga.'}.get(lang,'Request sent.'));return redirect(url_for('account'))
         if request.path=='/account' and request.method=='POST':
             u=current_user()
             if not u or u['role']!='agency':return None
@@ -79,7 +67,6 @@ def register_reports(app, admin_required, db, current_user):
                 if check_password_hash(u['password_hash'],np):c.close();flash(msg(lang,'same'));return redirect(url_for('account'))
                 c.execute("UPDATE users SET password_hash=? WHERE id=?",(generate_password_hash(np),u['id']));audit(c,u['id'],'agency_password_change',f"agency={agency['id']}");c.commit();c.close();flash(msg(lang,'password'));return redirect(url_for('account'))
             c.close();return redirect(url_for('account'))
-
         if request.path=='/admin/settings' and request.method=='POST':
             u=current_user()
             if u and u['role']=='super_admin':
@@ -146,3 +133,6 @@ def register_reports(app, admin_required, db, current_user):
         ws.freeze_panes='A2';ws.auto_filter.ref=ws.dimensions
         for i in range(1,len(headers)+1):max_len=max(len(str(ws.cell(row=j,column=i).value or '')) for j in range(1,min(ws.max_row,500)+1));ws.column_dimensions[get_column_letter(i)].width=min(max(max_len+2,12),32)
         summary=wb.create_sheet('Summary');summary.append(['MUROOJ GOLDEN B2B','Report Summary']);summary.append(['Requests',len(rows)]);summary.append(['Rooms',sum((r['rooms'] or 0) for r in rows)]);summary.append(['Persons',sum((r['persons'] or 0) for r in rows)]);summary.append(['Agencies',len(set(r['agency_id'] for r in rows))]);summary['A1'].font=Font(bold=True);summary['B1'].font=Font(bold=True);out=BytesIO();wb.save(out);out.seek(0);return send_file(out,as_attachment=True,download_name='murooj-golden-full-report.xlsx',mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+    from offer_extensions import register_offer_extensions
+    register_offer_extensions(app,db,current_user)
