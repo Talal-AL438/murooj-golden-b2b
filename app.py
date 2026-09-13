@@ -16,10 +16,10 @@ LANGS={
 "ms":{"portal":"Portal B2B Murooj Golden","home":"Utama","hotels":"Hotel","offers":"Tawaran","quick_request":"Permintaan Pantas","login":"Log Masuk","register":"Daftar Agensi","logout":"Log Keluar","account":"Akaun Saya","admin":"Pentadbir","hero":"Rakan Hotel Dipercayai Anda di Makkah dan Madinah","sub":"Portal B2B untuk agensi pelancongan, Haji dan Umrah.","makkah":"Makkah","madinah":"Madinah","view":"Lihat Hotel","location":"Lokasi","send_request":"Hantar Permintaan","agency_name":"Nama Agensi","country":"Negara","contact_name":"Nama Pegawai","whatsapp":"Nombor WhatsApp","email":"E-mel","password":"Kata Laluan","privacy":"Saya bersetuju dengan Terma dan Dasar Privasi","marketing":"Saya bersetuju menerima tawaran dan kemas kini pemasaran melalui WhatsApp","create_account":"Cipta Akaun","checkin":"Daftar Masuk","checkout":"Daftar Keluar","rooms":"Bilangan Bilik","persons":"Bilangan Orang","nationality":"Kewarganegaraan Kumpulan","meal":"Pelan Makanan","notes":"Catatan","status":"Status","repeat":"Ulang Permintaan","sent":"Dihantar","contacted":"Dihubungi melalui WhatsApp","closed":"Ditutup","submit":"Hantar","search":"Cari","new_requests":"Permintaan Baharu","agencies":"Agensi","reports":"Laporan","employees":"Pengguna & Kebenaran","settings":"Tetapan","audit":"Log Aktiviti","save":"Simpan","add":"Tambah","edit":"Edit","hide":"Sembunyi","show":"Tunjuk","language":"Bahasa","any_hotel":"Mana-mana Hotel Tersedia","room_only":"Tanpa Makanan","indo_fb":"Papan Penuh Indonesia","malay_fb":"Papan Penuh Malaysia","success_request":"Permintaan anda berjaya dihantar kepada Murooj Golden. Pasukan tempahan akan menghubungi anda melalui WhatsApp untuk mengesahkan ketersediaan dan harga.","welcome":"Selamat datang","special_offers":"Tawaran Istimewa","city":"Bandar","hotel":"Hotel","actions":"Tindakan","date":"Tarikh","job_title":"Jawatan","mobile":"Telefon","role":"Peranan","active":"Aktif","suspended":"Digantung","verified":"Disahkan","category":"Kategori","last_request":"Permintaan Terakhir","request_count":"Jumlah Permintaan","registration_date":"Tarikh Daftar","no_active_offers":"Tiada tawaran aktif buat masa ini"}}
 
 def db():
-    conn=sqlite3.connect(DB_PATH); conn.row_factory=sqlite3.Row; return conn
+    conn=sqlite3.connect(DB_PATH);conn.row_factory=sqlite3.Row;return conn
 
 def init_db():
-    conn=db(); conn.executescript("""
+    conn=db();conn.executescript("""
     CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY,value TEXT);
     CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,email TEXT UNIQUE NOT NULL,password_hash TEXT NOT NULL,role TEXT NOT NULL DEFAULT 'agency',name TEXT,job_title TEXT,mobile TEXT,language TEXT DEFAULT 'ar',active INTEGER DEFAULT 1,created_at TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS agencies (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER UNIQUE NOT NULL,agency_name TEXT NOT NULL,country TEXT NOT NULL,contact_name TEXT NOT NULL,whatsapp TEXT NOT NULL,category TEXT DEFAULT 'New',verified INTEGER DEFAULT 0,internal_notes TEXT DEFAULT '',marketing_consent INTEGER DEFAULT 1,created_at TEXT NOT NULL,FOREIGN KEY(user_id) REFERENCES users(id));
@@ -29,21 +29,21 @@ def init_db():
     CREATE TABLE IF NOT EXISTS offers (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,hotel_id INTEGER,start_date TEXT,end_date TEXT,meal TEXT,note TEXT,audience TEXT DEFAULT 'all',language_mode TEXT DEFAULT 'auto',manual_language TEXT DEFAULT 'ar',active INTEGER DEFAULT 1,pinned INTEGER DEFAULT 0,sort_order INTEGER DEFAULT 0,created_at TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER,action TEXT NOT NULL,details TEXT,created_at TEXT NOT NULL);
     """)
-    for k,v in {"company_name":"مروج الذهبية للاستثمار","brand":"MUROOJ GOLDEN","whatsapp":"966550558014","email":"talal_alaqely@icloud.com","announcement":"","announcement_active":"0"}.items(): conn.execute("INSERT OR IGNORE INTO settings(key,value) VALUES (?,?)",(k,v))
+    for k,v in {"company_name":"مروج الذهبية للاستثمار","brand":"MUROOJ GOLDEN","whatsapp":"966550558014","email":"talal_alaqely@icloud.com","announcement":"","announcement_active":"0"}.items():conn.execute("INSERT OR IGNORE INTO settings(key,value) VALUES (?,?)",(k,v))
     if conn.execute("SELECT COUNT(*) c FROM hotels").fetchone()["c"]==0:
-        now=datetime.utcnow().isoformat(); conn.execute("INSERT INTO hotels(name_ar,name_en,city,map_url,services,meals,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?)",("فندق ندى أجياد","NADA AJYAD HOTEL","Makkah","https://maps.app.goo.gl/PzgRgz23LRDex1Wq7?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",1,1,now)); conn.execute("INSERT INTO hotels(name_ar,name_en,city,map_url,services,meals,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?)",("فندق سواعد الخير","SAWAEED AL KHAIR HOTEL","Makkah","https://maps.app.goo.gl/GcA7zZYftYcuYx9N6?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",1,2,now))
+        now=datetime.utcnow().isoformat();conn.execute("INSERT INTO hotels(name_ar,name_en,city,map_url,services,meals,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?)",("فندق ندى أجياد","NADA AJYAD HOTEL","Makkah","https://maps.app.goo.gl/PzgRgz23LRDex1Wq7?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",1,1,now));conn.execute("INSERT INTO hotels(name_ar,name_en,city,map_url,services,meals,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?)",("فندق سواعد الخير","SAWAEED AL KHAIR HOTEL","Makkah","https://maps.app.goo.gl/GcA7zZYftYcuYx9N6?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",1,2,now))
     if conn.execute("SELECT COUNT(*) c FROM hotel_images").fetchone()["c"]==0:
-        now=datetime.utcnow().isoformat(); hotels=conn.execute("SELECT id,name_en FROM hotels").fetchall()
+        now=datetime.utcnow().isoformat();hotels=conn.execute("SELECT id,name_en FROM hotels").fetchall()
         for h in hotels:
-            if h["name_en"]=="NADA AJYAD HOTEL": conn.execute("INSERT INTO hotel_images(hotel_id,image_url,sort_order,created_at) VALUES(?,?,?,?)",(h["id"],"/static/ندى.jfif",1,now))
-            elif h["name_en"]=="SAWAEED AL KHAIR HOTEL": conn.execute("INSERT INTO hotel_images(hotel_id,image_url,sort_order,created_at) VALUES(?,?,?,?)",(h["id"],"/static/سواعد الخير.jfif",1,now))
-    conn.commit(); conn.close()
+            if h["name_en"]=="NADA AJYAD HOTEL":conn.execute("INSERT INTO hotel_images(hotel_id,image_url,sort_order,created_at) VALUES(?,?,?,?)",(h["id"],"/static/ندى.jfif",1,now))
+            elif h["name_en"]=="SAWAEED AL KHAIR HOTEL":conn.execute("INSERT INTO hotel_images(hotel_id,image_url,sort_order,created_at) VALUES(?,?,?,?)",(h["id"],"/static/سواعد الخير.jfif",1,now))
+    conn.commit();conn.close()
 
 @app.before_request
-def ensure(): init_db()
-def t(): return LANGS.get(session.get("lang","ar"),LANGS["ar"])
+def ensure():init_db()
+def t():return LANGS.get(session.get("lang","ar"),LANGS["ar"])
 @app.context_processor
-def inject(): return {"T":t(),"lang":session.get("lang","ar")}
+def inject():return {"T":t(),"lang":session.get("lang","ar")}
 def current_user():
     uid=session.get("user_id")
     if not uid:return None
@@ -83,6 +83,11 @@ def hotel_detail(hid):
     c=db();hotel=c.execute("SELECT * FROM hotels WHERE id=? AND active=1",(hid,)).fetchone()
     if not hotel:c.close();return "hotel not found",404
     images=c.execute("SELECT * FROM hotel_images WHERE hotel_id=? ORDER BY sort_order,id",(hid,)).fetchall();c.close();return render_template("hotel.html",hotel=hotel,images=images,user=current_user())
+@app.route("/offer/<int:oid>")
+def offer_detail(oid):
+    c=db();today=datetime.utcnow().date().isoformat();offer=c.execute("""SELECT o.*,h.name_ar,h.name_en,h.city,(SELECT image_url FROM hotel_images i WHERE i.hotel_id=o.hotel_id ORDER BY i.sort_order,i.id LIMIT 1) cover_image FROM offers o LEFT JOIN hotels h ON h.id=o.hotel_id WHERE o.id=? AND o.active=1 AND (o.end_date='' OR o.end_date IS NULL OR o.end_date>=?)""",(oid,today)).fetchone();c.close()
+    if not offer:return "offer not found",404
+    return render_template("offer.html",offer=offer,user=current_user())
 @app.route("/about")
 def about():return render_template("about.html",user=current_user())
 @app.route("/legal")
@@ -185,8 +190,18 @@ def hotel_toggle(hid):
 @admin_required
 def admin_offers():
     c=db()
-    if request.method=="POST":c.execute("INSERT INTO offers(title,hotel_id,start_date,end_date,meal,note,audience,language_mode,manual_language,active,pinned,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",(request.form["title"],request.form.get("hotel_id") or None,request.form.get("start_date",""),request.form.get("end_date",""),request.form.get("meal",""),request.form.get("note",""),request.form.get("audience","all"),request.form.get("language_mode","auto"),request.form.get("manual_language","ar"),1,1 if request.form.get("pinned") else 0,int(request.form.get("sort_order",0)),datetime.utcnow().isoformat()));c.commit();log("offer_add",request.form["title"])
+    if request.method=="POST":
+        action=request.form.get("action","add")
+        if action=="toggle":
+            oid=int(request.form["oid"]);row=c.execute("SELECT active FROM offers WHERE id=?",(oid,)).fetchone()
+            if not row:c.close();return "offer not found",404
+            c.execute("UPDATE offers SET active=? WHERE id=?",(0 if row["active"] else 1,oid));c.commit();c.close();log("offer_toggle",f"offer={oid}");return redirect(url_for("admin_offers"))
+        data=(request.form["title"].strip(),request.form.get("hotel_id") or None,request.form.get("start_date",""),request.form.get("end_date",""),request.form.get("meal","").strip(),request.form.get("note","").strip(),request.form.get("audience","all"),request.form.get("language_mode","auto"),request.form.get("manual_language","ar"),1 if request.form.get("pinned") else 0,int(request.form.get("sort_order",0)))
+        if action=="edit":
+            oid=int(request.form["oid"]);c.execute("UPDATE offers SET title=?,hotel_id=?,start_date=?,end_date=?,meal=?,note=?,audience=?,language_mode=?,manual_language=?,pinned=?,sort_order=? WHERE id=?",data+(oid,));c.commit();c.close();log("offer_edit",f"offer={oid}");return redirect(url_for("admin_offers"))
+        c.execute("INSERT INTO offers(title,hotel_id,start_date,end_date,meal,note,audience,language_mode,manual_language,active,pinned,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?,1,?,?,?)",data+(datetime.utcnow().isoformat(),));c.commit();c.close();log("offer_add",data[0]);return redirect(url_for("admin_offers"))
     offers=c.execute("SELECT o.*,h.name_en FROM offers o LEFT JOIN hotels h ON h.id=o.hotel_id ORDER BY o.pinned DESC,o.sort_order,o.id DESC").fetchall();hotels=c.execute("SELECT * FROM hotels WHERE active=1 ORDER BY sort_order,id").fetchall();c.close();return render_template("admin_offers.html",user=current_user(),offers=offers,hotels=hotels)
+
 @app.route("/admin/agencies",methods=["GET","POST"])
 @admin_required
 def admin_agencies():
