@@ -306,13 +306,42 @@ def new_request():
     conn.close()
     return render_template("request.html", hotels=hotels, user=u)
 
-@app.route("/account")
+@app.route("/account", methods=["GET","POST"])
 @login_required
 def account():
     u=current_user()
     if u["role"]!="agency": return redirect(url_for("admin"))
     conn=db()
     agency=conn.execute("SELECT * FROM agencies WHERE user_id=?",(u["id"],)).fetchone()
+    if request.method=="POST":
+        action=request.form.get("action","")
+        messages={
+          "ar":{"profile":"تم تحديث بيانات الحساب بنجاح.","password":"تم تغيير كلمة المرور بنجاح.","bad_password":"كلمة المرور الحالية غير صحيحة.","short":"يجب أن تكون كلمة المرور الجديدة 8 أحرف على الأقل."},
+          "en":{"profile":"Account details updated successfully.","password":"Password changed successfully.","bad_password":"Current password is incorrect.","short":"New password must be at least 8 characters."},
+          "id":{"profile":"Data akun berhasil diperbarui.","password":"Kata sandi berhasil diubah.","bad_password":"Kata sandi saat ini salah.","short":"Kata sandi baru minimal 8 karakter."},
+          "ms":{"profile":"Maklumat akaun berjaya dikemas kini.","password":"Kata laluan berjaya ditukar.","bad_password":"Kata laluan semasa tidak betul.","short":"Kata laluan baharu mestilah sekurang-kurangnya 8 aksara."}
+        }
+        msg=messages.get(session.get("lang","ar"),messages["ar"])
+        if action=="profile":
+            contact_name=request.form.get("contact_name","").strip()
+            country=request.form.get("country","").strip()
+            whatsapp=request.form.get("whatsapp","").strip()
+            if contact_name and country and whatsapp:
+                conn.execute("UPDATE agencies SET contact_name=?,country=?,whatsapp=? WHERE id=?",(contact_name,country,whatsapp,agency["id"]))
+                conn.execute("UPDATE users SET name=?,mobile=? WHERE id=?",(contact_name,whatsapp,u["id"]))
+                conn.commit(); flash(msg["profile"])
+        elif action=="password":
+            current_password=request.form.get("current_password","")
+            new_password=request.form.get("new_password","")
+            if not check_password_hash(u["password_hash"],current_password):
+                flash(msg["bad_password"])
+            elif len(new_password)<8:
+                flash(msg["short"])
+            else:
+                conn.execute("UPDATE users SET password_hash=? WHERE id=?",(generate_password_hash(new_password),u["id"]))
+                conn.commit(); flash(msg["password"])
+        conn.close()
+        return redirect(url_for("account"))
     reqs=conn.execute("""SELECT r.*,h.name_ar,h.name_en FROM requests r
                         LEFT JOIN hotels h ON h.id=r.hotel_id WHERE r.agency_id=? ORDER BY r.id DESC""",(agency["id"],)).fetchall()
     conn.close()
