@@ -291,6 +291,9 @@ def admin_settings():
 @super_required
 def admin_audit():
     c=db();rows=c.execute("SELECT a.*,u.email,u.name FROM audit a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 300").fetchall();c.close();return render_template("admin_audit.html",user=current_user(),rows=rows)
+from reports import register_reports
+register_reports(app,admin_required,db,current_user)
+
 @app.route("/health")
 def health():return jsonify({"ok":True})
 if __name__=="__main__":init_db();app.run(host="127.0.0.1",port=5000,debug=True)
