@@ -381,19 +381,50 @@ def admin_offers():
     conn.close()
     return render_template("admin_offers.html", user=current_user(), offers=offers, hotels=hotels)
 
-@app.route("/admin/agencies")
+@app.route("/admin/agencies", methods=["GET","POST"])
 @admin_required
 def admin_agencies():
-    q=request.args.get("q","").strip()
     conn=db()
-    sql="""SELECT a.*,u.email,
+    if request.method=="POST":
+        try:
+            aid=int(request.form.get("aid","0"))
+        except ValueError:
+            conn.close(); return "bad agency",400
+        agency=conn.execute("SELECT * FROM agencies WHERE id=?",(aid,)).fetchone()
+        if not agency:
+            conn.close(); return "agency not found",404
+        action=request.form.get("action","save")
+        if action=="save":
+            category=request.form.get("category","New")
+            if category not in ("New","Active","VIP","Suspended"):
+                conn.close(); return "bad category",400
+            verified=1 if request.form.get("verified") else 0
+            notes=request.form.get("internal_notes","").strip()
+            conn.execute("UPDATE agencies SET category=?,verified=?,internal_notes=? WHERE id=?",(category,verified,notes,aid))
+            conn.execute("UPDATE users SET active=? WHERE id=?",(0 if category=="Suspended" else 1,agency["user_id"]))
+        elif action=="toggle":
+            user=conn.execute("SELECT active FROM users WHERE id=?",(agency["user_id"],)).fetchone()
+            new_active=0 if user and user["active"] else 1
+            conn.execute("UPDATE users SET active=? WHERE id=?",(new_active,agency["user_id"]))
+            if not new_active:
+                conn.execute("UPDATE agencies SET category='Suspended' WHERE id=?",(aid,))
+            elif agency["category"]=="Suspended":
+                conn.execute("UPDATE agencies SET category='Active' WHERE id=?",(aid,))
+        else:
+            conn.close(); return "bad action",400
+        conn.commit(); conn.close()
+        log("agency_update", f"agency={aid}, action={action}")
+        return redirect(url_for("admin_agencies"))
+
+    q=request.args.get("q","").strip()
+    sql="""SELECT a.*,u.email,u.active,
            (SELECT COUNT(*) FROM requests r WHERE r.agency_id=a.id) request_count,
            (SELECT MAX(created_at) FROM requests r WHERE r.agency_id=a.id) last_request
            FROM agencies a JOIN users u ON u.id=a.user_id"""
     params=[]
     if q:
-        sql += " WHERE a.agency_name LIKE ? OR a.country LIKE ? OR a.contact_name LIKE ?"
-        params=[f"%{q}%"]*3
+        sql += " WHERE a.agency_name LIKE ? OR a.country LIKE ? OR a.contact_name LIKE ? OR u.email LIKE ?"
+        params=[f"%{q}%"]*4
     sql += " ORDER BY a.id DESC"
     agencies=conn.execute(sql,params).fetchall(); conn.close()
     return render_template("admin_agencies.html", user=current_user(), agencies=agencies, q=q)
