@@ -14,20 +14,23 @@
       <form method="post">
         <input type="hidden" name="action" value="profile">
         <label>{{ T.agency_name }}<input value="{{ agency.agency_name }}" disabled></label>
-        <label>{{ T.contact_name }}<input name="contact_name" value="{{ agency.contact_name }}" autocomplete="name" required></label>
-        <label>{{ T.country }}<input name="country" value="{{ agency.country }}" autocomplete="country-name" required></label>
-        <label>{{ T.whatsapp }}<input type="tel" name="whatsapp" value="{{ agency.whatsapp }}" autocomplete="tel" required></label>
+        <label>{{ T.contact_name }}<input name="contact_name" value="{{ agency.contact_name }}" minlength="2" maxlength="120" autocomplete="name" required></label>
+        <label>{{ T.country }}<input name="country" value="{{ agency.country }}" minlength="2" maxlength="100" autocomplete="country-name" required></label>
+        <label>{{ T.whatsapp }}<input type="tel" name="whatsapp" value="{{ agency.whatsapp }}" minlength="8" maxlength="24" autocomplete="tel" inputmode="tel" required></label>
         <label>{{ T.email }}<input value="{{ user.email }}" disabled></label>
+        <p style="opacity:.72">{% if lang=='ar' %}اسم الوكالة والبريد الإلكتروني ثابتان. لتغييرهما تواصل مع الإدارة.{% elif lang=='id' %}Nama agen dan email tetap. Hubungi admin untuk mengubahnya.{% elif lang=='ms' %}Nama agensi dan e-mel adalah tetap. Hubungi pentadbir untuk mengubahnya.{% else %}Agency name and email are fixed. Contact administration to change them.{% endif %}</p>
         <button class="btn gold" type="submit">{{ T.save }}</button>
       </form>
     </section>
 
     <section class="card form">
       <h3>{{ T.password }}</h3>
-      <form method="post">
+      <form method="post" id="passwordForm">
         <input type="hidden" name="action" value="password">
         <label>{% if lang=='ar' %}كلمة المرور الحالية{% elif lang=='id' %}Kata sandi saat ini{% elif lang=='ms' %}Kata laluan semasa{% else %}Current Password{% endif %}<input type="password" name="current_password" autocomplete="current-password" required></label>
-        <label>{% if lang=='ar' %}كلمة المرور الجديدة{% elif lang=='id' %}Kata sandi baru{% elif lang=='ms' %}Kata laluan baharu{% else %}New Password{% endif %}<input type="password" name="new_password" minlength="8" autocomplete="new-password" required></label>
+        <label>{% if lang=='ar' %}كلمة المرور الجديدة{% elif lang=='id' %}Kata sandi baru{% elif lang=='ms' %}Kata laluan baharu{% else %}New Password{% endif %}<input id="newPassword" type="password" name="new_password" minlength="8" autocomplete="new-password" required></label>
+        <label>{% if lang=='ar' %}تأكيد كلمة المرور الجديدة{% elif lang=='id' %}Konfirmasi kata sandi baru{% elif lang=='ms' %}Sahkan kata laluan baharu{% else %}Confirm New Password{% endif %}<input id="confirmPassword" type="password" name="confirm_password" minlength="8" autocomplete="new-password" required></label>
+        <p id="passwordHint" style="opacity:.72">{% if lang=='ar' %}استخدم 8 أحرف على الأقل، ولا تشارك كلمة المرور مع أي شخص.{% elif lang=='id' %}Gunakan minimal 8 karakter dan jangan bagikan kata sandi Anda.{% elif lang=='ms' %}Gunakan sekurang-kurangnya 8 aksara dan jangan kongsi kata laluan anda.{% else %}Use at least 8 characters and never share your password.{% endif %}</p>
         <button class="btn gold" type="submit">{{ T.save }}</button>
       </form>
       <hr>
@@ -50,4 +53,8 @@
     {% else %}<tr><td colspan="7">—</td></tr>{% endfor %}
   </table></div>
 </main>
+<script>
+const pf=document.getElementById('passwordForm'),np=document.getElementById('newPassword'),cp=document.getElementById('confirmPassword');
+if(pf){pf.addEventListener('submit',e=>{if(np.value!==cp.value){e.preventDefault();cp.setCustomValidity({{ ('كلمتا المرور غير متطابقتين.' if lang=='ar' else 'Passwords do not match.')|tojson }});cp.reportValidity();}else{cp.setCustomValidity('');}});cp.addEventListener('input',()=>cp.setCustomValidity(''));}
+</script>
 {% endblock %}
