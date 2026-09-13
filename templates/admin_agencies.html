@@ -1,5 +1,88 @@
+{% extends 'base.html' %}
+{% block body %}
+<main class="page-shell">
+  <div class="adminnav">
+    <a href="{{ url_for('admin') }}">{{ T.admin }}</a>
+    <a class="active" href="{{ url_for('admin_agencies') }}">{{ T.agencies }}</a>
+  </div>
 
-{% extends 'base.html' %}{% block body %}<main><div class="adminnav"><a href="{{url_for('admin')}}">{{T.admin}}</a><a href="{{url_for('admin_agencies')}}">{{T.agencies}}</a></div>
-<h1>{{T.agencies}}</h1><form><input name="q" value="{{q}}" placeholder="{{T.search}}"><button class="btn gold">{{T.search}}</button></form>
-<div class="tablewrap"><table><tr><th>{{T.agency_name}}</th><th>{{T.country}}</th><th>{{T.contact_name}}</th><th>{{T.whatsapp}}</th><th>{{T.email}}</th><th>{{T.category}}</th><th>{{T.verified}}</th><th>{{T.request_count}}</th><th>{{T.last_request}}</th></tr>
-{% for a in agencies %}<tr><td>{{a.agency_name}}</td><td>{{a.country}}</td><td>{{a.contact_name}}</td><td><a href="https://wa.me/{{a.whatsapp|replace('+','')|replace(' ','')}}" target="_blank">{{a.whatsapp}}</a></td><td>{{a.email}}</td><td>{{a.category}}</td><td>{{'✓' if a.verified else '—'}}</td><td>{{a.request_count}}</td><td>{{a.last_request or '—'}}</td></tr>{% endfor %}</table></div></main>{% endblock %}
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">MUROOJ GOLDEN B2B</span>
+      <h1>{{ T.agencies }}</h1>
+    </div>
+  </div>
+
+  <form class="card form" method="get" style="margin-bottom:18px">
+    <div class="form-grid">
+      <label>{{ T.search }}
+        <input name="q" value="{{ q }}" placeholder="{{ T.agency_name }} / {{ T.country }} / {{ T.contact_name }}">
+      </label>
+      <label>{{ T.category }}
+        <select id="agency-category-filter">
+          <option value="all">All</option>
+          <option value="New">New</option>
+          <option value="Active">Active</option>
+          <option value="VIP">VIP</option>
+          <option value="Suspended">Suspended</option>
+        </select>
+      </label>
+    </div>
+    <button class="btn gold" type="submit">{{ T.search }}</button>
+  </form>
+
+  <div class="tablewrap">
+    <table id="agencies-table">
+      <thead>
+        <tr>
+          <th>{{ T.agency_name }}</th>
+          <th>{{ T.country }}</th>
+          <th>{{ T.contact_name }}</th>
+          <th>{{ T.whatsapp }}</th>
+          <th>{{ T.email }}</th>
+          <th>{{ T.category }}</th>
+          <th>{{ T.verified }}</th>
+          <th>{{ T.request_count }}</th>
+          <th>{{ T.last_request }}</th>
+          <th>{{ T.actions }}</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for a in agencies %}
+        <tr data-category="{{ a.category or 'New' }}">
+          <td>
+            <strong>{{ a.agency_name }}</strong>
+            {% if a.internal_notes %}<br><small>{{ a.internal_notes }}</small>{% endif %}
+          </td>
+          <td>{{ a.country }}</td>
+          <td>{{ a.contact_name }}</td>
+          <td dir="ltr">{{ a.whatsapp }}</td>
+          <td>{{ a.email }}</td>
+          <td><span class="status {{ (a.category or 'New')|lower }}">{{ a.category or 'New' }}</span></td>
+          <td>{% if a.verified %}<span class="tag">✓ {{ T.verified }}</span>{% else %}—{% endif %}</td>
+          <td>{{ a.request_count }}</td>
+          <td>{{ a.last_request or '—' }}</td>
+          <td>
+            <a class="btn small gold" href="https://wa.me/{{ a.whatsapp|replace('+','')|replace(' ','')|replace('-','')|replace('(','')|replace(')','') }}" target="_blank" rel="noopener">WhatsApp</a>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="10">—</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+(function () {
+  const filter = document.getElementById('agency-category-filter');
+  const rows = Array.from(document.querySelectorAll('#agencies-table tbody tr[data-category]'));
+  filter.addEventListener('change', function () {
+    rows.forEach(function (row) {
+      row.hidden = filter.value !== 'all' && row.dataset.category !== filter.value;
+    });
+  });
+})();
+</script>
+{% endblock %}
