@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block body %}
+<main class="page-shell">
+  <section class="page-intro">
+    <span class="eyebrow">MUROOJ GOLDEN · {{ T.makkah if hotel.city=='Makkah' else T.madinah }}</span>
+    <h1><span>{{hotel.name_ar}}</span><br><span translate="no">{{hotel.name_en}}</span></h1>
+  </section>
+
+  {% if images %}
+  <section class="hotel-gallery">
+    {% for image in images %}<img class="hotel-image" src="{{image.image_url}}" alt="{{hotel.name_en}}">{% endfor %}
+  </section>
+  {% endif %}
+
+  <section class="grid" style="margin-top:22px">
+    <article class="card">
+      <h2>{{ 'الخدمات' if lang=='ar' else ('Fasilitas' if lang=='id' else ('Kemudahan' if lang=='ms' else 'Services')) }}</h2>
+      <div class="hotel-tags">{% for s in (hotel.services or '').split('|') if s %}<span class="tag">{{s}}</span>{% endfor %}</div>
+    </article>
+    <article class="card">
+      <h2>{{T.meal}}</h2>
+      <div class="hotel-tags"><span class="tag">{{T.room_only}}</span><span class="tag">{{T.indo_fb}}</span><span class="tag">{{T.malay_fb}}</span></div>
+    </article>
+  </section>
+
+  <div class="hotel-actions" style="margin-top:22px">
+    {% if hotel.map_url %}<a class="btn dark" target="_blank" rel="noopener" href="{{hotel.map_url}}">{{T.location}}</a>{% endif %}
+    {% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request',hotel=hotel.id,city=hotel.city)}}">{{T.send_request}}</a>{% else %}<a class="btn gold" href="{{url_for('login')}}">{{T.login}}</a>{% endif %}
+  </div>
+</main>
+{% endblock %}
