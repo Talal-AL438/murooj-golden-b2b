@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import request, redirect, url_for, render_template
+from flask import request, redirect, url_for, render_template, flash
 
 
 def register_offer_extensions(app, db, current_user):
@@ -16,6 +16,18 @@ def register_offer_extensions(app, db, current_user):
     @app.before_request
     def ensure_offer_schema():
         ensure_schema()
+        if request.path=='/register' and request.method=='POST':
+            lang=request.form.get('language','ar')
+            if lang not in ('ar','en','id','ms'):lang='ar'
+            messages={
+                'ar':{'bad':'يرجى إدخال بيانات الوكالة بشكل صحيح.','password':'يجب أن تكون كلمة المرور 8 أحرف على الأقل.','consent':'يجب الموافقة على الشروط واستقبال تحديثات WhatsApp.'},
+                'en':{'bad':'Please enter valid agency details.','password':'Password must be at least 8 characters.','consent':'You must accept the terms and WhatsApp updates.'},
+                'id':{'bad':'Masukkan data agen yang valid.','password':'Kata sandi minimal 8 karakter.','consent':'Anda harus menyetujui syarat dan pembaruan WhatsApp.'},
+                'ms':{'bad':'Sila masukkan maklumat agensi yang sah.','password':'Kata laluan mestilah sekurang-kurangnya 8 aksara.','consent':'Anda mesti bersetuju dengan terma dan kemas kini WhatsApp.'}}
+            m=messages[lang];agency=request.form.get('agency_name','').strip();country=request.form.get('country','').strip();contact=request.form.get('contact_name','').strip();wa=request.form.get('whatsapp','').strip();email=request.form.get('email','').strip().lower();password=request.form.get('password','');digits=''.join(ch for ch in wa if ch.isdigit())
+            if len(password)<8:flash(m['password']);return redirect(url_for('register'))
+            if not request.form.get('privacy') or not request.form.get('marketing'):flash(m['consent']);return redirect(url_for('register'))
+            if len(agency)<2 or len(agency)>150 or len(country)<2 or len(country)>100 or len(contact)<2 or len(contact)>120 or len(digits)<8 or len(digits)>15 or len(email)>254 or '@' not in email or '.' not in email.rsplit('@',1)[-1]:flash(m['bad']);return redirect(url_for('register'))
 
     def audit(action,details=''):
         u=current_user();c=db();c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(u['id'] if u else None,action,details,datetime.utcnow().isoformat()));c.commit();c.close()
