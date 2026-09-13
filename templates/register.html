@@ -1,9 +1,55 @@
+{% extends 'base.html' %}
+{% block body %}
+<main class="page-shell">
+  <section class="page-intro">
+    <span class="eyebrow">MUROOJ GOLDEN B2B</span>
+    <h1>{{ T.register }}</h1>
+    <p>{{ T.sub }}</p>
+  </section>
 
-{% extends 'base.html' %}{% block body %}<main><h1>{{T.register}}</h1><form method="post" class="card form">
-<label>{{T.agency_name}}<input name="agency_name" required></label><label>{{T.country}}<input name="country" required></label>
-<label>{{T.contact_name}}<input name="contact_name" required></label><label>{{T.whatsapp}}<input name="whatsapp" required></label>
-<label>{{T.email}}<input type="email" name="email" required></label><label>{{T.password}}<input type="password" name="password" minlength="8" required></label>
-<label>{{T.language}}<select name="language"><option value="ar">العربية</option><option value="en">English</option><option value="id">Bahasa Indonesia</option><option value="ms">Bahasa Melayu</option></select></label>
-<label class="check"><input type="checkbox" name="privacy" required> {{T.privacy}}</label>
-<label class="check"><input type="checkbox" name="marketing" required> {{T.marketing}} *</label>
-<button class="btn gold">{{T.create_account}}</button></form></main>{% endblock %}
+  <form method="post" class="card form" autocomplete="on">
+    <div class="form-grid">
+      <label>{{ T.agency_name }}
+        <input name="agency_name" autocomplete="organization" required>
+      </label>
+
+      <label>{{ T.country }}
+        <input name="country" placeholder="Indonesia / Malaysia / Saudi Arabia / ..." autocomplete="country-name" required>
+      </label>
+
+      <label>{{ T.contact_name }}
+        <input name="contact_name" autocomplete="name" required>
+      </label>
+
+      <label>{{ T.whatsapp }}
+        <input name="whatsapp" type="tel" inputmode="tel" placeholder="+62 / +60 / +966 ..." autocomplete="tel" required>
+      </label>
+
+      <label>{{ T.email }}
+        <input type="email" name="email" autocomplete="email" required>
+      </label>
+
+      <label>{{ T.password }}
+        <input type="password" name="password" minlength="8" autocomplete="new-password" required>
+        <small>Minimum 8 characters</small>
+      </label>
+
+      <label>{{ T.language }}
+        <select name="language" required>
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+          <option value="id">Bahasa Indonesia</option>
+          <option value="ms">Bahasa Melayu</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="consent-box">
+      <label class="check"><input type="checkbox" name="privacy" required> <span>{{ T.privacy }}</span></label>
+      <label class="check"><input type="checkbox" name="marketing" required> <span>{{ T.marketing }} *</span></label>
+    </div>
+
+    <button class="btn gold" type="submit">{{ T.create_account }}</button>
+  </form>
+</main>
+{% endblock %}
