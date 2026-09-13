@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block body %}
+<main class="page-shell">
+  <section class="page-intro">
+    <span class="eyebrow">MUROOJ GOLDEN B2B</span>
+    <h1>{{ offer.title }}</h1>
+    {% if offer.name_en %}<p><b>{{ offer.name_ar if lang=='ar' else offer.name_en }}</b></p>{% endif %}
+  </section>
+
+  <section class="card">
+    {% if offer.cover_image %}<img class="hotel-image" src="{{ offer.cover_image }}" alt="{{ offer.title }}">{% endif %}
+    <div class="hotel-card-body">
+      {% if offer.pinned %}<span class="tag">★ {{ 'عرض مميز' if lang=='ar' else 'Featured Offer' }}</span>{% endif %}
+      {% if offer.note %}<p>{{ offer.note }}</p>{% endif %}
+      <div class="hotel-tags">
+        {% if offer.start_date or offer.end_date %}<span class="tag">{{ offer.start_date or '—' }} → {{ offer.end_date or '—' }}</span>{% endif %}
+        {% if offer.meal %}<span class="tag">{{ offer.meal }}</span>{% endif %}
+      </div>
+      <div class="hotel-actions" style="margin-top:18px">
+        {% if offer.hotel_id %}<a class="btn outline" href="{{ url_for('hotel_detail', hid=offer.hotel_id) }}">{{ T.view }}</a>{% endif %}
+        {% if user and user['role']=='agency' %}
+          <a class="btn gold" href="{{ url_for('new_request', hotel=(offer.hotel_id or 'any'), city=(offer.city or 'Makkah'), checkin=offer.start_date, checkout=offer.end_date, meal=offer.meal) }}">{{ T.send_request }}</a>
+        {% else %}
+          <a class="btn gold" href="{{ url_for('login') }}">{{ T.login }}</a>
+        {% endif %}
+        <a class="btn dark" target="_blank" rel="noopener" href="https://wa.me/966550558014?text={{ ('MUROOJ GOLDEN B2B\nOffer: ' ~ offer.title ~ '\n' ~ request.url)|urlencode }}">WhatsApp</a>
+      </div>
+      <p style="margin-top:18px;opacity:.75">{{ 'التوفر والأسعار والتأكيد النهائي تتم عبر فريق الحجوزات في WhatsApp.' if lang=='ar' else 'Availability, pricing and final confirmation are provided by our reservations team through WhatsApp.' }}</p>
+    </div>
+  </section>
+</main>
+{% endblock %}
