@@ -1,28 +1,33 @@
 {% extends 'base.html' %}{% block body %}
 <main class="page-shell">
 <div class="adminnav"><a href="{{url_for('admin')}}">{{T.admin}}</a><a class="active" href="{{url_for('admin_offers')}}">{{T.offers}}</a></div>
-<div class="section-head"><div><span class="eyebrow">MUROOJ GOLDEN B2B</span><h1>{{T.offers}}</h1></div></div>
+<div class="section-head"><div><span class="eyebrow">MUROOJ GOLDEN B2B</span><h1>{{T.offers}}</h1><p>{{ 'أنشئ العرض وحدد صورته والجمهور المستهدف بدقة.' if lang=='ar' else 'Create offers with a dedicated image and precise agency targeting.' }}</p></div></div>
 
 <form method="post" class="card form" style="margin-bottom:22px">
 <input type="hidden" name="action" value="add"><input name="title" placeholder="Offer title" required>
 <select name="hotel_id"><option value="">{{T.any_hotel}}</option>{% for h in hotels %}<option value="{{h.id}}">{{h.name_ar}} / {{h.name_en}}</option>{% endfor %}</select>
+<label class="full">{{ 'صورة العرض (رابط أو مسار صورة)' if lang=='ar' else 'Offer image (URL or image path)' }}<input name="image_url" placeholder="https://... or /static/offer.jpg"></label>
 <div class="form-grid"><label>{{T.checkin}}<input type="date" name="start_date"></label><label>{{T.checkout}}<input type="date" name="end_date"></label><label>{{T.meal}}<input name="meal" placeholder="RO / F.B Indo / F.B Malaysian"></label><label>Sort order<input type="number" name="sort_order" value="0"></label></div>
 <label class="full">{{T.notes}}<input name="note" placeholder="Short note"></label>
 <div class="form-grid"><label>Audience<select name="audience"><option value="all">All agencies</option><option value="indonesia">Indonesia only</option><option value="malaysia">Malaysia only</option><option value="selected">Selected agencies</option></select></label><label>Language<select name="language_mode"><option value="auto">Auto language by agency</option><option value="manual">Manual language</option></select></label><label>Manual language<select name="manual_language"><option value="ar">العربية</option><option value="en">English</option><option value="id">Bahasa Indonesia</option><option value="ms">Bahasa Melayu</option></select></label></div>
+<label class="full">{{ 'اختيار وكالات محددة' if lang=='ar' else 'Selected agencies' }}<select name="selected_agencies" multiple size="6">{% for a in agencies %}<option value="{{a.id}}">{{a.agency_name}} — {{a.country}} — {{a.email}}</option>{% endfor %}</select></label>
 <label class="check"><input type="checkbox" name="pinned"> Pin offer</label><button class="btn gold">{{T.add}}</button>
 </form>
 
 <div class="grid">
 {% for o in offers %}
 <article class="card">
+  {% if o.image_url %}<img class="hotel-image" src="{{o.image_url}}" alt="{{o.title}}">{% endif %}
   <div class="section-head"><div><h3>{{o.title}}</h3><p>{{o.name_en or T.any_hotel}}</p></div><span class="status {{'active' if o.active else 'suspended'}}">{{T.active if o.active else T.hide}}</span></div>
-  <div class="hotel-tags">{% if o.pinned %}<span class="tag">★ Pinned</span>{% endif %}<span class="tag">{{o.start_date or '—'}} → {{o.end_date or '—'}}</span>{% if o.meal %}<span class="tag">{{o.meal}}</span>{% endif %}<span class="tag">{{o.audience}}</span></div>
+  <div class="hotel-tags">{% if o.pinned %}<span class="tag">★ Pinned</span>{% endif %}<span class="tag">{{o.start_date or '—'}} → {{o.end_date or '—'}}</span>{% if o.meal %}<span class="tag">{{o.meal}}</span>{% endif %}<span class="tag">{{o.audience}}</span>{% if o.audience=='selected' %}<span class="tag">{{ (offer_targets.get(o.id, [])|length) }} agencies</span>{% endif %}</div>
   {% if o.note %}<p>{{o.note}}</p>{% endif %}
   <form method="post" class="form" style="margin-top:14px">
     <input type="hidden" name="action" value="edit"><input type="hidden" name="oid" value="{{o.id}}">
     <div class="form-grid"><label>Title<input name="title" value="{{o.title}}" required></label><label>{{T.hotel}}<select name="hotel_id"><option value="">{{T.any_hotel}}</option>{% for h in hotels %}<option value="{{h.id}}" {{'selected' if o.hotel_id==h.id}}>{{h.name_en}}</option>{% endfor %}</select></label><label>{{T.checkin}}<input type="date" name="start_date" value="{{o.start_date or ''}}"></label><label>{{T.checkout}}<input type="date" name="end_date" value="{{o.end_date or ''}}"></label><label>{{T.meal}}<input name="meal" value="{{o.meal or ''}}"></label><label>Sort order<input type="number" name="sort_order" value="{{o.sort_order or 0}}"></label></div>
+    <label class="full">{{ 'صورة العرض' if lang=='ar' else 'Offer image' }}<input name="image_url" value="{{o.image_url or ''}}" placeholder="https://... or /static/offer.jpg"></label>
     <label class="full">{{T.notes}}<input name="note" value="{{o.note or ''}}"></label>
     <div class="form-grid"><label>Audience<select name="audience"><option value="all" {{'selected' if o.audience=='all'}}>All agencies</option><option value="indonesia" {{'selected' if o.audience=='indonesia'}}>Indonesia only</option><option value="malaysia" {{'selected' if o.audience=='malaysia'}}>Malaysia only</option><option value="selected" {{'selected' if o.audience=='selected'}}>Selected agencies</option></select></label><label>Language<select name="language_mode"><option value="auto" {{'selected' if o.language_mode=='auto'}}>Auto</option><option value="manual" {{'selected' if o.language_mode=='manual'}}>Manual</option></select></label><label>Manual language<select name="manual_language"><option value="ar" {{'selected' if o.manual_language=='ar'}}>العربية</option><option value="en" {{'selected' if o.manual_language=='en'}}>English</option><option value="id" {{'selected' if o.manual_language=='id'}}>Bahasa Indonesia</option><option value="ms" {{'selected' if o.manual_language=='ms'}}>Bahasa Melayu</option></select></label></div>
+    <label class="full">{{ 'الوكالات المستهدفة' if lang=='ar' else 'Target agencies' }}<select name="selected_agencies" multiple size="5">{% for a in agencies %}<option value="{{a.id}}" {{'selected' if a.id in offer_targets.get(o.id, [])}}>{{a.agency_name}} — {{a.country}}</option>{% endfor %}</select></label>
     <label class="check"><input type="checkbox" name="pinned" {{'checked' if o.pinned}}> Pin offer</label>
     <div class="hotel-actions"><button class="btn gold">{{T.save}}</button><a class="btn outline" target="_blank" href="{{url_for('offer_detail',oid=o.id)}}">Share / {{T.view}}</a></div>
   </form>
