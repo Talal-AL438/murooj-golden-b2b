@@ -32,6 +32,48 @@ def register_offer_extensions(app, db, current_user):
     def audit(action,details=''):
         u=current_user();c=db();c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(u['id'] if u else None,action,details,datetime.utcnow().isoformat()));c.commit();c.close()
 
+    def offer_error(u,key):
+        lang=(u['language'] if u else 'ar') or 'ar'
+        messages={
+            'ar':{'bad':'تعذر حفظ العرض. تحقق من البيانات المطلوبة.','dates':'تاريخ نهاية العرض يجب ألا يسبق تاريخ البداية.','hotel':'الفندق المحدد غير موجود أو غير نشط.','selected':'اختر وكالة واحدة على الأقل للعرض المخصص.','image':'رابط صورة العرض غير صالح.'},
+            'en':{'bad':'The offer could not be saved. Check the required fields.','dates':'Offer end date cannot be before the start date.','hotel':'The selected hotel does not exist or is inactive.','selected':'Select at least one agency for a targeted offer.','image':'The offer image URL is invalid.'},
+            'id':{'bad':'Penawaran tidak dapat disimpan. Periksa data wajib.','dates':'Tanggal akhir penawaran tidak boleh sebelum tanggal mulai.','hotel':'Hotel yang dipilih tidak ditemukan atau tidak aktif.','selected':'Pilih minimal satu agen untuk penawaran khusus.','image':'URL gambar penawaran tidak valid.'},
+            'ms':{'bad':'Tawaran tidak dapat disimpan. Semak maklumat wajib.','dates':'Tarikh tamat tawaran tidak boleh sebelum tarikh mula.','hotel':'Hotel yang dipilih tidak wujud atau tidak aktif.','selected':'Pilih sekurang-kurangnya satu agensi untuk tawaran khusus.','image':'URL imej tawaran tidak sah.'}}
+        return messages.get(lang,messages['en'])[key]
+
+    def validate_offer(c,u):
+        title=request.form.get('title','').strip();hotel_raw=request.form.get('hotel_id','').strip();start=request.form.get('start_date','').strip();end=request.form.get('end_date','').strip();meal=request.form.get('meal','').strip();note=request.form.get('note','').strip();image_url=request.form.get('image_url','').strip();audience=request.form.get('audience','all');language_mode=request.form.get('language_mode','auto');manual_language=request.form.get('manual_language','ar')
+        if not title or len(title)>200 or len(note)>2000 or meal not in ('','RO','F.B Indo','F.B Malaysian'):return None,offer_error(u,'bad')
+        hotel_id=None
+        if hotel_raw:
+            try:hotel_id=int(hotel_raw)
+            except ValueError:return None,offer_error(u,'hotel')
+            hotel=c.execute('SELECT id FROM hotels WHERE id=? AND active=1',(hotel_id,)).fetchone()
+            if not hotel:return None,offer_error(u,'hotel')
+        parsed_start=parsed_end=None
+        try:
+            if start:parsed_start=datetime.strptime(start,'%Y-%m-%d').date()
+            if end:parsed_end=datetime.strptime(end,'%Y-%m-%d').date()
+        except ValueError:return None,offer_error(u,'dates')
+        if parsed_start and parsed_end and parsed_end<parsed_start:return None,offer_error(u,'dates')
+        if image_url and not (image_url.startswith('/static/') or image_url.startswith('https://') or image_url.startswith('http://')):return None,offer_error(u,'image')
+        if audience not in ('all','indonesia','malaysia','selected'):audience='all'
+        if language_mode not in ('auto','manual'):language_mode='auto'
+        if manual_language not in ('ar','en','id','ms'):manual_language='ar'
+        selected=[]
+        for value in request.form.getlist('selected_agencies'):
+            try:selected.append(int(value))
+            except ValueError:pass
+        selected=list(dict.fromkeys(selected))
+        if selected:
+            placeholders=','.join('?' for _ in selected)
+            valid_ids={r['id'] for r in c.execute(f"SELECT a.id FROM agencies a JOIN users u ON u.id=a.user_id WHERE a.id IN ({placeholders}) AND u.active=1",selected).fetchall()}
+            selected=[sid for sid in selected if sid in valid_ids]
+        if audience=='selected' and not selected:return None,offer_error(u,'selected')
+        try:sort_order=int(request.form.get('sort_order',0))
+        except ValueError:sort_order=0
+        return {'title':title,'hotel_id':hotel_id,'start':start,'end':end,'meal':meal,'note':note,'image_url':image_url,'audience':audience,'language_mode':language_mode,'manual_language':manual_language,'pinned':1 if request.form.get('pinned') else 0,'sort_order':sort_order,'selected':selected},None
+
     def send_offer_notifications(c,oid,title,audience,selected,language_mode,manual_language):
         rows=c.execute("SELECT a.id agency_id,u.id user_id,u.language,a.country FROM agencies a JOIN users u ON u.id=a.user_id WHERE u.active=1").fetchall()
         selected=set(selected)
@@ -56,13 +98,9 @@ def register_offer_extensions(app, db, current_user):
                 placeholders=','.join('?' for _ in allowed)
                 base+=f" AND (o.audience IN ({placeholders}) OR (o.audience='selected' AND EXISTS (SELECT 1 FROM offer_targets ot WHERE ot.offer_id=o.id AND ot.agency_id=?)))"
                 params.extend(allowed);params.append(agency['id'])
-            else:
-                base+=" AND o.audience='all'"
-        else:
-            base+=" AND o.audience='all'"
-        offers=c.execute(base+" ORDER BY o.pinned DESC,o.sort_order,o.id DESC LIMIT 6",params).fetchall()
-        settings={r['key']:r['value'] for r in c.execute("SELECT * FROM settings").fetchall()};c.close()
-        return render_template('home.html',hotels=hotels,offers=offers,settings=settings,user=u)
+            else:base+=" AND o.audience='all'"
+        else:base+=" AND o.audience='all'"
+        offers=c.execute(base+" ORDER BY o.pinned DESC,o.sort_order,o.id DESC LIMIT 6",params).fetchall();settings={r['key']:r['value'] for r in c.execute("SELECT * FROM settings").fetchall()};c.close();return render_template('home.html',hotels=hotels,offers=offers,settings=settings,user=u)
 
     def admin_offers_extended():
         ensure_schema();u=current_user()
@@ -71,26 +109,23 @@ def register_offer_extensions(app, db, current_user):
         if request.method=='POST':
             action=request.form.get('action','add')
             if action=='toggle':
-                oid=int(request.form['oid']);row=c.execute('SELECT active FROM offers WHERE id=?',(oid,)).fetchone()
+                try:oid=int(request.form.get('oid',''))
+                except ValueError:c.close();flash(offer_error(u,'bad'));return redirect(url_for('admin_offers'))
+                row=c.execute('SELECT active FROM offers WHERE id=?',(oid,)).fetchone()
                 if not row:c.close();return 'offer not found',404
                 c.execute('UPDATE offers SET active=? WHERE id=?',(0 if row['active'] else 1,oid));c.commit();c.close();audit('offer_toggle',f'offer={oid}');return redirect(url_for('admin_offers'))
-            title=request.form.get('title','').strip();hotel_id=request.form.get('hotel_id') or None;start=request.form.get('start_date','');end=request.form.get('end_date','');meal=request.form.get('meal','').strip();note=request.form.get('note','').strip();image_url=request.form.get('image_url','').strip();audience=request.form.get('audience','all');language_mode=request.form.get('language_mode','auto');manual_language=request.form.get('manual_language','ar');pinned=1 if request.form.get('pinned') else 0
-            try:sort_order=int(request.form.get('sort_order',0))
-            except ValueError:sort_order=0
-            if audience not in ('all','indonesia','malaysia','selected'):audience='all'
-            if language_mode not in ('auto','manual'):language_mode='auto'
-            if manual_language not in ('ar','en','id','ms'):manual_language='ar'
-            selected=[]
-            for value in request.form.getlist('selected_agencies'):
-                try:selected.append(int(value))
-                except ValueError:pass
+            data,error=validate_offer(c,u)
+            if error:c.close();flash(error);return redirect(url_for('admin_offers'))
             if action=='edit':
-                oid=int(request.form['oid']);c.execute("UPDATE offers SET title=?,hotel_id=?,start_date=?,end_date=?,meal=?,note=?,image_url=?,audience=?,language_mode=?,manual_language=?,pinned=?,sort_order=? WHERE id=?",(title,hotel_id,start,end,meal,note,image_url,audience,language_mode,manual_language,pinned,sort_order,oid));c.execute('DELETE FROM offer_targets WHERE offer_id=?',(oid,))
-                if audience=='selected':c.executemany('INSERT OR IGNORE INTO offer_targets(offer_id,agency_id) VALUES(?,?)',[(oid,a) for a in selected])
+                try:oid=int(request.form.get('oid',''))
+                except ValueError:c.close();flash(offer_error(u,'bad'));return redirect(url_for('admin_offers'))
+                if not c.execute('SELECT id FROM offers WHERE id=?',(oid,)).fetchone():c.close();return 'offer not found',404
+                c.execute("UPDATE offers SET title=?,hotel_id=?,start_date=?,end_date=?,meal=?,note=?,image_url=?,audience=?,language_mode=?,manual_language=?,pinned=?,sort_order=? WHERE id=?",(data['title'],data['hotel_id'],data['start'],data['end'],data['meal'],data['note'],data['image_url'],data['audience'],data['language_mode'],data['manual_language'],data['pinned'],data['sort_order'],oid));c.execute('DELETE FROM offer_targets WHERE offer_id=?',(oid,))
+                if data['audience']=='selected':c.executemany('INSERT OR IGNORE INTO offer_targets(offer_id,agency_id) VALUES(?,?)',[(oid,a) for a in data['selected']])
                 c.commit();c.close();audit('offer_edit',f'offer={oid}');return redirect(url_for('admin_offers'))
-            cur=c.execute("INSERT INTO offers(title,hotel_id,start_date,end_date,meal,note,audience,language_mode,manual_language,active,pinned,sort_order,created_at,image_url) VALUES(?,?,?,?,?,?,?,?,?,1,?,?,?,?)",(title,hotel_id,start,end,meal,note,audience,language_mode,manual_language,pinned,sort_order,datetime.utcnow().isoformat(),image_url));oid=cur.lastrowid
-            if audience=='selected':c.executemany('INSERT OR IGNORE INTO offer_targets(offer_id,agency_id) VALUES(?,?)',[(oid,a) for a in selected])
-            send_offer_notifications(c,oid,title,audience,selected,language_mode,manual_language);c.commit();c.close();audit('offer_add',title);return redirect(url_for('admin_offers'))
+            cur=c.execute("INSERT INTO offers(title,hotel_id,start_date,end_date,meal,note,audience,language_mode,manual_language,active,pinned,sort_order,created_at,image_url) VALUES(?,?,?,?,?,?,?,?,?,1,?,?,?,?)",(data['title'],data['hotel_id'],data['start'],data['end'],data['meal'],data['note'],data['audience'],data['language_mode'],data['manual_language'],data['pinned'],data['sort_order'],datetime.utcnow().isoformat(),data['image_url']));oid=cur.lastrowid
+            if data['audience']=='selected':c.executemany('INSERT OR IGNORE INTO offer_targets(offer_id,agency_id) VALUES(?,?)',[(oid,a) for a in data['selected']])
+            send_offer_notifications(c,oid,data['title'],data['audience'],data['selected'],data['language_mode'],data['manual_language']);c.commit();c.close();audit('offer_add',data['title']);return redirect(url_for('admin_offers'))
         offers=c.execute("SELECT o.*,h.name_en FROM offers o LEFT JOIN hotels h ON h.id=o.hotel_id ORDER BY o.pinned DESC,o.sort_order,o.id DESC").fetchall();hotels=c.execute('SELECT * FROM hotels WHERE active=1 ORDER BY sort_order,id').fetchall();agencies=c.execute("SELECT a.id,a.agency_name,a.country,u.email FROM agencies a JOIN users u ON u.id=a.user_id WHERE u.active=1 ORDER BY a.agency_name").fetchall();targets={}
         for r in c.execute('SELECT offer_id,agency_id FROM offer_targets').fetchall():targets.setdefault(r['offer_id'],set()).add(r['agency_id'])
         c.close();return render_template('admin_offers.html',user=u,offers=offers,hotels=hotels,agencies=agencies,offer_targets=targets)
