@@ -3,11 +3,19 @@ from flask import request, redirect, url_for, render_template
 
 
 def register_offer_extensions(app, db, current_user):
-    c=db()
-    cols=[r['name'] for r in c.execute('PRAGMA table_info(offers)').fetchall()]
-    if 'image_url' not in cols:c.execute("ALTER TABLE offers ADD COLUMN image_url TEXT DEFAULT ''")
-    c.execute("CREATE TABLE IF NOT EXISTS offer_targets (offer_id INTEGER NOT NULL,agency_id INTEGER NOT NULL,PRIMARY KEY(offer_id,agency_id),FOREIGN KEY(offer_id) REFERENCES offers(id),FOREIGN KEY(agency_id) REFERENCES agencies(id))")
-    c.commit();c.close()
+    def ensure_schema():
+        c=db()
+        tables={r['name'] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
+        if 'offers' not in tables:
+            c.close();return
+        cols=[r['name'] for r in c.execute('PRAGMA table_info(offers)').fetchall()]
+        if 'image_url' not in cols:c.execute("ALTER TABLE offers ADD COLUMN image_url TEXT DEFAULT ''")
+        c.execute("CREATE TABLE IF NOT EXISTS offer_targets (offer_id INTEGER NOT NULL,agency_id INTEGER NOT NULL,PRIMARY KEY(offer_id,agency_id),FOREIGN KEY(offer_id) REFERENCES offers(id),FOREIGN KEY(agency_id) REFERENCES agencies(id))")
+        c.commit();c.close()
+
+    @app.before_request
+    def ensure_offer_schema():
+        ensure_schema()
 
     def audit(action,details=''):
         u=current_user();c=db();c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(u['id'] if u else None,action,details,datetime.utcnow().isoformat()));c.commit();c.close()
@@ -23,7 +31,7 @@ def register_offer_extensions(app, db, current_user):
             c.execute("INSERT INTO notifications(user_id,type,ref_id,title,body,link,created_at) VALUES(?,?,?,?,?,?,?)",(row['user_id'],'offer',oid,head,prefix+title,f'/offer/{oid}',datetime.utcnow().isoformat()))
 
     def admin_offers_extended():
-        u=current_user()
+        ensure_schema();u=current_user()
         if not u or u['role'] not in ('super_admin','staff'):return redirect(url_for('login'))
         c=db()
         if request.method=='POST':
@@ -54,7 +62,7 @@ def register_offer_extensions(app, db, current_user):
         c.close();return render_template('admin_offers.html',user=u,offers=offers,hotels=hotels,agencies=agencies,offer_targets=targets)
 
     def offer_detail_extended(oid):
-        c=db();today=datetime.utcnow().date().isoformat();offer=c.execute("""SELECT o.*,h.name_ar,h.name_en,h.city,(SELECT image_url FROM hotel_images i WHERE i.hotel_id=o.hotel_id ORDER BY i.sort_order,i.id LIMIT 1) cover_image FROM offers o LEFT JOIN hotels h ON h.id=o.hotel_id WHERE o.id=? AND o.active=1 AND (o.end_date='' OR o.end_date IS NULL OR o.end_date>=?)""",(oid,today)).fetchone();c.close()
+        ensure_schema();c=db();today=datetime.utcnow().date().isoformat();offer=c.execute("""SELECT o.*,h.name_ar,h.name_en,h.city,(SELECT image_url FROM hotel_images i WHERE i.hotel_id=o.hotel_id ORDER BY i.sort_order,i.id LIMIT 1) cover_image FROM offers o LEFT JOIN hotels h ON h.id=o.hotel_id WHERE o.id=? AND o.active=1 AND (o.end_date='' OR o.end_date IS NULL OR o.end_date>=?)""",(oid,today)).fetchone();c.close()
         if not offer:return 'offer not found',404
         return render_template('offer.html',offer=offer,user=current_user())
 
