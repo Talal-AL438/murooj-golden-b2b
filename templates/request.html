@@ -27,11 +27,11 @@
 
       <label>{{ T.checkin }}<input type="date" name="checkin" id="checkin" value="{{ request.args.get('checkin','') }}" required></label>
       <label>{{ T.checkout }}<input type="date" name="checkout" id="checkout" value="{{ request.args.get('checkout','') }}" required></label>
-      <label>{{ T.rooms }}<input type="number" min="1" step="1" name="rooms" value="{{ request.args.get('rooms','') }}" inputmode="numeric" required></label>
-      <label>{{ T.persons }}<input type="number" min="1" step="1" name="persons" value="{{ request.args.get('persons','') }}" inputmode="numeric" required></label>
-      <label>{{ T.nationality }}<input name="nationality" value="{{ request.args.get('nationality','') }}" autocomplete="country-name" required></label>
+      <label>{{ T.rooms }}<input type="number" min="1" step="1" name="rooms" id="rooms" value="{{ request.args.get('rooms','') }}" inputmode="numeric" required></label>
+      <label>{{ T.persons }}<input type="number" min="1" step="1" name="persons" id="persons" value="{{ request.args.get('persons','') }}" inputmode="numeric" required></label>
+      <label>{{ T.nationality }}<input name="nationality" id="nationality" value="{{ request.args.get('nationality','') }}" autocomplete="country-name" required></label>
       <label>{{ T.meal }}
-        <select name="meal" required>
+        <select name="meal" id="meal" required>
           <option value="RO" {{ 'selected' if request.args.get('meal','RO') == 'RO' }}>{{ T.room_only }}</option>
           <option value="F.B Indo" {{ 'selected' if request.args.get('meal') == 'F.B Indo' }}>{{ T.indo_fb }}</option>
           <option value="F.B Malaysian" {{ 'selected' if request.args.get('meal') == 'F.B Malaysian' }}>{{ T.malay_fb }}</option>
@@ -40,26 +40,51 @@
     </div>
 
     <label class="full">{{ T.notes }}<textarea name="notes" rows="5">{{ request.args.get('notes','') }}</textarea></label>
+
+    <section class="card" style="margin:18px 0;background:rgba(255,255,255,.03)">
+      <small class="eyebrow">{{ 'ملخص الطلب' if lang=='ar' else ('Ringkasan Permintaan' if lang=='id' else ('Ringkasan Permintaan' if lang=='ms' else 'Request Summary')) }}</small>
+      <div class="hotel-tags" id="request-summary"></div>
+      <p style="margin-bottom:0">{{ 'سيتم تأكيد التوفر والسعر عبر WhatsApp بعد إرسال الطلب.' if lang=='ar' else ('Ketersediaan dan harga akan dikonfirmasi melalui WhatsApp setelah permintaan dikirim.' if lang=='id' else ('Ketersediaan dan harga akan disahkan melalui WhatsApp selepas permintaan dihantar.' if lang=='ms' else 'Availability and pricing will be confirmed through WhatsApp after submission.')) }}</p>
+    </section>
+
     <button class="btn gold" type="submit">{{ T.submit }}</button>
   </form>
 </main>
 
 <script>
 (function () {
-  const today = new Date();
-  const minDate = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-  const checkin = document.getElementById('checkin');
-  const checkout = document.getElementById('checkout');
-  checkin.min = minDate;
-  checkout.min = checkin.value || minDate;
-  checkin.addEventListener('change', function () {
-    checkout.min = this.value || minDate;
-    if (checkout.value && checkout.value < checkout.min) checkout.value = '';
-  });
-
+  const form = document.getElementById('quick-request-form');
   const city = document.getElementById('request-city');
   const hotel = document.getElementById('request-hotel');
-  function syncHotels() {
+  const checkin = document.getElementById('checkin');
+  const checkout = document.getElementById('checkout');
+  const rooms = document.getElementById('rooms');
+  const persons = document.getElementById('persons');
+  const meal = document.getElementById('meal');
+  const summary = document.getElementById('request-summary');
+
+  const now = new Date();
+  const today = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+  checkin.min = today;
+
+  function nextDay(dateString) {
+    if (!dateString) return today;
+    const d = new Date(dateString + 'T00:00:00');
+    d.setDate(d.getDate() + 1);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function syncDates() {
+    checkout.min = nextDay(checkin.value);
+    if (checkout.value && checkout.value < checkout.min) checkout.value = '';
+  }
+
+  function selectedHotelCity() {
+    const option = hotel.options[hotel.selectedIndex];
+    return option && option.dataset ? option.dataset.city : '';
+  }
+
+  function syncHotels(resetInvalid) {
     let selectedVisible = hotel.value === 'any';
     Array.from(hotel.options).forEach(function (option) {
       if (option.value === 'any') return;
@@ -68,10 +93,47 @@
       option.disabled = !visible;
       if (visible && option.selected) selectedVisible = true;
     });
-    if (!selectedVisible) hotel.value = 'any';
+    if (resetInvalid && !selectedVisible) hotel.value = 'any';
   }
-  city.addEventListener('change', syncHotels);
-  syncHotels();
+
+  function syncCityFromHotel() {
+    const hCity = selectedHotelCity();
+    if (hotel.value !== 'any' && hCity && city.value !== hCity) {
+      city.value = hCity;
+      syncHotels(false);
+    }
+  }
+
+  function updateSummary() {
+    const items = [];
+    const hotelText = hotel.options[hotel.selectedIndex] ? hotel.options[hotel.selectedIndex].text : '';
+    if (hotelText) items.push(hotelText);
+    if (checkin.value && checkout.value) items.push(checkin.value + ' → ' + checkout.value);
+    if (rooms.value) items.push('{{ T.rooms }}: ' + rooms.value);
+    if (persons.value) items.push('{{ T.persons }}: ' + persons.value);
+    if (meal.value) items.push('{{ T.meal }}: ' + meal.options[meal.selectedIndex].text);
+    summary.innerHTML = items.map(function (x) { return '<span class="tag">' + x.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>'; }).join('');
+  }
+
+  checkin.addEventListener('change', function () { syncDates(); updateSummary(); });
+  checkout.addEventListener('change', updateSummary);
+  city.addEventListener('change', function () { syncHotels(true); updateSummary(); });
+  hotel.addEventListener('change', function () { syncCityFromHotel(); updateSummary(); });
+  [rooms, persons, meal].forEach(function (el) { el.addEventListener('input', updateSummary); el.addEventListener('change', updateSummary); });
+
+  form.addEventListener('submit', function (event) {
+    syncDates();
+    if (!checkin.value || !checkout.value || checkout.value <= checkin.value) {
+      event.preventDefault();
+      checkout.focus();
+      checkout.reportValidity();
+    }
+  });
+
+  syncCityFromHotel();
+  syncHotels(false);
+  syncDates();
+  updateSummary();
 })();
 </script>
 {% endblock %}
