@@ -4,6 +4,7 @@ from flask import request, render_template, send_file, redirect, url_for, flash
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def register_reports(app, admin_required, db, current_user):
@@ -12,10 +13,40 @@ def register_reports(app, admin_required, db, current_user):
         c.execute("CREATE TABLE IF NOT EXISTS staff_permissions (user_id INTEGER PRIMARY KEY,reports INTEGER DEFAULT 0,agencies INTEGER DEFAULT 0,hotels INTEGER DEFAULT 0,offers INTEGER DEFAULT 0,updated_at TEXT,FOREIGN KEY(user_id) REFERENCES users(id))")
     def get_permissions(user_id):
         c=db();ensure_permissions_table(c);row=c.execute("SELECT * FROM staff_permissions WHERE user_id=?",(user_id,)).fetchone();c.close();return {k:bool(row[k]) if row else False for k in permission_keys}
+    def audit(c,user_id,action,details=''):
+        c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(user_id,action,details,datetime.utcnow().isoformat()))
+    def msg(lang,key):
+        messages={
+            'ar':{'profile':'تم تحديث بيانات الحساب بنجاح.','profile_bad':'يرجى إدخال اسم المسؤول والدولة ورقم WhatsApp بشكل صحيح.','password':'تم تغيير كلمة المرور بنجاح.','bad':'كلمة المرور الحالية غير صحيحة.','short':'يجب أن تكون كلمة المرور الجديدة 8 أحرف على الأقل.','mismatch':'كلمتا المرور الجديدتان غير متطابقتين.','same':'اختر كلمة مرور جديدة مختلفة عن كلمة المرور الحالية.'},
+            'en':{'profile':'Account details updated successfully.','profile_bad':'Please enter a valid contact name, country, and WhatsApp number.','password':'Password changed successfully.','bad':'Current password is incorrect.','short':'New password must be at least 8 characters.','mismatch':'New passwords do not match.','same':'Choose a new password different from your current password.'},
+            'id':{'profile':'Data akun berhasil diperbarui.','profile_bad':'Masukkan nama kontak, negara, dan nomor WhatsApp yang valid.','password':'Kata sandi berhasil diubah.','bad':'Kata sandi saat ini salah.','short':'Kata sandi baru minimal 8 karakter.','mismatch':'Konfirmasi kata sandi tidak cocok.','same':'Pilih kata sandi baru yang berbeda dari kata sandi saat ini.'},
+            'ms':{'profile':'Maklumat akaun berjaya dikemas kini.','profile_bad':'Masukkan nama pegawai, negara dan nombor WhatsApp yang sah.','password':'Kata laluan berjaya ditukar.','bad':'Kata laluan semasa tidak betul.','short':'Kata laluan baharu mestilah sekurang-kurangnya 8 aksara.','mismatch':'Pengesahan kata laluan tidak sepadan.','same':'Pilih kata laluan baharu yang berbeza daripada kata laluan semasa.'}}
+        return messages.get(lang or 'ar',messages['ar'])[key]
 
     @app.before_request
     def portal_extensions_and_staff_access():
         c=db();ensure_permissions_table(c);c.commit();c.close()
+
+        if request.path=='/account' and request.method=='POST':
+            u=current_user()
+            if not u or u['role']!='agency':return None
+            lang=u['language'] or 'ar';action=request.form.get('action','');c=db();agency=c.execute("SELECT * FROM agencies WHERE user_id=?",(u['id'],)).fetchone()
+            if not agency:c.close();return None
+            if action=='profile':
+                cn=request.form.get('contact_name','').strip();country=request.form.get('country','').strip();wa=request.form.get('whatsapp','').strip()
+                normalized=''.join(ch for ch in wa if ch.isdigit())
+                if len(cn)<2 or len(country)<2 or len(normalized)<8 or len(normalized)>15:
+                    c.close();flash(msg(lang,'profile_bad'));return redirect(url_for('account'))
+                c.execute("UPDATE agencies SET contact_name=?,country=?,whatsapp=? WHERE id=?",(cn,country,wa,agency['id']));c.execute("UPDATE users SET name=?,mobile=? WHERE id=?",(cn,wa,u['id']));audit(c,u['id'],'agency_profile_update',f"agency={agency['id']}");c.commit();c.close();flash(msg(lang,'profile'));return redirect(url_for('account'))
+            if action=='password':
+                cp=request.form.get('current_password','');np=request.form.get('new_password','');confirm=request.form.get('confirm_password','')
+                if not check_password_hash(u['password_hash'],cp):c.close();flash(msg(lang,'bad'));return redirect(url_for('account'))
+                if len(np)<8:c.close();flash(msg(lang,'short'));return redirect(url_for('account'))
+                if np!=confirm:c.close();flash(msg(lang,'mismatch'));return redirect(url_for('account'))
+                if check_password_hash(u['password_hash'],np):c.close();flash(msg(lang,'same'));return redirect(url_for('account'))
+                c.execute("UPDATE users SET password_hash=? WHERE id=?",(generate_password_hash(np),u['id']));audit(c,u['id'],'agency_password_change',f"agency={agency['id']}");c.commit();c.close();flash(msg(lang,'password'));return redirect(url_for('account'))
+            c.close();return redirect(url_for('account'))
+
         if request.path=='/admin/settings' and request.method=='POST':
             u=current_user()
             if u and u['role']=='super_admin':
