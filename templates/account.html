@@ -1,1 +1,43 @@
-{% extends 'base.html' %}{% block body %}<main><div class="section-head"><h1>{{T.welcome}} — {{agency.agency_name}}</h1><a class="btn gold" href="{{url_for('new_request')}}">{{T.quick_request}}</a></div><div class="grid"><div class="card"><h3>{{T.account}}</h3><p><b>{{agency.contact_name}}</b></p><p>{{agency.country}}</p><p>{{agency.whatsapp}}</p></div><div class="card"><h3>{{T.quick_request}}</h3><p>Hotel availability and prices are confirmed through WhatsApp.</p><a class="btn gold" href="{{url_for('new_request')}}">{{T.send_request}}</a></div></div><h2>{{T.quick_request}}</h2><div class="tablewrap"><table><tr><th>#</th><th>{{T.hotel}}</th><th>{{T.date}}</th><th>{{T.rooms}}</th><th>{{T.persons}}</th><th>{{T.status}}</th><th>{{T.actions}}</th></tr>{% for r in reqs %}<tr><td>{{r.id}}</td><td>{{T.any_hotel if r.any_hotel else (r.name_ar if lang=='ar' else r.name_en)}}</td><td>{{r.checkin}} → {{r.checkout}}</td><td>{{r.rooms}}</td><td>{{r.persons}}</td><td><span class="status {{r.status}}">{{T[r.status]}}</span></td><td><a class="btn small gold" href="{{url_for('new_request')}}">{{T.repeat}}</a></td></tr>{% else %}<tr><td colspan="7">—</td></tr>{% endfor %}</table></div></main>{% endblock %}
+{% extends 'base.html' %}
+{% block body %}
+<main class="page-shell">
+  <div class="section-head">
+    <div><span class="eyebrow">MUROOJ GOLDEN B2B</span><h1>{{ T.welcome }} — {{ agency.agency_name }}</h1></div>
+    <a class="btn gold" href="{{ url_for('new_request') }}">{{ T.quick_request }}</a>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>{{ T.account }}</h3>
+      <p><b>{{ agency.contact_name }}</b></p>
+      <p>{{ agency.country }}</p>
+      <p dir="ltr">{{ agency.whatsapp }}</p>
+    </div>
+    <div class="card">
+      <h3>{{ T.quick_request }}</h3>
+      <p>Hotel availability and prices are confirmed through WhatsApp.</p>
+      <a class="btn gold" href="{{ url_for('new_request') }}">{{ T.send_request }}</a>
+    </div>
+  </div>
+
+  <h2>{{ T.quick_request }}</h2>
+  <div class="tablewrap">
+    <table>
+      <tr><th>#</th><th>{{ T.hotel }}</th><th>{{ T.date }}</th><th>{{ T.rooms }}</th><th>{{ T.persons }}</th><th>{{ T.status }}</th><th>{{ T.actions }}</th></tr>
+      {% for r in reqs %}
+      <tr>
+        <td>{{ r.id }}</td>
+        <td>{{ T.any_hotel if r.any_hotel else (r.name_ar if lang == 'ar' else r.name_en) }}</td>
+        <td>{{ r.checkin }} → {{ r.checkout }}</td>
+        <td>{{ r.rooms }}</td>
+        <td>{{ r.persons }}</td>
+        <td><span class="status {{ r.status }}">{{ T[r.status] }}</span></td>
+        <td>
+          <a class="btn small gold" href="{{ url_for('new_request', hotel=('any' if r.any_hotel else r.hotel_id), city=r.city, checkin=r.checkin, checkout=r.checkout, rooms=r.rooms, persons=r.persons, nationality=r.nationality, meal=r.meal, notes=r.notes) }}">{{ T.repeat }}</a>
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="7">—</td></tr>{% endfor %}
+    </table>
+  </div>
+</main>
+{% endblock %}
