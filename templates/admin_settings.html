@@ -1,4 +1,49 @@
+{% extends 'base.html' %}
+{% block body %}
+<main class="page-shell">
+  <div class="adminnav">
+    <a href="{{url_for('admin')}}">{{T.admin}}</a>
+    <a href="{{url_for('admin_reports')}}">{{T.reports}}</a>
+    <a href="{{url_for('admin_agencies')}}">{{T.agencies}}</a>
+    <a href="{{url_for('admin_hotels')}}">{{T.hotels}}</a>
+    <a href="{{url_for('admin_offers')}}">{{T.offers}}</a>
+    <a class="active" href="{{url_for('admin_settings')}}">{{T.settings}}</a>
+  </div>
 
-{% extends 'base.html' %}{% block body %}<main><div class="adminnav"><a href="{{url_for('admin')}}">{{T.admin}}</a><a href="{{url_for('admin_settings')}}">{{T.settings}}</a></div>
-<h1>{{T.settings}}</h1><form method="post" class="card form"><label>Company<input name="company_name" value="{{settings.company_name}}"></label><label>Brand<input name="brand" value="{{settings.brand}}"></label><label>WhatsApp<input name="whatsapp" value="{{settings.whatsapp}}"></label><label>Email<input name="email" value="{{settings.email}}"></label>
-<label class="full">Announcement<input name="announcement" value="{{settings.announcement}}"></label><label class="check"><input type="checkbox" name="announcement_active" value="1" {{'checked' if settings.announcement_active=='1'}}> Show announcement</label><button class="btn gold">{{T.save}}</button></form></main>{% endblock %}
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">MUROOJ GOLDEN B2B</span>
+      <h1>{{T.settings}}</h1>
+      <p>{{ 'إدارة بيانات التواصل والإعلان الرئيسي للبوابة.' if lang=='ar' else 'Manage portal contact details and the main announcement.' }}</p>
+    </div>
+  </div>
+
+  <form method="post" class="grid">
+    <section class="card form">
+      <h2>{{ 'بيانات الشركة' if lang=='ar' else 'Company Details' }}</h2>
+      <label>{{ 'اسم الشركة' if lang=='ar' else 'Company Name' }}<input name="company_name" value="{{settings.company_name}}" required></label>
+      <label>{{ 'العلامة التجارية' if lang=='ar' else 'Brand' }}<input name="brand" value="{{settings.brand}}" required></label>
+      <label>WhatsApp<input name="whatsapp" value="{{settings.whatsapp}}" inputmode="tel" required></label>
+      <label>{{T.email}}<input type="email" name="email" value="{{settings.email}}" required></label>
+      <p style="opacity:.72">{{ 'هذه البيانات هي مرجع التواصل الرسمي داخل البوابة.' if lang=='ar' else 'These are the official portal contact details.' }}</p>
+    </section>
+
+    <section class="card form">
+      <h2>{{ 'إعلان البوابة' if lang=='ar' else 'Portal Announcement' }}</h2>
+      <label class="full">{{ 'نص الإعلان' if lang=='ar' else 'Announcement Text' }}<textarea name="announcement" rows="5" placeholder="{{ 'اكتب الإعلان الذي سيظهر في الصفحة الرئيسية' if lang=='ar' else 'Write the announcement shown on the homepage' }}">{{settings.announcement}}</textarea></label>
+      <label class="check"><input type="checkbox" name="announcement_active" value="1" {{'checked' if settings.announcement_active=='1'}}> {{ 'إظهار الإعلان في الصفحة الرئيسية' if lang=='ar' else 'Show announcement on homepage' }}</label>
+      {% if settings.announcement_active=='1' and settings.announcement %}
+      <div class="notice" style="margin-top:14px"><b>{{ 'معاينة:' if lang=='ar' else 'Preview:' }}</b> {{settings.announcement}}</div>
+      {% endif %}
+      <p style="opacity:.72">{{ 'يمكن للوكالة التواصل مباشرة عبر WhatsApp من الإعلان عند ظهوره.' if lang=='ar' else 'Agencies can contact the team directly through WhatsApp from the announcement.' }}</p>
+    </section>
+
+    <section class="card" style="grid-column:1/-1">
+      <div class="section-head">
+        <div><h3>{{ 'حفظ التغييرات' if lang=='ar' else 'Save Changes' }}</h3><p>{{ 'سيتم تطبيق بيانات التواصل والإعلان بعد الحفظ.' if lang=='ar' else 'Contact details and announcement settings will be applied after saving.' }}</p></div>
+        <button class="btn gold" type="submit">{{T.save}}</button>
+      </div>
+    </section>
+  </form>
+</main>
+{% endblock %}
