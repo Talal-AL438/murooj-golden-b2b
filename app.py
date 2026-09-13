@@ -27,6 +27,7 @@ def init_db():
     CREATE TABLE IF NOT EXISTS hotel_images (id INTEGER PRIMARY KEY AUTOINCREMENT,hotel_id INTEGER NOT NULL,image_url TEXT NOT NULL,sort_order INTEGER DEFAULT 0,created_at TEXT NOT NULL,FOREIGN KEY(hotel_id) REFERENCES hotels(id));
     CREATE TABLE IF NOT EXISTS requests (id INTEGER PRIMARY KEY AUTOINCREMENT,agency_id INTEGER NOT NULL,hotel_id INTEGER,any_hotel INTEGER DEFAULT 0,city TEXT NOT NULL,checkin TEXT,checkout TEXT,rooms INTEGER,persons INTEGER,nationality TEXT,meal TEXT,notes TEXT,status TEXT DEFAULT 'sent',created_at TEXT NOT NULL,FOREIGN KEY(agency_id) REFERENCES agencies(id),FOREIGN KEY(hotel_id) REFERENCES hotels(id));
     CREATE TABLE IF NOT EXISTS offers (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,hotel_id INTEGER,start_date TEXT,end_date TEXT,meal TEXT,note TEXT,audience TEXT DEFAULT 'all',language_mode TEXT DEFAULT 'auto',manual_language TEXT DEFAULT 'ar',active INTEGER DEFAULT 1,pinned INTEGER DEFAULT 0,sort_order INTEGER DEFAULT 0,created_at TEXT NOT NULL);
+    CREATE TABLE IF NOT EXISTS notifications (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER NOT NULL,type TEXT NOT NULL,ref_id INTEGER,title TEXT NOT NULL,body TEXT,link TEXT,read_at TEXT,created_at TEXT NOT NULL,FOREIGN KEY(user_id) REFERENCES users(id));
     CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER,action TEXT NOT NULL,details TEXT,created_at TEXT NOT NULL);
     """)
     for k,v in {"company_name":"مروج الذهبية للاستثمار","brand":"MUROOJ GOLDEN","whatsapp":"966550558014","email":"talal_alaqely@icloud.com","announcement":"","announcement_active":"0"}.items():conn.execute("INSERT OR IGNORE INTO settings(key,value) VALUES (?,?)",(k,v))
@@ -42,12 +43,16 @@ def init_db():
 @app.before_request
 def ensure():init_db()
 def t():return LANGS.get(session.get("lang","ar"),LANGS["ar"])
-@app.context_processor
-def inject():return {"T":t(),"lang":session.get("lang","ar")}
 def current_user():
     uid=session.get("user_id")
     if not uid:return None
     c=db();u=c.execute("SELECT * FROM users WHERE id=?",(uid,)).fetchone();c.close();return u
+@app.context_processor
+def inject():
+    u=current_user();unread_count=0
+    if u and u["role"]=="agency":
+        c=db();unread_count=c.execute("SELECT COUNT(*) c FROM notifications WHERE user_id=? AND read_at IS NULL",(u["id"],)).fetchone()["c"];c.close()
+    return {"T":t(),"lang":session.get("lang","ar"),"unread_count":unread_count}
 def login_required(f):
     @wraps(f)
     def w(*a,**kw):
@@ -70,6 +75,25 @@ def super_required(f):
     return w
 def log(action,details=""):
     u=current_user();c=db();c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(u["id"] if u else None,action,details,datetime.utcnow().isoformat()));c.commit();c.close()
+
+def add_notification(c,user_id,kind,ref_id,title,body,link):
+    c.execute("INSERT INTO notifications(user_id,type,ref_id,title,body,link,created_at) VALUES(?,?,?,?,?,?,?)",(user_id,kind,ref_id,title,body,link,datetime.utcnow().isoformat()))
+
+def notify_offer(c,oid,title,audience):
+    rows=c.execute("SELECT u.id,u.language,a.country FROM users u JOIN agencies a ON a.user_id=u.id WHERE u.active=1").fetchall()
+    for row in rows:
+        country=(row["country"] or "").lower()
+        allowed=audience=="all" or (audience=="indonesia" and "indonesia" in country) or (audience=="malaysia" and "malaysia" in country)
+        if not allowed:continue
+        lang=row["language"] or "ar"
+        labels={"ar":("عرض جديد","تمت إضافة عرض جديد: "),"en":("New offer","A new offer is available: "),"id":("Penawaran baru","Penawaran baru tersedia: "),"ms":("Tawaran baharu","Tawaran baharu tersedia: ")}
+        head,body=labels.get(lang,labels["en"]);add_notification(c,row["id"],"offer",oid,head,body+title,f"/offer/{oid}")
+
+def notify_request_status(c,rid,status):
+    row=c.execute("SELECT u.id,u.language FROM requests r JOIN agencies a ON a.id=r.agency_id JOIN users u ON u.id=a.user_id WHERE r.id=?",(rid,)).fetchone()
+    if not row:return
+    labels={"ar":{"sent":("تحديث الطلب",f"الطلب #{rid} تم استلامه."),"contacted":("تحديث الطلب",f"تم التواصل بخصوص الطلب #{rid} عبر WhatsApp."),"closed":("تحديث الطلب",f"تم إغلاق الطلب #{rid}.")},"en":{"sent":("Request update",f"Request #{rid} has been received."),"contacted":("Request update",f"Request #{rid} was contacted via WhatsApp."),"closed":("Request update",f"Request #{rid} has been closed.")},"id":{"sent":("Pembaruan permintaan",f"Permintaan #{rid} telah diterima."),"contacted":("Pembaruan permintaan",f"Permintaan #{rid} telah dihubungi melalui WhatsApp."),"closed":("Pembaruan permintaan",f"Permintaan #{rid} telah ditutup.")},"ms":{"sent":("Kemas kini permintaan",f"Permintaan #{rid} telah diterima."),"contacted":("Kemas kini permintaan",f"Permintaan #{rid} telah dihubungi melalui WhatsApp."),"closed":("Kemas kini permintaan",f"Permintaan #{rid} telah ditutup.")}}
+    title,body=labels.get(row["language"] or "ar",labels["en"]).get(status,labels["en"]["sent"]);add_notification(c,row["id"],"request",rid,title,body,"/account")
 
 @app.route("/lang/<code>")
 def set_lang(code):
@@ -129,7 +153,7 @@ def new_request():
     if request.method=="POST":
         hv=request.form.get("hotel_id","");any_hotel=1 if hv=="any" else 0;hotel_id=None if any_hotel else int(hv);rooms=int(request.form["rooms"]);persons=int(request.form["persons"])
         if rooms<1 or persons<1 or request.form["checkout"]<request.form["checkin"]:c.close();return "invalid request",400
-        c.execute("INSERT INTO requests(agency_id,hotel_id,any_hotel,city,checkin,checkout,rooms,persons,nationality,meal,notes,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",(agency["id"],hotel_id,any_hotel,request.form["city"],request.form["checkin"],request.form["checkout"],rooms,persons,request.form["nationality"],request.form["meal"],request.form.get("notes",""),"sent",datetime.utcnow().isoformat()));c.commit();flash(t()["success_request"]);c.close();return redirect(url_for("account"))
+        cur=c.execute("INSERT INTO requests(agency_id,hotel_id,any_hotel,city,checkin,checkout,rooms,persons,nationality,meal,notes,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",(agency["id"],hotel_id,any_hotel,request.form["city"],request.form["checkin"],request.form["checkout"],rooms,persons,request.form["nationality"],request.form["meal"],request.form.get("notes",""),"sent",datetime.utcnow().isoformat()));notify_request_status(c,cur.lastrowid,"sent");c.commit();flash(t()["success_request"]);c.close();return redirect(url_for("account"))
     c.close();return render_template("request.html",hotels=hotels,user=u)
 @app.route("/account",methods=["GET","POST"])
 @login_required
@@ -150,6 +174,25 @@ def account():
         c.close();return redirect(url_for("account"))
     reqs=c.execute("SELECT r.*,h.name_ar,h.name_en FROM requests r LEFT JOIN hotels h ON h.id=r.hotel_id WHERE r.agency_id=? ORDER BY r.id DESC",(agency["id"],)).fetchall();c.close();return render_template("account.html",user=u,agency=agency,reqs=reqs)
 
+@app.route("/notifications")
+@login_required
+def notifications():
+    u=current_user()
+    if u["role"]!="agency":return redirect(url_for("admin"))
+    c=db();rows=c.execute("SELECT * FROM notifications WHERE user_id=? ORDER BY id DESC LIMIT 100",(u["id"],)).fetchall();c.close();return render_template("notifications.html",user=u,notifications=rows)
+@app.route("/notification/<int:nid>/open")
+@login_required
+def notification_open(nid):
+    u=current_user();c=db();row=c.execute("SELECT * FROM notifications WHERE id=? AND user_id=?",(nid,u["id"])).fetchone()
+    if not row:c.close();return "notification not found",404
+    c.execute("UPDATE notifications SET read_at=COALESCE(read_at,?) WHERE id=?",(datetime.utcnow().isoformat(),nid));c.commit();link=row["link"] or "/notifications";c.close();return redirect(link if link.startswith("/") else url_for("notifications"))
+@app.route("/notifications/read-all",methods=["POST"])
+@login_required
+def notifications_read_all():
+    u=current_user()
+    if u["role"]!="agency":return redirect(url_for("admin"))
+    c=db();c.execute("UPDATE notifications SET read_at=? WHERE user_id=? AND read_at IS NULL",(datetime.utcnow().isoformat(),u["id"]));c.commit();c.close();return redirect(url_for("notifications"))
+
 @app.route("/admin")
 @admin_required
 def admin():
@@ -159,7 +202,11 @@ def admin():
 def update_request_status(rid):
     status=request.form["status"]
     if status not in ("sent","contacted","closed"):return "bad status",400
-    c=db();c.execute("UPDATE requests SET status=? WHERE id=?",(status,rid));c.commit();c.close();log("request_status",f"request={rid}, status={status}");return redirect(url_for("admin"))
+    c=db();old=c.execute("SELECT status FROM requests WHERE id=?",(rid,)).fetchone()
+    if not old:c.close();return "request not found",404
+    c.execute("UPDATE requests SET status=? WHERE id=?",(status,rid))
+    if old["status"]!=status:notify_request_status(c,rid,status)
+    c.commit();c.close();log("request_status",f"request={rid}, status={status}");return redirect(url_for("admin"))
 
 @app.route("/admin/hotels",methods=["GET","POST"])
 @admin_required
@@ -199,7 +246,7 @@ def admin_offers():
         data=(request.form["title"].strip(),request.form.get("hotel_id") or None,request.form.get("start_date",""),request.form.get("end_date",""),request.form.get("meal","").strip(),request.form.get("note","").strip(),request.form.get("audience","all"),request.form.get("language_mode","auto"),request.form.get("manual_language","ar"),1 if request.form.get("pinned") else 0,int(request.form.get("sort_order",0)))
         if action=="edit":
             oid=int(request.form["oid"]);c.execute("UPDATE offers SET title=?,hotel_id=?,start_date=?,end_date=?,meal=?,note=?,audience=?,language_mode=?,manual_language=?,pinned=?,sort_order=? WHERE id=?",data+(oid,));c.commit();c.close();log("offer_edit",f"offer={oid}");return redirect(url_for("admin_offers"))
-        c.execute("INSERT INTO offers(title,hotel_id,start_date,end_date,meal,note,audience,language_mode,manual_language,active,pinned,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?,1,?,?,?)",data+(datetime.utcnow().isoformat(),));c.commit();c.close();log("offer_add",data[0]);return redirect(url_for("admin_offers"))
+        cur=c.execute("INSERT INTO offers(title,hotel_id,start_date,end_date,meal,note,audience,language_mode,manual_language,active,pinned,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?,1,?,?,?)",data+(datetime.utcnow().isoformat(),));notify_offer(c,cur.lastrowid,data[0],data[6]);c.commit();c.close();log("offer_add",data[0]);return redirect(url_for("admin_offers"))
     offers=c.execute("SELECT o.*,h.name_en FROM offers o LEFT JOIN hotels h ON h.id=o.hotel_id ORDER BY o.pinned DESC,o.sort_order,o.id DESC").fetchall();hotels=c.execute("SELECT * FROM hotels WHERE active=1 ORDER BY sort_order,id").fetchall();c.close();return render_template("admin_offers.html",user=current_user(),offers=offers,hotels=hotels)
 
 @app.route("/admin/agencies",methods=["GET","POST"])
