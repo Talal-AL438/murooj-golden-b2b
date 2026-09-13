@@ -1,4 +1,5 @@
 from io import BytesIO
+from datetime import datetime
 from flask import request, render_template, send_file
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -6,6 +7,34 @@ from openpyxl.utils import get_column_letter
 
 
 def register_reports(app, admin_required, db, current_user):
+    @app.before_request
+    def save_extended_announcement_settings():
+        if request.path != '/admin/settings' or request.method != 'POST':
+            return None
+        u=current_user()
+        if not u or u['role']!='super_admin':
+            return None
+        c=db()
+        values={
+            'announcement_active':'1' if request.form.get('announcement_active') else '0',
+            'announcement_target':request.form.get('announcement_target','all') if request.form.get('announcement_target','all') in ('all','indonesia','malaysia') else 'all',
+            'announcement_start':request.form.get('announcement_start','').strip(),
+            'announcement_end':request.form.get('announcement_end','').strip(),
+            'announcement_whatsapp':'1' if request.form.get('announcement_whatsapp') else '0',
+        }
+        for key,value in values.items():
+            c.execute("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",(key,value))
+        c.commit();c.close()
+        return None
+
+    @app.context_processor
+    def extended_portal_context():
+        u=current_user(); country=''
+        if u and u['role']=='agency':
+            c=db(); row=c.execute("SELECT country FROM agencies WHERE user_id=?",(u['id'],)).fetchone(); c.close()
+            if row: country=row['country'] or ''
+        return {'agency_country':country,'current_date':datetime.utcnow().date().isoformat()}
+
     def filters():
         return {
             'country': request.args.get('country','').strip(),
