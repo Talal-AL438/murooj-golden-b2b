@@ -8,21 +8,33 @@
 
 <section><h2>{{T.special_offers}}</h2><div class="grid">{% for o in offers %}
 <div class="card"><h3>{{o.title}}</h3><p>{{o.note}}</p><p>{{o.start_date}} — {{o.end_date}}</p>
-{% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request')}}">{{T.send_request}}</a>{% endif %}</div>
+{% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request')}}?hotel={{o.hotel_id or 'any'}}">{{T.send_request}}</a>{% endif %}</div>
 {% else %}<div class="card">{{T.no_active_offers}}</div>{% endfor %}</div></section>
 
 <section id="hotels"><h2>{{T.hotels}} — {{T.makkah}}</h2><div class="grid hotel-grid">{% for h in hotels %}
-<article class="card hotel-card">
+<article class="card hotel-card" id="hotel-{{h.id}}">
 {% if h.name_en == 'NADA AJYAD HOTEL' %}
-<img class="hotel-image" src="{{ url_for('static', filename='ندى.jfif') }}" alt="فندق ندى أجياد">
+<img class="hotel-image" src="{{ url_for('static', filename='ندى.jfif') }}" alt="{{h.name_ar}}">
 {% elif h.name_en == 'SAWAEED AL KHAIR HOTEL' %}
-<img class="hotel-image" src="{{ url_for('static', filename='سواعد الخير.jfif') }}" alt="فندق سواعد الخير">
+<img class="hotel-image" src="{{ url_for('static', filename='سواعد الخير.jfif') }}" alt="{{h.name_ar}}">
 {% endif %}
 <div class="hotel-card-body">
 <h3 class="hotel-name"><span class="hotel-name-ar">{{h.name_ar}}</span><span class="hotel-name-en" translate="no">{{h.name_en}}</span></h3>
+<p>{{T.makkah}}</p>
 <div class="hotel-tags">{% for s in h.services.split('|') %}<span class="tag">{{s}}</span>{% endfor %}</div>
+<details class="hotel-details">
+<summary class="btn outline">{{T.view}}</summary>
+<div class="hotel-detail-content">
+<h4>{{T.services if T.services is defined else T.hotels}}</h4>
+<div class="hotel-tags">{% for s in h.services.split('|') %}<span class="tag">{{s}}</span>{% endfor %}</div>
+<h4>{{T.meal}}</h4>
+<div class="hotel-tags"><span class="tag">{{T.room_only}}</span><span class="tag">{{T.indo_fb}}</span><span class="tag">{{T.malay_fb}}</span></div>
 <div class="hotel-actions"><a class="btn dark" target="_blank" rel="noopener" href="{{h.map_url}}">{{T.location}}</a>
-{% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request')}}?hotel={{h.id}}">{{T.send_request}}</a>{% endif %}</div>
+{% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request')}}?hotel={{h.id}}&city={{h.city}}">{{T.send_request}}</a>{% else %}<a class="btn gold" href="{{url_for('login')}}">{{T.login}}</a>{% endif %}</div>
+</div>
+</details>
+<div class="hotel-actions"><a class="btn dark" target="_blank" rel="noopener" href="{{h.map_url}}">{{T.location}}</a>
+{% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request')}}?hotel={{h.id}}&city={{h.city}}">{{T.send_request}}</a>{% endif %}</div>
 </div>
 </article>
 {% endfor %}</div></section>
