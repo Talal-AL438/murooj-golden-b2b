@@ -17,15 +17,50 @@ def register_reports(app, admin_required, db, current_user):
         c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(user_id,action,details,datetime.utcnow().isoformat()))
     def msg(lang,key):
         messages={
-            'ar':{'profile':'تم تحديث بيانات الحساب بنجاح.','profile_bad':'يرجى إدخال اسم المسؤول والدولة ورقم WhatsApp بشكل صحيح.','password':'تم تغيير كلمة المرور بنجاح.','bad':'كلمة المرور الحالية غير صحيحة.','short':'يجب أن تكون كلمة المرور الجديدة 8 أحرف على الأقل.','mismatch':'كلمتا المرور الجديدتان غير متطابقتين.','same':'اختر كلمة مرور جديدة مختلفة عن كلمة المرور الحالية.'},
-            'en':{'profile':'Account details updated successfully.','profile_bad':'Please enter a valid contact name, country, and WhatsApp number.','password':'Password changed successfully.','bad':'Current password is incorrect.','short':'New password must be at least 8 characters.','mismatch':'New passwords do not match.','same':'Choose a new password different from your current password.'},
-            'id':{'profile':'Data akun berhasil diperbarui.','profile_bad':'Masukkan nama kontak, negara, dan nomor WhatsApp yang valid.','password':'Kata sandi berhasil diubah.','bad':'Kata sandi saat ini salah.','short':'Kata sandi baru minimal 8 karakter.','mismatch':'Konfirmasi kata sandi tidak cocok.','same':'Pilih kata sandi baru yang berbeda dari kata sandi saat ini.'},
-            'ms':{'profile':'Maklumat akaun berjaya dikemas kini.','profile_bad':'Masukkan nama pegawai, negara dan nombor WhatsApp yang sah.','password':'Kata laluan berjaya ditukar.','bad':'Kata laluan semasa tidak betul.','short':'Kata laluan baharu mestilah sekurang-kurangnya 8 aksara.','mismatch':'Pengesahan kata laluan tidak sepadan.','same':'Pilih kata laluan baharu yang berbeza daripada kata laluan semasa.'}}
+            'ar':{'profile':'تم تحديث بيانات الحساب بنجاح.','profile_bad':'يرجى إدخال اسم المسؤول والدولة ورقم WhatsApp بشكل صحيح.','password':'تم تغيير كلمة المرور بنجاح.','bad':'كلمة المرور الحالية غير صحيحة.','short':'يجب أن تكون كلمة المرور الجديدة 8 أحرف على الأقل.','mismatch':'كلمتا المرور الجديدتان غير متطابقتين.','same':'اختر كلمة مرور جديدة مختلفة عن كلمة المرور الحالية.','request_bad':'تعذر إرسال الطلب. تحقق من الفندق والتواريخ وعدد الغرف والأشخاص والبيانات المطلوبة.'},
+            'en':{'profile':'Account details updated successfully.','profile_bad':'Please enter a valid contact name, country, and WhatsApp number.','password':'Password changed successfully.','bad':'Current password is incorrect.','short':'New password must be at least 8 characters.','mismatch':'New passwords do not match.','same':'Choose a new password different from your current password.','request_bad':'The request could not be sent. Check the hotel, dates, rooms, persons, and required details.'},
+            'id':{'profile':'Data akun berhasil diperbarui.','profile_bad':'Masukkan nama kontak, negara, dan nomor WhatsApp yang valid.','password':'Kata sandi berhasil diubah.','bad':'Kata sandi saat ini salah.','short':'Kata sandi baru minimal 8 karakter.','mismatch':'Konfirmasi kata sandi tidak cocok.','same':'Pilih kata sandi baru yang berbeda dari kata sandi saat ini.','request_bad':'Permintaan tidak dapat dikirim. Periksa hotel, tanggal, kamar, jumlah orang, dan data wajib.'},
+            'ms':{'profile':'Maklumat akaun berjaya dikemas kini.','profile_bad':'Masukkan nama pegawai, negara dan nombor WhatsApp yang sah.','password':'Kata laluan berjaya ditukar.','bad':'Kata laluan semasa tidak betul.','short':'Kata laluan baharu mestilah sekurang-kurangnya 8 aksara.','mismatch':'Pengesahan kata laluan tidak sepadan.','same':'Pilih kata laluan baharu yang berbeza daripada kata laluan semasa.','request_bad':'Permintaan tidak dapat dihantar. Semak hotel, tarikh, bilik, bilangan orang dan maklumat wajib.'}}
         return messages.get(lang or 'ar',messages['ar'])[key]
 
     @app.before_request
     def portal_extensions_and_staff_access():
         c=db();ensure_permissions_table(c);c.commit();c.close()
+
+        if request.path=='/request' and request.method=='POST':
+            u=current_user()
+            if not u or u['role']!='agency':return None
+            lang=u['language'] or 'ar';c=db();agency=c.execute("SELECT id FROM agencies WHERE user_id=?",(u['id'],)).fetchone()
+            if not agency:c.close();return None
+            hv=request.form.get('hotel_id','').strip();city=request.form.get('city','').strip();checkin=request.form.get('checkin','').strip();checkout=request.form.get('checkout','').strip();nationality=request.form.get('nationality','').strip();meal=request.form.get('meal','').strip();notes=request.form.get('notes','').strip()
+            valid=True;hotel_id=None;any_hotel=(hv=='any')
+            try:
+                rooms=int(request.form.get('rooms','0'));persons=int(request.form.get('persons','0'))
+            except (TypeError,ValueError):rooms=0;persons=0;valid=False
+            if rooms<1 or rooms>500 or persons<1 or persons>5000:valid=False
+            if city not in ('Makkah','Madinah'):valid=False
+            try:
+                ci=datetime.strptime(checkin,'%Y-%m-%d').date();co=datetime.strptime(checkout,'%Y-%m-%d').date()
+                if co<=ci:valid=False
+            except ValueError:valid=False
+            if not nationality or len(nationality)>100 or len(notes)>2000:valid=False
+            if meal not in ('RO','F.B Indo','F.B Malaysian'):valid=False
+            if any_hotel:
+                hotel_id=None
+            else:
+                try:hotel_id=int(hv)
+                except (TypeError,ValueError):valid=False
+                if hotel_id:
+                    hotel=c.execute("SELECT id,city,active FROM hotels WHERE id=?",(hotel_id,)).fetchone()
+                    if not hotel or not hotel['active'] or hotel['city']!=city:valid=False
+            if not valid:
+                c.close();flash(msg(lang,'request_bad'));return redirect(url_for('new_request'))
+            cur=c.execute("INSERT INTO requests(agency_id,hotel_id,any_hotel,city,checkin,checkout,rooms,persons,nationality,meal,notes,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",(agency['id'],hotel_id,1 if any_hotel else 0,city,checkin,checkout,rooms,persons,nationality,meal,notes,'sent',datetime.utcnow().isoformat()))
+            rid=cur.lastrowid
+            c.execute("INSERT INTO notifications(user_id,type,ref_id,title,body,link,created_at) VALUES(?,?,?,?,?,?,?)",(u['id'],'request',rid,'تحديث الطلب' if lang=='ar' else 'Request update',f'#{rid}','/account',datetime.utcnow().isoformat()))
+            audit(c,u['id'],'request_submit',f"request={rid}, agency={agency['id']}");c.commit();c.close()
+            success={'ar':'تم إرسال طلبك إلى مروج الذهبية بنجاح. سيتواصل معك فريق الحجوزات عبر WhatsApp لتأكيد التوفر والسعر.','en':'Your request was sent to Murooj Golden successfully. Our reservations team will contact you on WhatsApp to confirm availability and price.','id':'Permintaan Anda berhasil dikirim ke Murooj Golden. Tim reservasi akan menghubungi Anda melalui WhatsApp untuk mengonfirmasi ketersediaan dan harga.','ms':'Permintaan anda berjaya dihantar kepada Murooj Golden. Pasukan tempahan akan menghubungi anda melalui WhatsApp untuk mengesahkan ketersediaan dan harga.'}
+            flash(success.get(lang,success['en']));return redirect(url_for('account'))
 
         if request.path=='/account' and request.method=='POST':
             u=current_user()
@@ -33,10 +68,8 @@ def register_reports(app, admin_required, db, current_user):
             lang=u['language'] or 'ar';action=request.form.get('action','');c=db();agency=c.execute("SELECT * FROM agencies WHERE user_id=?",(u['id'],)).fetchone()
             if not agency:c.close();return None
             if action=='profile':
-                cn=request.form.get('contact_name','').strip();country=request.form.get('country','').strip();wa=request.form.get('whatsapp','').strip()
-                normalized=''.join(ch for ch in wa if ch.isdigit())
-                if len(cn)<2 or len(country)<2 or len(normalized)<8 or len(normalized)>15:
-                    c.close();flash(msg(lang,'profile_bad'));return redirect(url_for('account'))
+                cn=request.form.get('contact_name','').strip();country=request.form.get('country','').strip();wa=request.form.get('whatsapp','').strip();normalized=''.join(ch for ch in wa if ch.isdigit())
+                if len(cn)<2 or len(country)<2 or len(normalized)<8 or len(normalized)>15:c.close();flash(msg(lang,'profile_bad'));return redirect(url_for('account'))
                 c.execute("UPDATE agencies SET contact_name=?,country=?,whatsapp=? WHERE id=?",(cn,country,wa,agency['id']));c.execute("UPDATE users SET name=?,mobile=? WHERE id=?",(cn,wa,u['id']));audit(c,u['id'],'agency_profile_update',f"agency={agency['id']}");c.commit();c.close();flash(msg(lang,'profile'));return redirect(url_for('account'))
             if action=='password':
                 cp=request.form.get('current_password','');np=request.form.get('new_password','');confirm=request.form.get('confirm_password','')
