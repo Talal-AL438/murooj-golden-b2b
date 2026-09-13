@@ -9,7 +9,7 @@
 {% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request')}}">{{T.send_request}}</a>{% endif %}</div>
 {% else %}<div class="card">{{T.no_active_offers}}</div>{% endfor %}</div></section>
 <section id="hotels"><h2>{{T.hotels}} — {{T.makkah}}</h2><div class="grid">{% for h in hotels %}
-<div class="card">{% if h.name_en == 'NADA AJYAD HOTEL' %}<img class="hotel-image" src="{{ url_for('static', filename='ندى.jfif') }}" alt="{{h.name_ar}}">{% endif %}<h3>{{h.name_ar}}</h3>
+<div class="card">{% if h.name_en == 'NADA AJYAD HOTEL' %}<img class="hotel-image" src="{{ url_for('static', filename='ندى.jfif') }}" alt="فندق ندى أجياد">{% endif %}<h3>{% if h.name_en == 'NADA AJYAD HOTEL' %}فندق ندى أجياد{% else %}{{h.name_ar}}{% endif %}</h3>
 <div>{% for s in h.services.split('|') %}<span class="tag">{{s}}</span>{% endfor %}</div>
 <p><a class="btn dark" target="_blank" href="{{h.map_url}}">{{T.location}}</a>
 {% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request')}}?hotel={{h.id}}">{{T.send_request}}</a>{% endif %}</p></div>
