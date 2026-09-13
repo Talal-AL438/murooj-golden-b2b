@@ -3,6 +3,7 @@
 <main class="page-shell">
   <div class="adminnav">
     <a class="active" href="{{ url_for('admin') }}">{{ T.admin }}</a>
+    <a href="{{ url_for('admin_reports') }}">{{ T.reports }}</a>
     <a href="{{ url_for('admin_agencies') }}">{{ T.agencies }}</a>
     <a href="{{ url_for('admin_hotels') }}">{{ T.hotels }}</a>
     <a href="{{ url_for('admin_offers') }}">{{ T.offers }}</a>
@@ -21,31 +22,20 @@
     <div class="stat"><span>{{ T.hotels }}</span><strong>{{ stats.hotels }}</strong></div>
   </div>
 
-  <section class="card form" id="reports" style="margin:22px 0">
-    <div class="section-head"><h2>{{ T.reports }}</h2><button type="button" class="btn gold" id="export-report">CSV / Excel</button></div>
-    <div class="form-grid">
-      <label>{{ T.country }}<input id="report-country" placeholder="{{ T.country }}"></label>
-      <label>{{ T.hotel }}<input id="report-hotel" placeholder="{{ T.hotel }}"></label>
-      <label>{{ T.status }}
-        <select id="report-status"><option value="">All</option><option value="sent">{{ T.sent }}</option><option value="contacted">{{ T.contacted }}</option><option value="closed">{{ T.closed }}</option></select>
-      </label>
-      <label>From<input type="date" id="report-from"></label>
-      <label>To<input type="date" id="report-to"></label>
-    </div>
-    <div class="stats" style="margin-top:18px">
-      <div class="stat"><span>{{ T.quick_request }}</span><strong id="filtered-count">{{ reqs|length }}</strong></div>
-      <div class="stat"><span>{{ T.rooms }}</span><strong id="filtered-rooms">0</strong></div>
-      <div class="stat"><span>{{ T.persons }}</span><strong id="filtered-persons">0</strong></div>
+  <section class="card" style="margin:22px 0">
+    <div class="section-head">
+      <div><h2>{{ T.reports }}</h2><p>{{ 'جميع الطلبات والتقارير التاريخية مع الفلاتر وتصدير Excel الحقيقي.' if lang=='ar' else 'Full historical reports with filters and real Excel export.' }}</p></div>
+      <div class="hotel-actions"><a class="btn gold" href="{{ url_for('admin_reports') }}">{{ T.reports }}</a><a class="btn dark" href="{{ url_for('admin_reports_excel') }}">Excel .xlsx</a></div>
     </div>
   </section>
 
-  <h2>{{ T.new_requests }}</h2>
-  <div class="tablewrap"><table id="request-report-table">
+  <div class="section-head"><h2>{{ T.new_requests }}</h2><span class="tag">{{ 'آخر 50 طلب للمتابعة السريعة' if lang=='ar' else 'Latest 50 requests for quick follow-up' }}</span></div>
+  <div class="tablewrap"><table>
     <thead><tr><th>#</th><th>{{ T.agency_name }}</th><th>{{ T.country }}</th><th>{{ T.hotel }}</th><th>{{ T.date }}</th><th>{{ T.persons }}</th><th>{{ T.rooms }}</th><th>{{ T.meal }}</th><th>{{ T.status }}</th><th>{{ T.actions }}</th></tr></thead>
     <tbody>
     {% for r in reqs %}
-      {% set hotel_name = T.any_hotel if r.any_hotel else (r.name_ar or r.name_en) %}
-      <tr class="{{ 'new-row' if r.status == 'sent' }}" data-country="{{ r.country }}" data-hotel="{{ hotel_name }}" data-status="{{ r.status }}" data-created="{{ r.created_at[:10] }}" data-rooms="{{ r.rooms or 0 }}" data-persons="{{ r.persons or 0 }}">
+      {% set hotel_name = T.any_hotel if r.any_hotel else (r.name_ar if lang=='ar' else (r.name_en or r.name_ar)) %}
+      <tr class="{{ 'new-row' if r.status == 'sent' }}">
         <td>{{ r.id }}</td><td>{{ r.agency_name }}</td><td>{{ r.country }}</td><td>{{ hotel_name }}</td><td>{{ r.checkin }} → {{ r.checkout }}</td><td>{{ r.persons }}</td><td>{{ r.rooms }}</td><td>{{ r.meal }}</td><td><span class="status {{ r.status }}">{{ T[r.status] }}</span></td>
         <td><a class="btn small dark" target="_blank" rel="noopener" href="https://wa.me/{{ r.whatsapp|replace('+','')|replace(' ','')|replace('-','') }}">WhatsApp</a>
           <form method="post" action="{{ url_for('update_request_status',rid=r.id) }}" class="inline"><select name="status"><option value="sent" {{ 'selected' if r.status=='sent' }}>{{ T.sent }}</option><option value="contacted" {{ 'selected' if r.status=='contacted' }}>{{ T.contacted }}</option><option value="closed" {{ 'selected' if r.status=='closed' }}>{{ T.closed }}</option></select><button class="btn small gold">{{ T.save }}</button></form>
@@ -55,56 +45,4 @@
     </tbody>
   </table></div>
 </main>
-
-<script>
-(function () {
-  const rows = Array.from(document.querySelectorAll('#request-report-table tbody tr[data-country]'));
-  const country = document.getElementById('report-country');
-  const hotel = document.getElementById('report-hotel');
-  const status = document.getElementById('report-status');
-  const from = document.getElementById('report-from');
-  const to = document.getElementById('report-to');
-  const count = document.getElementById('filtered-count');
-  const rooms = document.getElementById('filtered-rooms');
-  const persons = document.getElementById('filtered-persons');
-
-  function visibleRows() {
-    const c = country.value.trim().toLowerCase();
-    const h = hotel.value.trim().toLowerCase();
-    return rows.filter(function (row) {
-      const ok = (!c || row.dataset.country.toLowerCase().includes(c)) &&
-                 (!h || row.dataset.hotel.toLowerCase().includes(h)) &&
-                 (!status.value || row.dataset.status === status.value) &&
-                 (!from.value || row.dataset.created >= from.value) &&
-                 (!to.value || row.dataset.created <= to.value);
-      row.hidden = !ok;
-      return ok;
-    });
-  }
-
-  function applyFilters() {
-    const shown = visibleRows();
-    count.textContent = shown.length;
-    rooms.textContent = shown.reduce((n,r) => n + Number(r.dataset.rooms || 0), 0);
-    persons.textContent = shown.reduce((n,r) => n + Number(r.dataset.persons || 0), 0);
-  }
-  [country,hotel,status,from,to].forEach(el => el.addEventListener(el.tagName === 'INPUT' && el.type === 'text' ? 'input' : 'change', applyFilters));
-  applyFilters();
-
-  document.getElementById('export-report').addEventListener('click', function () {
-    const shown = visibleRows();
-    const lines = [['Request ID','Agency','Country','Hotel','Dates','Persons','Rooms','Meal','Status']];
-    shown.forEach(function (row) {
-      const cells = Array.from(row.cells).slice(0,9).map(td => td.innerText.trim().replace(/\s+/g,' '));
-      lines.push(cells);
-    });
-    const csv = '\uFEFF' + lines.map(line => line.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'murooj-golden-requests-report.csv';
-    document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(link.href);
-  });
-})();
-</script>
 {% endblock %}
