@@ -1,16 +1,19 @@
 from datetime import datetime
 from flask import request, redirect, url_for, render_template, flash
+from werkzeug.security import generate_password_hash
 
 
 def register_offer_extensions(app, db, current_user):
     def ensure_schema():
         c=db()
         tables={r['name'] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
-        if 'offers' not in tables:
-            c.close();return
-        cols=[r['name'] for r in c.execute('PRAGMA table_info(offers)').fetchall()]
-        if 'image_url' not in cols:c.execute("ALTER TABLE offers ADD COLUMN image_url TEXT DEFAULT ''")
-        c.execute("CREATE TABLE IF NOT EXISTS offer_targets (offer_id INTEGER NOT NULL,agency_id INTEGER NOT NULL,PRIMARY KEY(offer_id,agency_id),FOREIGN KEY(offer_id) REFERENCES offers(id),FOREIGN KEY(agency_id) REFERENCES agencies(id))")
+        if 'users' in tables:
+            user_cols=[r['name'] for r in c.execute('PRAGMA table_info(users)').fetchall()]
+            if 'department' not in user_cols:c.execute("ALTER TABLE users ADD COLUMN department TEXT DEFAULT ''")
+        if 'offers' in tables:
+            cols=[r['name'] for r in c.execute('PRAGMA table_info(offers)').fetchall()]
+            if 'image_url' not in cols:c.execute("ALTER TABLE offers ADD COLUMN image_url TEXT DEFAULT ''")
+            c.execute("CREATE TABLE IF NOT EXISTS offer_targets (offer_id INTEGER NOT NULL,agency_id INTEGER NOT NULL,PRIMARY KEY(offer_id,agency_id),FOREIGN KEY(offer_id) REFERENCES offers(id),FOREIGN KEY(agency_id) REFERENCES agencies(id))")
         c.commit();c.close()
 
     @app.before_request
@@ -31,6 +34,46 @@ def register_offer_extensions(app, db, current_user):
 
     def audit(action,details=''):
         u=current_user();c=db();c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(u['id'] if u else None,action,details,datetime.utcnow().isoformat()));c.commit();c.close()
+
+    def employee_error(key):
+        u=current_user();lang=(u['language'] if u else 'ar') or 'ar'
+        messages={
+            'ar':{'bad':'تحقق من اسم الموظف والقسم والمسمى الوظيفي والجوال والبريد الإلكتروني.','password':'كلمة المرور المؤقتة يجب أن تكون 8 أحرف على الأقل.','email':'البريد الإلكتروني مستخدم بالفعل.','saved':'تم تحديث بيانات الموظف بنجاح.','added':'تمت إضافة الموظف بنجاح.'},
+            'en':{'bad':'Check the employee name, department, job title, mobile, and email.','password':'Temporary password must be at least 8 characters.','email':'This email is already in use.','saved':'Employee details updated successfully.','added':'Employee added successfully.'},
+            'id':{'bad':'Periksa nama, departemen, jabatan, ponsel, dan email pegawai.','password':'Kata sandi sementara minimal 8 karakter.','email':'Email ini sudah digunakan.','saved':'Data pegawai berhasil diperbarui.','added':'Pegawai berhasil ditambahkan.'},
+            'ms':{'bad':'Semak nama, jabatan, bahagian, telefon dan e-mel pekerja.','password':'Kata laluan sementara mestilah sekurang-kurangnya 8 aksara.','email':'E-mel ini telah digunakan.','saved':'Maklumat pekerja berjaya dikemas kini.','added':'Pekerja berjaya ditambah.'}}
+        return messages.get(lang,messages['en'])[key]
+
+    def valid_employee_fields(name,department,job_title,mobile,email):
+        digits=''.join(ch for ch in mobile if ch.isdigit())
+        return 2<=len(name)<=120 and 2<=len(department)<=100 and 2<=len(job_title)<=120 and 8<=len(digits)<=15 and len(email)<=254 and '@' in email and '.' in email.rsplit('@',1)[-1]
+
+    def admin_employees_extended():
+        ensure_schema();u=current_user()
+        if not u or u['role']!='super_admin':return redirect(url_for('admin'))
+        c=db()
+        if request.method=='POST':
+            name=request.form.get('name','').strip();department=request.form.get('department','').strip();job_title=request.form.get('job_title','').strip();mobile=request.form.get('mobile','').strip();email=request.form.get('email','').strip().lower();password=request.form.get('password','')
+            if not valid_employee_fields(name,department,job_title,mobile,email):c.close();flash(employee_error('bad'));return redirect(url_for('admin_employees'))
+            if len(password)<8:c.close();flash(employee_error('password'));return redirect(url_for('admin_employees'))
+            if c.execute('SELECT 1 FROM users WHERE email=?',(email,)).fetchone():c.close();flash(employee_error('email'));return redirect(url_for('admin_employees'))
+            c.execute("INSERT INTO users(email,password_hash,role,name,job_title,mobile,department,language,active,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)",(email,generate_password_hash(password),'staff',name,job_title,mobile,department,'ar',1,datetime.utcnow().isoformat()));c.commit();c.close();audit('employee_add',email);flash(employee_error('added'));return redirect(url_for('admin_employees'))
+        employees=c.execute("SELECT * FROM users WHERE role IN ('staff','super_admin') ORDER BY CASE WHEN role='super_admin' THEN 0 ELSE 1 END,id").fetchall();c.close();return render_template('admin_employees.html',user=u,employees=employees)
+
+    @app.route('/admin/employee/<int:uid>/edit',methods=['POST'])
+    def edit_employee_extended(uid):
+        ensure_schema();u=current_user()
+        if not u or u['role']!='super_admin':return redirect(url_for('admin'))
+        c=db();employee=c.execute("SELECT * FROM users WHERE id=? AND role='staff'",(uid,)).fetchone()
+        if not employee:c.close();return 'staff not found',404
+        name=request.form.get('name','').strip();department=request.form.get('department','').strip();job_title=request.form.get('job_title','').strip();mobile=request.form.get('mobile','').strip();email=request.form.get('email','').strip().lower();new_password=request.form.get('new_password','')
+        if not valid_employee_fields(name,department,job_title,mobile,email):c.close();flash(employee_error('bad'));return redirect(url_for('admin_employees'))
+        duplicate=c.execute('SELECT 1 FROM users WHERE email=? AND id<>?',(email,uid)).fetchone()
+        if duplicate:c.close();flash(employee_error('email'));return redirect(url_for('admin_employees'))
+        if new_password and len(new_password)<8:c.close();flash(employee_error('password'));return redirect(url_for('admin_employees'))
+        c.execute('UPDATE users SET name=?,department=?,job_title=?,mobile=?,email=? WHERE id=?',(name,department,job_title,mobile,email,uid))
+        if new_password:c.execute('UPDATE users SET password_hash=? WHERE id=?',(generate_password_hash(new_password),uid))
+        c.commit();c.close();audit('employee_edit',f'employee={uid}');flash(employee_error('saved'));return redirect(url_for('admin_employees'))
 
     def offer_error(u,key):
         lang=(u['language'] if u else 'ar') or 'ar'
@@ -137,4 +180,5 @@ def register_offer_extensions(app, db, current_user):
 
     app.view_functions['home']=home_extended
     app.view_functions['admin_offers']=admin_offers_extended
+    app.view_functions['admin_employees']=admin_employees_extended
     app.view_functions['offer_detail']=offer_detail_extended
