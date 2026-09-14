@@ -15,7 +15,12 @@
   <section class="grid" style="margin-top:22px">
     <article class="card">
       <h2>{{ 'الخدمات' if lang=='ar' else ('Fasilitas' if lang=='id' else ('Kemudahan' if lang=='ms' else 'Services')) }}</h2>
-      <div class="hotel-tags">{% for s in (hotel.services or '').split('|') if s %}<span class="tag">{{s}}</span>{% endfor %}</div>
+      <div class="hotel-tags">
+        {% for s in (hotel.services or '').split('|') if s %}
+          {% set key = s.strip().lower() %}
+          <span class="tag">{% if lang=='ar' %}{{ {'wi-fi':'واي فاي','24h reception':'استقبال 24 ساعة','elevators':'مصاعد','ac':'تكييف','restaurant':'مطعم','indonesian meals':'وجبات إندونيسية','malaysian meals':'وجبات ماليزية','cleaning':'تنظيف','fridge':'ثلاجة','tv':'تلفزيون'}.get(key,s) }}{% elif lang=='id' %}{{ {'wi-fi':'Wi-Fi','24h reception':'Resepsionis 24 jam','elevators':'Lift','ac':'AC','restaurant':'Restoran','indonesian meals':'Makanan Indonesia','malaysian meals':'Makanan Malaysia','cleaning':'Layanan kebersihan','fridge':'Kulkas','tv':'TV'}.get(key,s) }}{% elif lang=='ms' %}{{ {'wi-fi':'Wi-Fi','24h reception':'Kaunter penerimaan 24 jam','elevators':'Lif','ac':'Penyaman udara','restaurant':'Restoran','indonesian meals':'Hidangan Indonesia','malaysian meals':'Hidangan Malaysia','cleaning':'Perkhidmatan pembersihan','fridge':'Peti sejuk','tv':'TV'}.get(key,s) }}{% else %}{{s}}{% endif %}</span>
+        {% endfor %}
+      </div>
     </article>
     <article class="card">
       <h2>{{T.meal}}</h2>
