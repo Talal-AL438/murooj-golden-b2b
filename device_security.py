@@ -42,11 +42,11 @@ def register_device_security(app, db, current_user):
             if failed_ip>=20:
                 g.login_rate_blocked=True;flash('تم تجاوز عدد محاولات تسجيل الدخول من هذا الاتصال. حاول مرة أخرى بعد 15 دقيقة.');return redirect(url_for('login'))
         if request.path.startswith('/static/'):return None
-        u=current_user()
-        if not u or u['role'] not in ('super_admin','staff'):return None
         if session.get('_pending_admin_device_id'):
             if request.endpoint in ('admin_device_verification','logout'):return None
             return redirect(url_for('admin_device_verification'))
+        u=current_user()
+        if not u or u['role'] not in ('super_admin','staff'):return None
         row=current_device_row(u['id'])
         if row:
             c=db();c.execute("UPDATE trusted_admin_devices SET last_seen_at=? WHERE id=?",(datetime.utcnow().isoformat(),row['id']));c.commit();c.close();return None
@@ -63,7 +63,12 @@ def register_device_security(app, db, current_user):
                 if trusted_count(u['id'])==0:
                     trust_current_device(u['id'],u['id'])
                 else:
-                    raw=secrets.token_urlsafe(32);now=datetime.utcnow().isoformat();c=db();cur=c.execute("INSERT INTO pending_admin_devices(user_id,token_hash,user_agent,ip,created_at) VALUES(?,?,?,?,?)",(u['id'],token_hash(raw),(request.headers.get('User-Agent') or '')[:300],client_ip(),now));pid=cur.lastrowid;c.commit();c.close();session['_pending_admin_device_id']=pid;session['_pending_admin_device_token']=raw;response=make_response(redirect(url_for('admin_device_verification')))
+                    raw=secrets.token_urlsafe(32);now=datetime.utcnow().isoformat();c=db();cur=c.execute("INSERT INTO pending_admin_devices(user_id,token_hash,user_agent,ip,created_at) VALUES(?,?,?,?,?)",(u['id'],token_hash(raw),(request.headers.get('User-Agent') or '')[:300],client_ip(),now));pid=cur.lastrowid;c.commit();c.close()
+                    lang=session.get('lang',u['language'] or 'ar');csrf=session.get('_csrf_token');uid=u['id']
+                    session.clear();session['lang']=lang
+                    if csrf:session['_csrf_token']=csrf
+                    session['_pending_admin_device_id']=pid;session['_pending_admin_device_token']=raw;session['_pending_admin_user_id']=uid
+                    response=make_response(redirect(url_for('admin_device_verification')))
         raw=getattr(g,'set_admin_device_cookie',None)
         if raw:
             response.set_cookie(COOKIE_NAME,raw,max_age=60*60*24*180,secure=True,httponly=True,samesite='Lax')
@@ -77,15 +82,21 @@ def register_device_security(app, db, current_user):
 
     @app.route('/admin/device-verification')
     def admin_device_verification():
-        pid=session.get('_pending_admin_device_id');raw=session.get('_pending_admin_device_token')
-        if not pid or not raw:return redirect(url_for('login'))
-        c=db();row=c.execute("SELECT p.*,u.email,u.name,u.role FROM pending_admin_devices p JOIN users u ON u.id=p.user_id WHERE p.id=? AND p.token_hash=?",(pid,token_hash(raw))).fetchone()
-        if not row:c.close();session.pop('_pending_admin_device_id',None);session.pop('_pending_admin_device_token',None);return redirect(url_for('login'))
+        pid=session.get('_pending_admin_device_id');raw=session.get('_pending_admin_device_token');pending_uid=session.get('_pending_admin_user_id')
+        if not pid or not raw or not pending_uid:return redirect(url_for('login'))
+        c=db();row=c.execute("SELECT p.*,u.email,u.name,u.role,u.language,u.password_hash,u.active FROM pending_admin_devices p JOIN users u ON u.id=p.user_id WHERE p.id=? AND p.user_id=? AND p.token_hash=?",(pid,pending_uid,token_hash(raw))).fetchone()
+        if not row:
+            c.close();lang=session.get('lang','ar');session.clear();session['lang']=lang;return redirect(url_for('login'))
+        if not row['active']:
+            c.close();lang=session.get('lang',row['language'] or 'ar');session.clear();session['lang']=lang;flash('تم إيقاف هذا الحساب.' if lang=='ar' else 'This account has been suspended.');return redirect(url_for('login'))
         if row['rejected_at']:
-            c.close();lang=session.get('lang','ar');session.clear();session['lang']=lang;flash('تم رفض اعتماد هذا الجهاز.' if lang=='ar' else 'This device approval request was rejected.');return redirect(url_for('login'))
+            c.close();lang=session.get('lang',row['language'] or 'ar');session.clear();session['lang']=lang;flash('تم رفض اعتماد هذا الجهاز.' if lang=='ar' else 'This device approval request was rejected.');return redirect(url_for('login'))
         if row['approved_at']:
-            now=datetime.utcnow().isoformat();c.execute("INSERT INTO trusted_admin_devices(user_id,token_hash,user_agent,created_at,last_seen_at,approved_by,active) VALUES(?,?,?,?,?,?,1)",(row['user_id'],row['token_hash'],row['user_agent'],now,now,row['approved_by']));c.execute("DELETE FROM pending_admin_devices WHERE id=?",(pid,));c.commit();c.close();session.pop('_pending_admin_device_id',None);session.pop('_pending_admin_device_token',None);resp=make_response(redirect(url_for('admin')));resp.set_cookie(COOKIE_NAME,raw,max_age=60*60*24*180,secure=True,httponly=True,samesite='Lax');return resp
-        c.close();return render_template('admin_device_verification.html',user=current_user(),request_id=pid)
+            now=datetime.utcnow().isoformat();c.execute("INSERT INTO trusted_admin_devices(user_id,token_hash,user_agent,created_at,last_seen_at,approved_by,active) VALUES(?,?,?,?,?,?,1)",(row['user_id'],row['token_hash'],row['user_agent'],now,now,row['approved_by']));c.execute("DELETE FROM pending_admin_devices WHERE id=?",(pid,));c.commit();c.close()
+            lang=session.get('lang',row['language'] or 'ar');csrf=session.get('_csrf_token');session.clear();session['lang']=lang;session['user_id']=row['user_id'];session['_auth_hash']=row['password_hash']
+            if csrf:session['_csrf_token']=csrf
+            resp=make_response(redirect(url_for('admin')));resp.set_cookie(COOKIE_NAME,raw,max_age=60*60*24*180,secure=True,httponly=True,samesite='Lax');return resp
+        c.close();return render_template('admin_device_verification.html',user=None,request_id=pid)
 
     @app.route('/admin/device-requests')
     def admin_device_requests():
