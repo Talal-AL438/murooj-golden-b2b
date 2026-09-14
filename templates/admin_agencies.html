@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
 <main class="page-shell">
-  <div class="adminnav"><a href="{{ url_for('admin') }}">{{ T.admin }}</a><a class="active" href="{{ url_for('admin_agencies') }}">{{ T.agencies }}</a></div>
+  <div class="adminnav"><a href="{{ url_for('admin') }}">{{ T.admin }}</a>{% if user.role=='super_admin' or staff_permissions.get('reports') %}<a href="{{url_for('admin_reports')}}">{{T.reports}}</a>{% endif %}{% if user.role=='super_admin' or staff_permissions.get('agencies') %}<a class="active" href="{{ url_for('admin_agencies') }}">{{ T.agencies }}</a>{% endif %}{% if user.role=='super_admin' or staff_permissions.get('hotels') %}<a href="{{url_for('admin_hotels')}}">{{T.hotels}}</a>{% endif %}{% if user.role=='super_admin' or staff_permissions.get('offers') %}<a href="{{url_for('admin_offers')}}">{{T.offers}}</a>{% endif %}{% if user.role=='super_admin' %}<a href="{{url_for('admin_employees')}}">{{T.employees}}</a><a href="{{url_for('admin_settings')}}">{{T.settings}}</a><a href="{{url_for('admin_audit')}}">{{T.audit}}</a>{% endif %}</div>
   <div class="section-head"><div><span class="eyebrow">MUROOJ GOLDEN B2B</span><h1>{{ T.agencies }}</h1></div></div>
 
   <form class="card form" method="get" style="margin-bottom:18px">
