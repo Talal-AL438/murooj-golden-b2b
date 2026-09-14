@@ -67,6 +67,11 @@ def register_device_security(app, db, current_user):
         raw=getattr(g,'set_admin_device_cookie',None)
         if raw:
             response.set_cookie(COOKIE_NAME,raw,max_age=60*60*24*180,secure=True,httponly=True,samesite='Lax')
+        response.headers['Strict-Transport-Security']='max-age=31536000; includeSubDomains'
+        response.headers['X-Content-Type-Options']='nosniff'
+        response.headers['X-Frame-Options']='DENY'
+        response.headers['Referrer-Policy']='strict-origin-when-cross-origin'
+        response.headers['Permissions-Policy']='camera=(), microphone=(), geolocation=()'
         return response
 
     @app.route('/admin/device-verification')
