@@ -126,7 +126,7 @@ def register_offer_extensions(app, db, current_user):
             if end:parsed_end=datetime.strptime(end,'%Y-%m-%d').date()
         except ValueError:return None,offer_error(u,'dates')
         if parsed_start and parsed_end and parsed_end<parsed_start:return None,offer_error(u,'dates')
-        if image_url and not (image_url.startswith('/static/') or image_url.startswith('https://') or image_url.startswith('http://')):return None,offer_error(u,'image')
+        if image_url and (len(image_url)>500 or not (image_url.startswith('/static/') or image_url.startswith('https://'))):return None,offer_error(u,'image')
         if audience not in ('all','indonesia','malaysia','selected'):audience='all'
         if language_mode not in ('auto','manual'):language_mode='auto'
         if manual_language not in ('ar','en','id','ms'):manual_language='ar'
