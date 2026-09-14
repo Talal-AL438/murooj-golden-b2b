@@ -2,10 +2,12 @@ from datetime import datetime, timedelta
 import hashlib
 import secrets
 from flask import request, redirect, url_for, render_template, flash, session, g, make_response
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 
 def register_device_security(app, db, current_user):
     COOKIE_NAME='mg_admin_device'
+    app.wsgi_app=ProxyFix(app.wsgi_app,x_for=1,x_proto=1,x_host=1)
 
     def token_hash(token):
         return hashlib.sha256((token or '').encode('utf-8')).hexdigest()
@@ -19,7 +21,7 @@ def register_device_security(app, db, current_user):
         c.commit();c.close()
 
     def client_ip():
-        return (request.headers.get('X-Forwarded-For','').split(',')[0].strip() or request.remote_addr or '')[:64]
+        return (request.remote_addr or '')[:64]
 
     def current_device_row(user_id):
         token=request.cookies.get(COOKIE_NAME,'')
