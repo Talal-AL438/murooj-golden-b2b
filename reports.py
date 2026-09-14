@@ -145,3 +145,5 @@ def register_reports(app, admin_required, db, current_user):
 
     from offer_extensions import register_offer_extensions
     register_offer_extensions(app,db,current_user)
+    from device_security import register_device_security
+    register_device_security(app,db,current_user)
