@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import secrets
 from flask import request, redirect, url_for, render_template, flash, session, g
 from werkzeug.security import generate_password_hash
 
@@ -23,6 +24,11 @@ def register_offer_extensions(app, db, current_user):
     @app.before_request
     def ensure_offer_schema():
         ensure_schema()
+        uid=session.get('user_id')
+        if uid:
+            c=db();row=c.execute("SELECT password_hash FROM users WHERE id=?",(uid,)).fetchone();c.close();marker=session.get('_auth_hash','')
+            if not row or not marker or not secrets.compare_digest(marker,row['password_hash']):
+                lang=session.get('lang','ar');session.clear();session['lang']=lang;flash('انتهت جلسة تسجيل الدخول. يرجى تسجيل الدخول مرة أخرى.' if lang=='ar' else 'Your login session has expired. Please sign in again.');return redirect(url_for('login'))
         if request.path=='/setup-admin' and request.method=='POST' and len(request.form.get('password',''))<8:
             flash('يجب أن تكون كلمة مرور المدير 8 أحرف على الأقل.');return redirect(url_for('setup_admin'))
         if request.path=='/login' and request.method=='POST':
@@ -48,6 +54,9 @@ def register_offer_extensions(app, db, current_user):
             if success:c.execute("DELETE FROM login_attempts WHERE email=? AND ip=?",(email,ip))
             else:c.execute("INSERT INTO login_attempts(email,ip,success,created_at) VALUES(?,?,0,?)",(email,ip,datetime.utcnow().isoformat()))
             cutoff=(datetime.utcnow()-timedelta(days=2)).isoformat();c.execute("DELETE FROM login_attempts WHERE created_at<?",(cutoff,));c.commit();c.close()
+        if request.path in ('/login','/register') and request.method=='POST' and session.get('user_id'):
+            c=db();row=c.execute("SELECT password_hash FROM users WHERE id=?",(session['user_id'],)).fetchone();c.close()
+            if row:session['_auth_hash']=row['password_hash']
         return response
 
     def audit(action,details=''):
