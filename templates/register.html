@@ -31,7 +31,7 @@
 
       <label>{{ T.password }}
         <input type="password" name="password" minlength="8" autocomplete="new-password" required>
-        <small>Minimum 8 characters</small>
+        <small>{{ '8 أحرف على الأقل' if lang=='ar' else ('Minimum 8 characters' if lang=='en' else ('Minimal 8 karakter' if lang=='id' else 'Minimum 8 aksara')) }}</small>
       </label>
 
       <label>{{ T.language }}
