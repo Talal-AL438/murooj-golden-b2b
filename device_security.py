@@ -1,7 +1,10 @@
 from datetime import datetime, timedelta
 import hashlib
 import secrets
-from flask import request, redirect, url_for, render_template, flash, session, g, make_response
+import sqlite3
+import tempfile
+import os
+from flask import request, redirect, url_for, render_template, flash, session, g, make_response, send_file, after_this_request
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 
@@ -103,6 +106,21 @@ def register_device_security(app, db, current_user):
         u=current_user()
         if not u or u['role']!='super_admin' or session.get('_pending_admin_device_id') or not current_device_row(u['id']):return redirect(url_for('admin'))
         c=db();rows=c.execute("SELECT p.*,u.email,u.name,u.role FROM pending_admin_devices p JOIN users u ON u.id=p.user_id WHERE p.approved_at IS NULL AND p.rejected_at IS NULL ORDER BY p.id DESC").fetchall();trusted=c.execute("SELECT d.*,u.email,u.name FROM trusted_admin_devices d JOIN users u ON u.id=d.user_id WHERE d.active=1 ORDER BY d.last_seen_at DESC").fetchall();c.close();return render_template('admin_device_requests.html',user=u,requests=rows,trusted_devices=trusted)
+
+    @app.route('/admin/database-backup')
+    def admin_database_backup():
+        u=current_user()
+        if not u or u['role']!='super_admin' or session.get('_pending_admin_device_id') or not current_device_row(u['id']):return redirect(url_for('admin'))
+        source=db();tmp=tempfile.NamedTemporaryFile(prefix='murooj-golden-',suffix='.db',delete=False);tmp_path=tmp.name;tmp.close();destination=sqlite3.connect(tmp_path)
+        try:source.backup(destination)
+        finally:destination.close();source.close()
+        c=db();c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(u['id'],'database_backup','manual sqlite backup',datetime.utcnow().isoformat()));c.commit();c.close()
+        @after_this_request
+        def cleanup_backup(response):
+            try:os.remove(tmp_path)
+            except OSError:pass
+            return response
+        return send_file(tmp_path,as_attachment=True,download_name='murooj-golden-backup-'+datetime.utcnow().strftime('%Y%m%d-%H%M%S')+'.db',mimetype='application/octet-stream',max_age=0)
 
     @app.route('/admin/device-request/<int:pid>/approve',methods=['POST'])
     def approve_admin_device(pid):
