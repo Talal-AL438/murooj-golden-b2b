@@ -45,12 +45,15 @@ def register_reports(app, admin_required, db, current_user):
             if rooms<1 or rooms>500 or persons<1 or persons>5000:valid=False
             if city not in ('Makkah','Madinah'):valid=False
             try:
-                ci=datetime.strptime(checkin,'%Y-%m-%d').date();co=datetime.strptime(checkout,'%Y-%m-%d').date()
-                if co<=ci:valid=False
+                ci=datetime.strptime(checkin,'%Y-%m-%d').date();co=datetime.strptime(checkout,'%Y-%m-%d').date();today=datetime.utcnow().date()
+                if ci<today or co<=ci:valid=False
             except ValueError:valid=False
             if not nationality or len(nationality)>100 or len(notes)>2000:valid=False
             if meal not in ('RO','F.B Indo','F.B Malaysian'):valid=False
-            if not any_hotel:
+            if any_hotel:
+                available=c.execute("SELECT 1 FROM hotels WHERE city=? AND active=1 LIMIT 1",(city,)).fetchone()
+                if not available:valid=False
+            else:
                 try:hotel_id=int(hv)
                 except (TypeError,ValueError):valid=False
                 if hotel_id:
