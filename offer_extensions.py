@@ -32,7 +32,7 @@ def register_offer_extensions(app, db, current_user):
         if request.path=='/setup-admin' and request.method=='POST' and len(request.form.get('password',''))<8:
             flash('يجب أن تكون كلمة مرور المدير 8 أحرف على الأقل.');return redirect(url_for('setup_admin'))
         if request.path=='/login' and request.method=='POST':
-            email=request.form.get('email','').strip().lower();ip=(request.headers.get('X-Forwarded-For','').split(',')[0].strip() or request.remote_addr or '')[:64];cutoff=(datetime.utcnow()-timedelta(minutes=15)).isoformat();c=db();failed=c.execute("SELECT COUNT(*) c FROM login_attempts WHERE email=? AND ip=? AND success=0 AND created_at>=?",(email,ip,cutoff)).fetchone()['c'];c.close()
+            email=request.form.get('email','').strip().lower();ip=(request.remote_addr or '')[:64];cutoff=(datetime.utcnow()-timedelta(minutes=15)).isoformat();c=db();failed=c.execute("SELECT COUNT(*) c FROM login_attempts WHERE email=? AND ip=? AND success=0 AND created_at>=?",(email,ip,cutoff)).fetchone()['c'];c.close()
             if failed>=5:g.login_rate_blocked=True;flash('تم تجاوز عدد محاولات تسجيل الدخول. حاول مرة أخرى بعد 15 دقيقة.');return redirect(url_for('login'))
         if request.path=='/register' and request.method=='POST':
             lang=request.form.get('language','ar')
@@ -46,7 +46,7 @@ def register_offer_extensions(app, db, current_user):
     @app.after_request
     def record_login_attempt(response):
         if request.path=='/login' and request.method=='POST' and not getattr(g,'login_rate_blocked',False):
-            email=request.form.get('email','').strip().lower();ip=(request.headers.get('X-Forwarded-For','').split(',')[0].strip() or request.remote_addr or '')[:64];success=1 if session.get('user_id') else 0;c=db()
+            email=request.form.get('email','').strip().lower();ip=(request.remote_addr or '')[:64];success=1 if (session.get('user_id') or session.get('_pending_admin_user_id')) else 0;c=db()
             if success:c.execute("DELETE FROM login_attempts WHERE email=? AND ip=?",(email,ip))
             else:c.execute("INSERT INTO login_attempts(email,ip,success,created_at) VALUES(?,?,0,?)",(email,ip,datetime.utcnow().isoformat()))
             cutoff=(datetime.utcnow()-timedelta(days=2)).isoformat();c.execute("DELETE FROM login_attempts WHERE created_at<?",(cutoff,));c.commit();c.close()
