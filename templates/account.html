@@ -55,6 +55,6 @@
 </main>
 <script>
 const pf=document.getElementById('passwordForm'),np=document.getElementById('newPassword'),cp=document.getElementById('confirmPassword');
-if(pf){pf.addEventListener('submit',e=>{if(np.value!==cp.value){e.preventDefault();cp.setCustomValidity({{ ('كلمتا المرور غير متطابقتين.' if lang=='ar' else 'Passwords do not match.')|tojson }});cp.reportValidity();}else{cp.setCustomValidity('');}});cp.addEventListener('input',()=>cp.setCustomValidity(''));}
+if(pf){pf.addEventListener('submit',e=>{if(np.value!==cp.value){e.preventDefault();cp.setCustomValidity({{ ('كلمتا المرور غير متطابقتين.' if lang=='ar' else ('Kata sandi tidak cocok.' if lang=='id' else ('Kata laluan tidak sepadan.' if lang=='ms' else 'Passwords do not match.')))|tojson }});cp.reportValidity();}else{cp.setCustomValidity('');}});cp.addEventListener('input',()=>cp.setCustomValidity(''));}
 </script>
 {% endblock %}
