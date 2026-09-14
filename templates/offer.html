@@ -6,7 +6,7 @@
     {% set display_image = offer.image_url or offer.cover_image %}
     {% if display_image %}<img class="hotel-image" src="{{ display_image }}" alt="{{ offer.title }}">{% endif %}
     <div class="hotel-card-body">
-      {% if offer.pinned %}<span class="tag">★ {{ 'عرض مميز' if lang=='ar' else 'Featured Offer' }}</span>{% endif %}
+      {% if offer.pinned %}<span class="tag">★ {{ 'عرض مميز' if lang=='ar' else ('Featured Offer' if lang=='en' else ('Penawaran Unggulan' if lang=='id' else 'Tawaran Pilihan')) }}</span>{% endif %}
       {% if offer.note %}<p>{{ offer.note }}</p>{% endif %}
       <div class="hotel-tags">{% if offer.start_date or offer.end_date %}<span class="tag">{{ offer.start_date or '—' }} → {{ offer.end_date or '—' }}</span>{% endif %}{% if offer.meal %}<span class="tag">{{ offer.meal }}</span>{% endif %}</div>
       <div class="hotel-actions" style="margin-top:18px">
@@ -14,7 +14,7 @@
         {% if user and user['role']=='agency' %}<a class="btn gold" href="{{ url_for('new_request', hotel=(offer.hotel_id or 'any'), city=(offer.city or 'Makkah'), checkin=offer.start_date, checkout=offer.end_date, meal=offer.meal) }}">{{ T.send_request }}</a>{% else %}<a class="btn gold" href="{{ url_for('login') }}">{{ T.login }}</a>{% endif %}
         <a class="btn dark" target="_blank" rel="noopener" href="https://wa.me/966550558014?text={{ ('MUROOJ GOLDEN B2B\nOffer: ' ~ offer.title ~ '\n' ~ request.url)|urlencode }}">WhatsApp</a>
       </div>
-      <p style="margin-top:18px;opacity:.75">{{ 'التوفر والأسعار والتأكيد النهائي تتم عبر فريق الحجوزات في WhatsApp.' if lang=='ar' else 'Availability, pricing and final confirmation are provided by our reservations team through WhatsApp.' }}</p>
+      <p style="margin-top:18px;opacity:.75">{{ 'التوفر والأسعار والتأكيد النهائي تتم عبر فريق الحجوزات في WhatsApp.' if lang=='ar' else ('Availability, pricing and final confirmation are provided by our reservations team through WhatsApp.' if lang=='en' else ('Ketersediaan, harga, dan konfirmasi akhir diberikan oleh tim reservasi kami melalui WhatsApp.' if lang=='id' else 'Ketersediaan, harga dan pengesahan akhir diberikan oleh pasukan tempahan kami melalui WhatsApp.')) }}</p>
     </div>
   </section>
 </main>
