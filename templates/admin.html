@@ -3,10 +3,10 @@
 <main class="page-shell">
   <div class="adminnav">
     <a class="active" href="{{ url_for('admin') }}">{{ T.admin }}</a>
-    <a href="{{ url_for('admin_reports') }}">{{ T.reports }}</a>
-    <a href="{{ url_for('admin_agencies') }}">{{ T.agencies }}</a>
-    <a href="{{ url_for('admin_hotels') }}">{{ T.hotels }}</a>
-    <a href="{{ url_for('admin_offers') }}">{{ T.offers }}</a>
+    {% if user.role=='super_admin' or staff_permissions.get('reports') %}<a href="{{ url_for('admin_reports') }}">{{ T.reports }}</a>{% endif %}
+    {% if user.role=='super_admin' or staff_permissions.get('agencies') %}<a href="{{ url_for('admin_agencies') }}">{{ T.agencies }}</a>{% endif %}
+    {% if user.role=='super_admin' or staff_permissions.get('hotels') %}<a href="{{ url_for('admin_hotels') }}">{{ T.hotels }}</a>{% endif %}
+    {% if user.role=='super_admin' or staff_permissions.get('offers') %}<a href="{{ url_for('admin_offers') }}">{{ T.offers }}</a>{% endif %}
     {% if user.role == 'super_admin' %}<a href="{{ url_for('admin_employees') }}">{{ T.employees }}</a><a href="{{ url_for('admin_settings') }}">{{ T.settings }}</a><a href="{{ url_for('admin_audit') }}">{{ T.audit }}</a>{% endif %}
   </div>
 
@@ -22,12 +22,14 @@
     <div class="stat"><span>{{ T.hotels }}</span><strong>{{ stats.hotels }}</strong></div>
   </div>
 
+  {% if user.role=='super_admin' or staff_permissions.get('reports') %}
   <section class="card" style="margin:22px 0">
     <div class="section-head">
       <div><h2>{{ T.reports }}</h2><p>{{ 'جميع الطلبات والتقارير التاريخية مع الفلاتر وتصدير Excel الحقيقي.' if lang=='ar' else 'Full historical reports with filters and real Excel export.' }}</p></div>
       <div class="hotel-actions"><a class="btn gold" href="{{ url_for('admin_reports') }}">{{ T.reports }}</a><a class="btn dark" href="{{ url_for('admin_reports_excel') }}">Excel .xlsx</a></div>
     </div>
   </section>
+  {% endif %}
 
   <div class="section-head"><h2>{{ T.new_requests }}</h2><span class="tag">{{ 'آخر 50 طلب للمتابعة السريعة' if lang=='ar' else 'Latest 50 requests for quick follow-up' }}</span></div>
   <div class="tablewrap"><table>
