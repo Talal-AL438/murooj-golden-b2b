@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import hashlib
 import secrets
 from flask import request, redirect, url_for, render_template, flash, session, g, make_response
@@ -35,6 +35,10 @@ def register_device_security(app, db, current_user):
     @app.before_request
     def enforce_admin_device():
         ensure_tables()
+        if request.path=='/login' and request.method=='POST':
+            ip=client_ip();cutoff=(datetime.utcnow()-timedelta(minutes=15)).isoformat();c=db();failed_ip=c.execute("SELECT COUNT(*) c FROM login_attempts WHERE ip=? AND success=0 AND created_at>=?",(ip,cutoff)).fetchone()['c'];c.close()
+            if failed_ip>=20:
+                g.login_rate_blocked=True;flash('تم تجاوز عدد محاولات تسجيل الدخول من هذا الاتصال. حاول مرة أخرى بعد 15 دقيقة.');return redirect(url_for('login'))
         if request.path.startswith('/static/'):return None
         u=current_user()
         if not u or u['role'] not in ('super_admin','staff'):return None
