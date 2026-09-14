@@ -1,5 +1,6 @@
 from io import BytesIO
 from datetime import datetime
+import secrets
 from flask import request, render_template, send_file, redirect, url_for, flash, session
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -20,11 +21,15 @@ def register_reports(app, admin_required, db, current_user):
             'ar':{'profile':'تم تحديث بيانات الحساب بنجاح.','profile_bad':'يرجى إدخال اسم المسؤول والدولة ورقم WhatsApp بشكل صحيح.','password':'تم تغيير كلمة المرور بنجاح.','bad':'كلمة المرور الحالية غير صحيحة.','short':'يجب أن تكون كلمة المرور الجديدة 8 أحرف على الأقل.','mismatch':'كلمتا المرور الجديدتان غير متطابقتين.','same':'اختر كلمة مرور جديدة مختلفة عن كلمة المرور الحالية.','request_bad':'تعذر إرسال الطلب. تحقق من الفندق والتواريخ وعدد الغرف والأشخاص والبيانات المطلوبة.'},
             'en':{'profile':'Account details updated successfully.','profile_bad':'Please enter a valid contact name, country, and WhatsApp number.','password':'Password changed successfully.','bad':'Current password is incorrect.','short':'New password must be at least 8 characters.','mismatch':'New passwords do not match.','same':'Choose a new password different from your current password.','request_bad':'The request could not be sent. Check the hotel, dates, rooms, persons, and required details.'},
             'id':{'profile':'Data akun berhasil diperbarui.','profile_bad':'Masukkan nama kontak, negara, dan nomor WhatsApp yang valid.','password':'Kata sandi berhasil diubah.','bad':'Kata sandi saat ini salah.','short':'Kata sandi baru minimal 8 karakter.','mismatch':'Konfirmasi kata sandi tidak cocok.','same':'Pilih kata sandi baru yang berbeda dari kata sandi saat ini.','request_bad':'Permintaan tidak dapat dikirim. Periksa hotel, tanggal, kamar, jumlah orang, dan data wajib.'},
-            'ms':{'profile':'Maklumat akaun berjaya dikemas kini.','profile_bad':'Masukkan nama pegawai, negara dan nombor WhatsApp yang sah.','password':'Kata laluan berjaya ditukar.','bad':'Kata laluan semasa tidak betul.','short':'Kata laluan baharu mestilah sekurang-kurangnya 8 aksara.','mismatch':'Pengesahan kata laluan tidak sepadan.','same':'Pilih kata laluan baharu yang berbeza daripada kata laluan semasa.','request_bad':'Permintaan tidak dapat dihantar. Semak hotel, tarikh, bilik, bilangan orang dan maklumat wajib.'}}
+            'ms':{'profile':'Maklumat akaun berjaya dikemas kini.','profile_bad':'Masukkan nama pegawai, negara dan nombor WhatsApp yang sah.','password':'Kata laluan berjaya dikemas kini.','bad':'Kata laluan semasa tidak betul.','short':'Kata laluan baharu mestilah sekurang-kurangnya 8 aksara.','mismatch':'Pengesahan kata laluan tidak sepadan.','same':'Pilih kata laluan baharu yang berbeza daripada kata laluan semasa.','request_bad':'Permintaan tidak dapat dihantar. Semak hotel, tarikh, bilik, bilangan orang dan maklumat wajib.'}}
         return messages.get(lang or 'ar',messages['ar'])[key]
 
     @app.before_request
     def portal_extensions_and_staff_access():
+        if '_csrf_token' not in session:session['_csrf_token']=secrets.token_urlsafe(32)
+        if request.method=='POST':
+            sent=request.form.get('_csrf_token','') or request.headers.get('X-CSRF-Token','')
+            if not sent or not secrets.compare_digest(sent,session.get('_csrf_token','')):return 'Invalid or missing CSRF token.',400
         c=db();ensure_permissions_table(c);c.commit();c.close()
         u=current_user()
         if u and not u['active']:
@@ -88,13 +93,14 @@ def register_reports(app, admin_required, db, current_user):
 
     @app.context_processor
     def extended_portal_context():
+        if '_csrf_token' not in session:session['_csrf_token']=secrets.token_urlsafe(32)
         u=current_user();country='';staff_permissions={k:True for k in permission_keys};permissions={}
         if u and u['role']=='agency':
             c=db();row=c.execute("SELECT country FROM agencies WHERE user_id=?",(u['id'],)).fetchone();c.close();country=(row['country'] or '') if row else ''
         elif u and u['role']=='staff':staff_permissions=get_permissions(u['id'])
         elif u and u['role']=='super_admin':
             c=db();ensure_permissions_table(c);rows=c.execute("SELECT * FROM staff_permissions").fetchall();c.close();permissions={r['user_id']:{k:bool(r[k]) for k in permission_keys} for r in rows}
-        return {'agency_country':country,'current_date':datetime.utcnow().date().isoformat(),'staff_permissions':staff_permissions,'permissions':permissions}
+        return {'agency_country':country,'current_date':datetime.utcnow().date().isoformat(),'staff_permissions':staff_permissions,'permissions':permissions,'csrf_token':session['_csrf_token']}
 
     @app.route('/admin/employee/<int:uid>/permissions',methods=['POST'])
     def update_staff_permissions(uid):
