@@ -1,6 +1,6 @@
 from io import BytesIO
 from datetime import datetime
-from flask import request, render_template, send_file, redirect, url_for, flash
+from flask import request, render_template, send_file, redirect, url_for, flash, session
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
@@ -26,6 +26,9 @@ def register_reports(app, admin_required, db, current_user):
     @app.before_request
     def portal_extensions_and_staff_access():
         c=db();ensure_permissions_table(c);c.commit();c.close()
+        u=current_user()
+        if u and not u['active']:
+            lang=u['language'] or 'ar';session.clear();flash('تم إيقاف هذا الحساب. تواصل مع الإدارة إذا كنت تحتاج إلى استعادة الوصول.' if lang=='ar' else 'This account has been suspended. Contact the administrator if you need access restored.');return redirect(url_for('login'))
         if request.path=='/request' and request.method=='POST':
             u=current_user()
             if not u or u['role']!='agency':return None
@@ -99,7 +102,7 @@ def register_reports(app, admin_required, db, current_user):
         if not u or u['role']!='super_admin':return redirect(url_for('admin'))
         c=db();ensure_permissions_table(c);employee=c.execute("SELECT id,role FROM users WHERE id=?",(uid,)).fetchone()
         if not employee or employee['role']!='staff':c.close();return 'staff not found',404
-        vals=[1 if request.form.get(k) else 0 for k in permission_keys];c.execute("INSERT INTO staff_permissions(user_id,reports,agencies,hotels,offers,updated_at) VALUES(?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET reports=excluded.reports,agencies=excluded.agencies,hotels=excluded.hotels,offers=excluded.offers,updated_at=excluded.updated_at",(uid,*vals,datetime.utcnow().isoformat()));c.commit();c.close();flash('تم تحديث صلاحيات الموظف.');return redirect(url_for('admin_employees'))
+        vals=[1 if request.form.get(k) else 0 for k in permission_keys];c.execute("INSERT INTO staff_permissions(user_id,reports,agencies,hotels,offers,updated_at) VALUES(?,?,?,?,?,?) ON CONFLICT(user_id) DO UPDATE SET reports=excluded.reports,agencies=excluded.agencies,hotels=excluded.hotels,offers=excluded.offers,updated_at=excluded.updated_at",(uid,*vals,datetime.utcnow().isoformat()));audit(c,u['id'],'staff_permissions_update',f"employee={uid}, reports={vals[0]}, agencies={vals[1]}, hotels={vals[2]}, offers={vals[3]}");c.commit();c.close();flash('تم تحديث صلاحيات الموظف.');return redirect(url_for('admin_employees'))
 
     @app.route('/admin/employee/<int:uid>/toggle',methods=['POST'])
     def toggle_staff(uid):
@@ -107,7 +110,7 @@ def register_reports(app, admin_required, db, current_user):
         if not u or u['role']!='super_admin':return redirect(url_for('admin'))
         c=db();row=c.execute("SELECT active,role FROM users WHERE id=?",(uid,)).fetchone()
         if not row or row['role']!='staff':c.close();return 'staff not found',404
-        c.execute("UPDATE users SET active=? WHERE id=?",(0 if row['active'] else 1,uid));c.commit();c.close();flash('تم تحديث حالة الموظف.');return redirect(url_for('admin_employees'))
+        new_active=0 if row['active'] else 1;c.execute("UPDATE users SET active=? WHERE id=?",(new_active,uid));audit(c,u['id'],'staff_status_update',f"employee={uid}, active={new_active}");c.commit();c.close();flash('تم تحديث حالة الموظف.');return redirect(url_for('admin_employees'))
 
     def filters():return {'country':request.args.get('country','').strip(),'hotel':request.args.get('hotel','').strip(),'status':request.args.get('status','').strip(),'from':request.args.get('from','').strip(),'to':request.args.get('to','').strip()}
     def query_rows(c,f):
