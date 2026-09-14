@@ -1,15 +1,19 @@
-from datetime import datetime
-from flask import request, redirect, url_for, render_template, flash
+from datetime import datetime, timedelta
+from flask import request, redirect, url_for, render_template, flash, session, g
 from werkzeug.security import generate_password_hash
 
 
 def register_offer_extensions(app, db, current_user):
+    app.config.update(SESSION_COOKIE_HTTPONLY=True,SESSION_COOKIE_SAMESITE='Lax',SESSION_COOKIE_SECURE=True)
+
     def ensure_schema():
         c=db()
         tables={r['name'] for r in c.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
         if 'users' in tables:
             user_cols=[r['name'] for r in c.execute('PRAGMA table_info(users)').fetchall()]
             if 'department' not in user_cols:c.execute("ALTER TABLE users ADD COLUMN department TEXT DEFAULT ''")
+            c.execute("CREATE TABLE IF NOT EXISTS login_attempts (id INTEGER PRIMARY KEY AUTOINCREMENT,email TEXT,ip TEXT,success INTEGER DEFAULT 0,created_at TEXT NOT NULL)")
+            c.execute("CREATE INDEX IF NOT EXISTS idx_login_attempts_lookup ON login_attempts(email,ip,created_at)")
         if 'offers' in tables:
             cols=[r['name'] for r in c.execute('PRAGMA table_info(offers)').fetchall()]
             if 'image_url' not in cols:c.execute("ALTER TABLE offers ADD COLUMN image_url TEXT DEFAULT ''")
@@ -19,6 +23,11 @@ def register_offer_extensions(app, db, current_user):
     @app.before_request
     def ensure_offer_schema():
         ensure_schema()
+        if request.path=='/setup-admin' and request.method=='POST' and len(request.form.get('password',''))<8:
+            flash('يجب أن تكون كلمة مرور المدير 8 أحرف على الأقل.');return redirect(url_for('setup_admin'))
+        if request.path=='/login' and request.method=='POST':
+            email=request.form.get('email','').strip().lower();ip=(request.headers.get('X-Forwarded-For','').split(',')[0].strip() or request.remote_addr or '')[:64];cutoff=(datetime.utcnow()-timedelta(minutes=15)).isoformat();c=db();failed=c.execute("SELECT COUNT(*) c FROM login_attempts WHERE email=? AND ip=? AND success=0 AND created_at>=?",(email,ip,cutoff)).fetchone()['c'];c.close()
+            if failed>=5:g.login_rate_blocked=True;flash('تم تجاوز عدد محاولات تسجيل الدخول. حاول مرة أخرى بعد 15 دقيقة.');return redirect(url_for('login'))
         if request.path=='/register' and request.method=='POST':
             lang=request.form.get('language','ar')
             if lang not in ('ar','en','id','ms'):lang='ar'
@@ -31,6 +40,15 @@ def register_offer_extensions(app, db, current_user):
             if len(password)<8:flash(m['password']);return redirect(url_for('register'))
             if not request.form.get('privacy') or not request.form.get('marketing'):flash(m['consent']);return redirect(url_for('register'))
             if len(agency)<2 or len(agency)>150 or len(country)<2 or len(country)>100 or len(contact)<2 or len(contact)>120 or len(digits)<8 or len(digits)>15 or len(email)>254 or '@' not in email or '.' not in email.rsplit('@',1)[-1]:flash(m['bad']);return redirect(url_for('register'))
+
+    @app.after_request
+    def record_login_attempt(response):
+        if request.path=='/login' and request.method=='POST' and not getattr(g,'login_rate_blocked',False):
+            email=request.form.get('email','').strip().lower();ip=(request.headers.get('X-Forwarded-For','').split(',')[0].strip() or request.remote_addr or '')[:64];success=1 if session.get('user_id') else 0;c=db()
+            if success:c.execute("DELETE FROM login_attempts WHERE email=? AND ip=?",(email,ip))
+            else:c.execute("INSERT INTO login_attempts(email,ip,success,created_at) VALUES(?,?,0,?)",(email,ip,datetime.utcnow().isoformat()))
+            cutoff=(datetime.utcnow()-timedelta(days=2)).isoformat();c.execute("DELETE FROM login_attempts WHERE created_at<?",(cutoff,));c.commit();c.close()
+        return response
 
     def audit(action,details=''):
         u=current_user();c=db();c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(u['id'] if u else None,action,details,datetime.utcnow().isoformat()));c.commit();c.close()
