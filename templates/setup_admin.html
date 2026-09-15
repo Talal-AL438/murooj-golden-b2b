@@ -1,5 +1,18 @@
-
-{% extends 'base.html' %}{% block body %}<main><h1>Super Admin Setup</h1><div class="notice">This page only works once, before a Super Admin exists.</div>
-<form method="post" class="card form narrow"><label>Name<input name="name" required></label>
-<label>Email<input type="email" name="email" value="talal_alaqely@icloud.com" required></label>
-<label>Create password<input type="password" name="password" minlength="10" required></label><button class="btn gold">Create Super Admin</button></form></main>{% endblock %}
+{% extends 'base.html' %}
+{% block body %}
+{% set is_ar = lang == 'ar' %}
+{% set is_id = lang == 'id' %}
+{% set is_ms = lang == 'ms' %}
+<main>
+  <h1>{{ 'إعداد المدير العام' if is_ar else ('Pengaturan Super Admin' if is_id else ('Persediaan Super Admin' if is_ms else 'Super Admin Setup')) }}</h1>
+  <div class="notice">
+    {{ 'تعمل هذه الصفحة مرة واحدة فقط، قبل إنشاء حساب المدير العام.' if is_ar else ('Halaman ini hanya berfungsi sekali, sebelum Super Admin dibuat.' if is_id else ('Halaman ini hanya berfungsi sekali, sebelum Super Admin diwujudkan.' if is_ms else 'This page only works once, before a Super Admin exists.')) }}
+  </div>
+  <form method="post" class="card form narrow">
+    <label>{{ 'الاسم' if is_ar else ('Nama' if (is_id or is_ms) else 'Name') }}<input name="name" required></label>
+    <label>{{ 'البريد الإلكتروني' if is_ar else ('Email' if is_id else ('E-mel' if is_ms else 'Email')) }}<input type="email" name="email" value="talal_alaqely@icloud.com" required></label>
+    <label>{{ 'إنشاء كلمة المرور' if is_ar else ('Buat kata sandi' if is_id else ('Cipta kata laluan' if is_ms else 'Create password')) }}<input type="password" name="password" minlength="10" required></label>
+    <button class="btn gold">{{ 'إنشاء حساب المدير العام' if is_ar else ('Buat Super Admin' if is_id else ('Cipta Super Admin' if is_ms else 'Create Super Admin')) }}</button>
+  </form>
+</main>
+{% endblock %}
