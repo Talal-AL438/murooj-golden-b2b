@@ -1,15 +1,14 @@
 import os
 import re
 import sqlite3
-from contextlib import closing
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 try:
     import psycopg2
     from psycopg2.extras import RealDictCursor
-except ImportError:  # SQLite demo can still run without PostgreSQL driver
+except ImportError:
     psycopg2 = None
     RealDictCursor = None
-
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_SQLITE_PATH = os.path.join(APP_DIR, "murooj.db")
@@ -50,6 +49,14 @@ def is_postgres():
 
 def sqlite_path():
     return os.environ.get("DB_PATH") or DEFAULT_SQLITE_PATH
+
+
+def secure_postgres_url(url):
+    """Ensure PostgreSQL uses encrypted transport without logging credentials."""
+    parts = urlsplit(url)
+    query = dict(parse_qsl(parts.query, keep_blank_values=True))
+    query["sslmode"] = os.environ.get("PGSSLMODE", "require")
+    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
 
 
 def _qmark_to_percent(sql_text):
@@ -103,7 +110,6 @@ class PostgresConnectionProxy:
         insert_match = re.match(r"insert\s+into\s+([a-zA-Z_][a-zA-Z0-9_]*)", stripped, flags=re.I)
         insert_ignore = re.match(r"insert\s+or\s+ignore\s+into\s+([a-zA-Z_][a-zA-Z0-9_]*)", stripped, flags=re.I)
         if insert_ignore:
-            table = insert_ignore.group(1)
             statement = re.sub(r"^\s*insert\s+or\s+ignore\s+into", "INSERT INTO", statement, count=1, flags=re.I)
             if " on conflict " not in statement.lower():
                 statement = statement.rstrip().rstrip(";") + " ON CONFLICT DO NOTHING"
@@ -137,7 +143,6 @@ class PostgresConnectionProxy:
         self._raw.close()
 
 
-
 def connect_db():
     if is_postgres():
         if psycopg2 is None:
@@ -145,7 +150,7 @@ def connect_db():
         url = os.environ.get("DATABASE_URL", "").strip()
         if not url:
             raise RuntimeError("DATABASE_URL is required when DB_ENGINE=postgres")
-        return PostgresConnectionProxy(psycopg2.connect(url))
+        return PostgresConnectionProxy(psycopg2.connect(secure_postgres_url(url)))
     conn = sqlite3.connect(sqlite_path())
     conn.row_factory = sqlite3.Row
     return conn
