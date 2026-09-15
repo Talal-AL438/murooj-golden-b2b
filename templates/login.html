@@ -1,4 +1,16 @@
-
-{% extends 'base.html' %}{% block body %}<main><h1>{{T.login}}</h1><form method="post" class="card form narrow">
-<label>{{T.email}}<input type="email" name="email" required></label><label>{{T.password}}<input type="password" name="password" required></label>
-<button class="btn gold">{{T.login}}</button><a class="btn dark" href="{{url_for('register')}}">{{T.register}}</a></form></main>{% endblock %}
+{% extends 'base.html' %}{% block body %}
+<main>
+  <h1>{{ T.login }}</h1>
+  <form method="post" class="card form narrow">
+    <label>{{ T.email }}<input type="email" name="email" autocomplete="email" required></label>
+    <label>{{ T.password }}<input type="password" name="password" autocomplete="current-password" required></label>
+    <button class="btn gold" type="submit">{{ T.login }}</button>
+    <a class="btn dark" href="{{ url_for('register') }}">{{ T.register }}</a>
+    <p style="margin-top:14px;text-align:center">
+      <a href="{{ url_for('forgot_password') }}">
+        {% if lang=='ar' %}نسيت كلمة المرور؟{% elif lang=='id' %}Lupa kata sandi?{% elif lang=='ms' %}Lupa kata laluan?{% else %}Forgot password?{% endif %}
+      </a>
+    </p>
+  </form>
+</main>
+{% endblock %}
