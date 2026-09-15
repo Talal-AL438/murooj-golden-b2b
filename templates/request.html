@@ -47,13 +47,14 @@
       <p style="margin-bottom:0">{{ 'سيتم تأكيد التوفر والسعر عبر WhatsApp بعد إرسال الطلب.' if lang=='ar' else ('Ketersediaan dan harga akan dikonfirmasi melalui WhatsApp setelah permintaan dikirim.' if lang=='id' else ('Ketersediaan dan harga akan disahkan melalui WhatsApp selepas permintaan dihantar.' if lang=='ms' else 'Availability and pricing will be confirmed through WhatsApp after submission.')) }}</p>
     </section>
 
-    <button class="btn gold" type="submit">{{ T.submit }}</button>
+    <button class="btn gold" type="submit" id="request-submit">{{ T.submit }}</button>
   </form>
 </main>
 
 <script>
 (function () {
   const form = document.getElementById('quick-request-form');
+  const submitButton = document.getElementById('request-submit');
   const city = document.getElementById('request-city');
   const hotel = document.getElementById('request-hotel');
   const checkin = document.getElementById('checkin');
@@ -62,6 +63,7 @@
   const persons = document.getElementById('persons');
   const meal = document.getElementById('meal');
   const summary = document.getElementById('request-summary');
+  let submitting = false;
 
   const now = new Date();
   const today = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
@@ -121,12 +123,31 @@
   hotel.addEventListener('change', function () { syncCityFromHotel(); updateSummary(); });
   [rooms, persons, meal].forEach(function (el) { el.addEventListener('input', updateSummary); el.addEventListener('change', updateSummary); });
 
-  form.addEventListener('submit', function (event) {
+  form.addEventListener('submit', async function (event) {
+    if (submitting) return;
     syncDates();
     if (!checkin.value || !checkout.value || checkout.value <= checkin.value) {
       event.preventDefault();
       checkout.focus();
       checkout.reportValidity();
+      return;
+    }
+
+    // Free Render services can sleep. Wake the service with a safe GET before
+    // allowing the important POST so the request is not lost on the wake page.
+    event.preventDefault();
+    submitting = true;
+    submitButton.disabled = true;
+    submitButton.textContent = {{ ('"جاري الإرسال..."' if lang=='ar' else '"Sending..."')|safe }};
+    try {
+      const response = await fetch('/health/postgres', {method: 'GET', cache: 'no-store', credentials: 'same-origin'});
+      if (!response.ok) throw new Error('service not ready');
+      form.submit();
+    } catch (error) {
+      submitting = false;
+      submitButton.disabled = false;
+      submitButton.textContent = {{ ('"إرسال"' if lang=='ar' else '"Submit"')|safe }};
+      alert({{ ('"تعذر الاتصال بالخادم. حاول الإرسال مرة أخرى بعد لحظات."' if lang=='ar' else '"Could not reach the server. Please try again in a moment."')|safe }});
     }
   });
 
