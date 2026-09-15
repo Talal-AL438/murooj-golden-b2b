@@ -14,6 +14,9 @@ ensure_postgres_schema()
 sqlite3.connect = lambda *args, **kwargs: connect_db()
 
 from app import app  # noqa: E402
+from password_recovery import register_password_recovery  # noqa: E402
+
+register_password_recovery(app)
 
 
 @app.get("/health/postgres")
