@@ -12,11 +12,7 @@ except ImportError:
 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_SQLITE_PATH = os.path.join(APP_DIR, "murooj.db")
-SERIAL_ID_TABLES = {
-    "users", "agencies", "hotels", "hotel_images", "requests", "offers",
-    "notifications", "audit", "login_attempts", "trusted_admin_devices",
-    "pending_admin_devices",
-}
+SERIAL_ID_TABLES = {"users","agencies","hotels","hotel_images","requests","offers","notifications","audit","login_attempts","trusted_admin_devices","pending_admin_devices"}
 
 POSTGRES_SCHEMA = """
 CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY,value TEXT);
@@ -39,135 +35,81 @@ CREATE INDEX IF NOT EXISTS idx_pending_admin_devices_user ON pending_admin_devic
 """
 
 
-def database_engine():
-    return (os.environ.get("DB_ENGINE") or "sqlite").strip().lower()
-
-
-def is_postgres():
-    return database_engine() in {"postgres", "postgresql"}
-
-
-def sqlite_path():
-    return os.environ.get("DB_PATH") or DEFAULT_SQLITE_PATH
+def database_engine(): return (os.environ.get("DB_ENGINE") or "sqlite").strip().lower()
+def is_postgres(): return database_engine() in {"postgres","postgresql"}
+def sqlite_path(): return os.environ.get("DB_PATH") or DEFAULT_SQLITE_PATH
 
 
 def secure_postgres_url(url):
-    """Ensure PostgreSQL uses encrypted transport without logging credentials."""
-    parts = urlsplit(url)
-    query = dict(parse_qsl(parts.query, keep_blank_values=True))
-    query["sslmode"] = os.environ.get("PGSSLMODE", "require")
-    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(query), parts.fragment))
+    parts=urlsplit(url);query=dict(parse_qsl(parts.query,keep_blank_values=True));query["sslmode"]=os.environ.get("PGSSLMODE","require")
+    return urlunsplit((parts.scheme,parts.netloc,parts.path,urlencode(query),parts.fragment))
 
 
-def _qmark_to_percent(sql_text):
-    return sql_text.replace("?", "%s")
+def _qmark_to_percent(sql_text): return sql_text.replace("?","%s")
 
 
 def _translate_postgres_sql(sql_text):
-    stripped = sql_text.strip()
-    low = stripped.lower()
+    stripped=sql_text.strip();low=stripped.lower()
     if "from sqlite_master" in low:
         return "SELECT table_name AS name FROM information_schema.tables WHERE table_schema='public'"
-    pragma = re.match(r"pragma\s+table_info\(([^)]+)\)", stripped, flags=re.I)
+    pragma=re.match(r"pragma\s+table_info\(([^)]+)\)",stripped,flags=re.I)
     if pragma:
-        table = pragma.group(1).strip().strip("'\"")
-        return (
-            "SELECT column_name AS name FROM information_schema.columns "
-            "WHERE table_schema='public' AND table_name=%s ORDER BY ordinal_position"
-        ), (table,)
+        table=pragma.group(1).strip().strip("'\"")
+        return ("SELECT column_name AS name FROM information_schema.columns WHERE table_schema='public' AND table_name=%s ORDER BY ordinal_position",(table,))
+    # Extension modules may still issue SQLite-flavoured CREATE TABLE statements.
+    # Convert their identity columns while preserving all other portable SQL.
+    sql_text=re.sub(r"\bINTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT\b","BIGSERIAL PRIMARY KEY",sql_text,flags=re.I)
     return _qmark_to_percent(sql_text)
 
 
 class CursorProxy:
-    def __init__(self, cursor, lastrowid=None):
-        self._cursor = cursor
-        self.lastrowid = lastrowid
-
-    def fetchone(self):
-        return self._cursor.fetchone()
-
-    def fetchall(self):
-        return self._cursor.fetchall()
-
+    def __init__(self,cursor,lastrowid=None): self._cursor=cursor;self.lastrowid=lastrowid
+    def fetchone(self): return self._cursor.fetchone()
+    def fetchall(self): return self._cursor.fetchall()
     @property
-    def rowcount(self):
-        return self._cursor.rowcount
+    def rowcount(self): return self._cursor.rowcount
 
 
 class PostgresConnectionProxy:
-    def __init__(self, raw):
-        self._raw = raw
-
-    def execute(self, statement, params=()):
-        translated = _translate_postgres_sql(statement)
-        if isinstance(translated, tuple):
-            statement, forced_params = translated
-            params = forced_params
-        else:
-            statement = translated
-
-        stripped = statement.strip()
-        insert_match = re.match(r"insert\s+into\s+([a-zA-Z_][a-zA-Z0-9_]*)", stripped, flags=re.I)
-        insert_ignore = re.match(r"insert\s+or\s+ignore\s+into\s+([a-zA-Z_][a-zA-Z0-9_]*)", stripped, flags=re.I)
+    def __init__(self,raw): self._raw=raw
+    def execute(self,statement,params=()):
+        translated=_translate_postgres_sql(statement)
+        if isinstance(translated,tuple): statement,params=translated
+        else: statement=translated
+        stripped=statement.strip()
+        insert_match=re.match(r"insert\s+into\s+([a-zA-Z_][a-zA-Z0-9_]*)",stripped,flags=re.I)
+        insert_ignore=re.match(r"insert\s+or\s+ignore\s+into\s+([a-zA-Z_][a-zA-Z0-9_]*)",stripped,flags=re.I)
         if insert_ignore:
-            statement = re.sub(r"^\s*insert\s+or\s+ignore\s+into", "INSERT INTO", statement, count=1, flags=re.I)
-            if " on conflict " not in statement.lower():
-                statement = statement.rstrip().rstrip(";") + " ON CONFLICT DO NOTHING"
-            insert_match = re.match(r"insert\s+into\s+([a-zA-Z_][a-zA-Z0-9_]*)", statement.strip(), flags=re.I)
-
-        cur = self._raw.cursor(cursor_factory=RealDictCursor)
-        lastrowid = None
-        table = insert_match.group(1).lower() if insert_match else None
+            statement=re.sub(r"^\s*insert\s+or\s+ignore\s+into","INSERT INTO",statement,count=1,flags=re.I)
+            if " on conflict " not in statement.lower(): statement=statement.rstrip().rstrip(";")+" ON CONFLICT DO NOTHING"
+            insert_match=re.match(r"insert\s+into\s+([a-zA-Z_][a-zA-Z0-9_]*)",statement.strip(),flags=re.I)
+        cur=self._raw.cursor(cursor_factory=RealDictCursor);lastrowid=None;table=insert_match.group(1).lower() if insert_match else None
         if table in SERIAL_ID_TABLES and " returning " not in statement.lower() and " on conflict " not in statement.lower():
-            statement = statement.rstrip().rstrip(";") + " RETURNING id"
-            cur.execute(statement, tuple(params or ()))
-            row = cur.fetchone()
-            if row:
-                lastrowid = row.get("id")
-        else:
-            cur.execute(statement, tuple(params or ()))
-        return CursorProxy(cur, lastrowid=lastrowid)
-
-    def executescript(self, script):
-        cur = self._raw.cursor()
-        cur.execute(script)
-        return CursorProxy(cur)
-
-    def commit(self):
-        self._raw.commit()
-
-    def rollback(self):
-        self._raw.rollback()
-
-    def close(self):
-        self._raw.close()
+            statement=statement.rstrip().rstrip(";")+" RETURNING id";cur.execute(statement,tuple(params or ()));row=cur.fetchone();lastrowid=row.get("id") if row else None
+        else: cur.execute(statement,tuple(params or ()))
+        return CursorProxy(cur,lastrowid)
+    def executescript(self,script):
+        cur=self._raw.cursor();cur.execute(_translate_postgres_sql(script));return CursorProxy(cur)
+    def commit(self): self._raw.commit()
+    def rollback(self): self._raw.rollback()
+    def close(self): self._raw.close()
 
 
 def connect_db():
     if is_postgres():
-        if psycopg2 is None:
-            raise RuntimeError("psycopg2 is required for PostgreSQL mode")
-        url = os.environ.get("DATABASE_URL", "").strip()
-        if not url:
-            raise RuntimeError("DATABASE_URL is required when DB_ENGINE=postgres")
+        if psycopg2 is None: raise RuntimeError("psycopg2 is required for PostgreSQL mode")
+        url=os.environ.get("DATABASE_URL","").strip()
+        if not url: raise RuntimeError("DATABASE_URL is required when DB_ENGINE=postgres")
         return PostgresConnectionProxy(psycopg2.connect(secure_postgres_url(url)))
-    conn = sqlite3.connect(sqlite_path())
-    conn.row_factory = sqlite3.Row
-    return conn
+    conn=sqlite3.connect(sqlite_path());conn.row_factory=sqlite3.Row;return conn
 
 
 def ensure_postgres_schema(conn=None):
-    if not is_postgres():
-        return
-    owned = conn is None
-    c = conn or connect_db()
-    try:
-        c.executescript(POSTGRES_SCHEMA)
-        c.commit()
+    if not is_postgres(): return
+    owned=conn is None;c=conn or connect_db()
+    try: c.executescript(POSTGRES_SCHEMA);c.commit()
     finally:
-        if owned:
-            c.close()
+        if owned:c.close()
 
 
-def backend_name():
-    return "postgresql" if is_postgres() else "sqlite"
+def backend_name(): return "postgresql" if is_postgres() else "sqlite"
