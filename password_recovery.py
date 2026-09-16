@@ -51,5 +51,8 @@ def register_password_recovery(app, db):
             password=request.form.get('password','');confirm=request.form.get('confirm_password','')
             if len(password)<8:c.close();flash(text('short'));return render_template('reset_password.html')
             if password!=confirm:c.close();flash(text('mismatch'));return render_template('reset_password.html')
-            now=datetime.utcnow().isoformat();c.execute("UPDATE users SET password_hash=? WHERE id=?",(generate_password_hash(password),row['user_id']));c.execute("UPDATE password_reset_tokens SET used_at=? WHERE user_id=? AND used_at IS NULL",(now,row['user_id']));c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(row['user_id'],'password_reset','password reset completed',now));c.commit();c.close();session.pop('uid',None);flash(text('done'));return redirect(url_for('login'))
+            now=datetime.utcnow().isoformat();c.execute("UPDATE users SET password_hash=? WHERE id=?",(generate_password_hash(password),row['user_id']));c.execute("UPDATE password_reset_tokens SET used_at=? WHERE user_id=? AND used_at IS NULL",(now,row['user_id']));c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(row['user_id'],'password_reset','password reset completed',now));c.commit();c.close()
+            lang=session.get('lang','ar');csrf=session.get('_csrf_token');session.clear();session['lang']=lang
+            if csrf:session['_csrf_token']=csrf
+            flash(text('done'));return redirect(url_for('login'))
         c.close();return render_template('reset_password.html')
