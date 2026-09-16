@@ -52,7 +52,8 @@ def inject():
     u=current_user();unread_count=0
     if u and u["role"]=="agency":
         c=db();unread_count=c.execute("SELECT COUNT(*) c FROM notifications WHERE user_id=? AND read_at IS NULL",(u["id"],)).fetchone()["c"];c.close()
-    return {"T":t(),"lang":session.get("lang","ar"),"unread_count":unread_count}
+    c=db();portal_settings={r["key"]:r["value"] for r in c.execute("SELECT * FROM settings").fetchall()};c.close()
+    return {"T":t(),"lang":session.get("lang","ar"),"unread_count":unread_count,"portal_settings":portal_settings}
 def login_required(f):
     @wraps(f)
     def w(*a,**kw):
@@ -123,14 +124,17 @@ def register():
         if not request.form.get("privacy") or not request.form.get("marketing"):flash("Both privacy and WhatsApp marketing consent are required.");return redirect(url_for("register"))
         email=request.form["email"].strip().lower();c=db()
         if c.execute("SELECT 1 FROM users WHERE email=?",(email,)).fetchone():c.close();flash("Email already registered.");return redirect(url_for("register"))
-        now=datetime.utcnow().isoformat();cur=c.execute("INSERT INTO users(email,password_hash,role,name,mobile,language,created_at) VALUES(?,?,?,?,?,?,?)",(email,generate_password_hash(request.form["password"]),"agency",request.form["contact_name"],request.form["whatsapp"],request.form.get("language","ar"),now));uid=cur.lastrowid;c.execute("INSERT INTO agencies(user_id,agency_name,country,contact_name,whatsapp,marketing_consent,created_at) VALUES(?,?,?,?,?,?,?)",(uid,request.form["agency_name"],request.form["country"],request.form["contact_name"],request.form["whatsapp"],1,now));c.commit();c.close();session["user_id"]=uid;session["lang"]=request.form.get("language","ar");return redirect(url_for("account"))
+        now=datetime.utcnow().isoformat();cur=c.execute("INSERT INTO users(email,password_hash,role,name,mobile,language,created_at) VALUES(?,?,?,?,?,?,?)",(email,generate_password_hash(request.form["password"]),"agency",request.form["contact_name"],request.form["whatsapp"],request.form.get("language","ar"),now));uid=cur.lastrowid;c.execute("INSERT INTO agencies(user_id,agency_name,country,contact_name,whatsapp,marketing_consent,created_at) VALUES(?,?,?,?,?,?,?)",(uid,request.form["agency_name"],request.form["country"],request.form["contact_name"],request.form["whatsapp"],1,now));c.commit();c.close();session["user_id"]=uid;session["lang"]=request.form.get("language","ar");return redirect(url_for("home", _anchor="hotels"))
     return render_template("register.html",user=current_user())
 @app.route("/login",methods=["GET","POST"])
 def login():
     if request.method=="POST":
         c=db();u=c.execute("SELECT * FROM users WHERE email=?",(request.form["email"].strip().lower(),)).fetchone();c.close()
-        if u and u["active"] and check_password_hash(u["password_hash"],request.form["password"]):session["user_id"]=u["id"];session["lang"]=u["language"] or "ar";return redirect(url_for("admin" if u["role"] in ("super_admin","staff") else "account"))
-        flash("Invalid login or suspended account.")
+        if u and u["active"] and check_password_hash(u["password_hash"],request.form["password"]):
+            session["user_id"]=u["id"];session["lang"]=u["language"] or "ar"
+            return redirect(url_for("admin") if u["role"] in ("super_admin","staff") else url_for("home", _anchor="hotels"))
+        login_messages={"ar":"البريد الإلكتروني أو كلمة المرور غير صحيحة، أو الحساب غير نشط.","en":"Email or password is incorrect, or the account is inactive.","id":"Email atau kata sandi salah, atau akun tidak aktif.","ms":"E-mel atau kata laluan tidak betul, atau akaun tidak aktif."}
+        flash(login_messages.get(session.get("lang","ar"),login_messages["ar"]))
     return render_template("login.html",user=current_user())
 @app.route("/logout")
 def logout():session.clear();return redirect(url_for("home"))
@@ -298,6 +302,9 @@ from password_recovery import register_password_recovery
 register_password_recovery(app,db)
 from reports import register_reports
 register_reports(app,admin_required,db,current_user)
+
+@app.route("/robots.txt")
+def robots_txt():return app.send_static_file("robots.txt")
 
 @app.route("/health")
 def health():return jsonify({"ok":True})
