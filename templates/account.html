@@ -48,7 +48,7 @@
       {% set wa_text = 'MUROOJ GOLDEN B2B\nAgency: ' ~ agency.agency_name ~ '\nRequest: #' ~ r.id ~ '\nCity: ' ~ r.city ~ '\nHotel: ' ~ hotel_name ~ '\nCheck-in: ' ~ r.checkin ~ '\nCheck-out: ' ~ r.checkout ~ '\nRooms: ' ~ r.rooms ~ '\nPersons: ' ~ r.persons ~ '\nNationality: ' ~ r.nationality ~ '\nMeal: ' ~ r.meal ~ '\nNotes: ' ~ (r.notes or '-') %}
       <tr><td>{{ r.id }}</td><td>{{ hotel_name }}</td><td>{{ r.checkin }} → {{ r.checkout }}</td><td>{{ r.rooms }}</td><td>{{ r.persons }}</td><td><span class="status {{ r.status }}">{{ T[r.status] }}</span></td><td>
         <a class="btn small gold" href="{{ url_for('new_request', hotel=('any' if r.any_hotel else r.hotel_id), city=r.city, checkin=r.checkin, checkout=r.checkout, rooms=r.rooms, persons=r.persons, nationality=r.nationality, meal=r.meal, notes=r.notes) }}">{{ T.repeat }}</a>
-        <a class="btn small" target="_blank" rel="noopener" href="https://wa.me/966550558014?text={{ wa_text|urlencode }}">WhatsApp</a>
+        <a class="btn small" target="_blank" rel="noopener" href="https://wa.me/{{ company_settings.get('whatsapp','966550558014') }}?text={{ wa_text|urlencode }}">WhatsApp</a>
       </td></tr>
     {% else %}<tr><td colspan="7">—</td></tr>{% endfor %}
   </table></div>
