@@ -1,5 +1,4 @@
 {% extends 'base.html' %}{% block body %}<main><h1>{{T.login}}</h1><form method="post" class="card form narrow">
 <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
 <label>{{T.email}}<input type="email" name="email" autocomplete="email" required></label><label>{{T.password}}<input type="password" name="password" autocomplete="current-password" required></label>
-<a href="{{url_for('forgot_password')}}">{{ {'ar':'نسيت كلمة المرور؟','en':'Forgot password?','id':'Lupa kata sandi?','ms':'Lupa kata laluan?'}[session.get('lang','ar')] }}</a>
 <button class="btn gold">{{T.login}}</button><a class="btn dark" href="{{url_for('register')}}">{{T.register}}</a></form></main>{% endblock %}
