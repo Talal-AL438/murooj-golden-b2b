@@ -18,10 +18,10 @@ def register_password_recovery(app, db):
         return row['value'] if row and row['value'] is not None else default
 
     def send_reset_email(c, recipient, reset_url):
-        """Send through Resend when configured. No API key or raw token is stored in the database."""
+        """Send through Resend when configured. The API key remains environment-only."""
         api_key=os.environ.get('RESEND_API_KEY','').strip()
-        sender=os.environ.get('RESEND_FROM_EMAIL','').strip()
-        sender_name=os.environ.get('RESEND_FROM_NAME','MUROOJ GOLDEN').strip() or 'MUROOJ GOLDEN'
+        sender=setting(c,'mail_sender_email','').strip() or os.environ.get('RESEND_FROM_EMAIL','').strip()
+        sender_name=setting(c,'mail_sender_name','').strip() or os.environ.get('RESEND_FROM_NAME','MUROOJ GOLDEN').strip() or 'MUROOJ GOLDEN'
         reply_to=setting(c,'email','').strip()
         if not api_key or not sender:
             return False
