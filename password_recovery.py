@@ -6,7 +6,7 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timedelta
 from flask import request, render_template, redirect, url_for, flash, session
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 def register_password_recovery(app, db):
@@ -52,6 +52,7 @@ def register_password_recovery(app, db):
             'invalid':{'ar':'رابط الاستعادة غير صالح أو انتهت صلاحيته.','en':'The recovery link is invalid or has expired.','id':'Tautan pemulihan tidak valid atau telah kedaluwarsa.','ms':'Pautan pemulihan tidak sah atau telah tamat tempoh.'},
             'short':{'ar':'يجب أن تكون كلمة المرور 8 أحرف على الأقل.','en':'Password must be at least 8 characters.','id':'Kata sandi minimal 8 karakter.','ms':'Kata laluan mestilah sekurang-kurangnya 8 aksara.'},
             'mismatch':{'ar':'كلمتا المرور غير متطابقتين.','en':'Passwords do not match.','id':'Kata sandi tidak cocok.','ms':'Kata laluan tidak sepadan.'},
+            'same':{'ar':'اختر كلمة مرور جديدة مختلفة عن كلمة المرور الحالية.','en':'Choose a new password different from your current password.','id':'Pilih kata sandi baru yang berbeda dari kata sandi saat ini.','ms':'Pilih kata laluan baharu yang berbeza daripada kata laluan semasa.'},
             'done':{'ar':'تم تغيير كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.','en':'Password changed successfully. You can log in now.','id':'Kata sandi berhasil diubah. Anda sekarang dapat masuk.','ms':'Kata laluan berjaya diubah. Anda boleh log masuk sekarang.'}}
         return messages[key].get(lang,messages[key]['ar'])
 
@@ -86,6 +87,8 @@ def register_password_recovery(app, db):
             password=request.form.get('password','');confirm=request.form.get('confirm_password','')
             if len(password)<8:c.close();flash(text('short'));return render_template('reset_password.html')
             if password!=confirm:c.close();flash(text('mismatch'));return render_template('reset_password.html')
+            user=c.execute("SELECT password_hash FROM users WHERE id=?",(row['user_id'],)).fetchone()
+            if user and check_password_hash(user['password_hash'],password):c.close();flash(text('same'));return render_template('reset_password.html')
             now=datetime.utcnow().isoformat();c.execute("UPDATE users SET password_hash=? WHERE id=?",(generate_password_hash(password),row['user_id']));c.execute("UPDATE password_reset_tokens SET used_at=? WHERE user_id=? AND used_at IS NULL",(now,row['user_id']));c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(row['user_id'],'password_reset','password reset completed',now));c.commit();c.close()
             lang=session.get('lang','ar');csrf=session.get('_csrf_token');session.clear();session['lang']=lang
             if csrf:session['_csrf_token']=csrf
