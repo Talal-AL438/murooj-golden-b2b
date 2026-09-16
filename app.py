@@ -30,7 +30,7 @@ def init_db():
     CREATE TABLE IF NOT EXISTS notifications (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER NOT NULL,type TEXT NOT NULL,ref_id INTEGER,title TEXT NOT NULL,body TEXT,link TEXT,read_at TEXT,created_at TEXT NOT NULL,FOREIGN KEY(user_id) REFERENCES users(id));
     CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER,action TEXT NOT NULL,details TEXT,created_at TEXT NOT NULL);
     """)
-    for k,v in {"company_name":"مروج الذهبية للاستثمار","brand":"MUROOJ GOLDEN","whatsapp":"966550558014","email":"talal_alaqely@icloud.com","announcement":"","announcement_active":"0"}.items():conn.execute("INSERT OR IGNORE INTO settings(key,value) VALUES (?,?)",(k,v))
+    for k,v in {"company_name":"مروج الذهبية للاستثمار","brand":"MUROOJ GOLDEN","whatsapp":"966550558014","email":"talal_alaqely@icloud.com","mail_sender_name":"MUROOJ GOLDEN","mail_sender_email":"","announcement":"","announcement_active":"0","announcement_target":"all","announcement_start":"","announcement_end":"","announcement_whatsapp":"0"}.items():conn.execute("INSERT OR IGNORE INTO settings(key,value) VALUES (?,?)",(k,v))
     if conn.execute("SELECT COUNT(*) c FROM hotels").fetchone()["c"]==0:
         now=datetime.utcnow().isoformat();conn.execute("INSERT INTO hotels(name_ar,name_en,city,map_url,services,meals,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?)",("فندق ندى أجياد","NADA AJYAD HOTEL","Makkah","https://maps.app.goo.gl/PzgRgz23LRDex1Wq7?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",1,1,now));conn.execute("INSERT INTO hotels(name_ar,name_en,city,map_url,services,meals,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?)",("فندق سواعد الخير","SAWAEED AL KHAIR HOTEL","Makkah","https://maps.app.goo.gl/GcA7zZYftYcuYx9N6?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",1,2,now))
     if conn.execute("SELECT COUNT(*) c FROM hotel_images").fetchone()["c"]==0:
@@ -283,8 +283,11 @@ def admin_employees():
 def admin_settings():
     c=db()
     if request.method=="POST":
-        for key in ("company_name","brand","whatsapp","email","announcement","announcement_active"):
+        for key in ("company_name","brand","whatsapp","email","mail_sender_name","mail_sender_email","announcement","announcement_target","announcement_start","announcement_end"):
             if key in request.form:c.execute("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",(key,request.form[key]))
+        for key in ("announcement_active","announcement_whatsapp"):
+            value="1" if request.form.get(key) else "0"
+            c.execute("INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",(key,value))
         c.commit();log("settings_update","general settings")
     settings={r["key"]:r["value"] for r in c.execute("SELECT * FROM settings").fetchall()};c.close();return render_template("admin_settings.html",user=current_user(),settings=settings)
 @app.route("/admin/audit")
