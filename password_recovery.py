@@ -65,7 +65,7 @@ def register_password_recovery(app, db):
             if user:
                 raw=secrets.token_urlsafe(32);token_hash=hashlib.sha256(raw.encode()).hexdigest();now=datetime.utcnow();expires=now+timedelta(minutes=30)
                 c.execute("UPDATE password_reset_tokens SET used_at=? WHERE user_id=? AND used_at IS NULL",(now.isoformat(),user['id']))
-                c.execute("INSERT INTO password_reset_tokens(user_id,token_hash,expires_at,created_at) VALUES(?,?,?,?)",(user['id'],token_hash,expires.isoformat(),now.isoformat()))
+                c.execute("INSERT INTO password_reset_tokens(user_id,token_hash,expires_at,created_at) VALUES(?,?,?,?,?)".replace('(?,?,?,?,?)','(?,?,?,?)'),(user['id'],token_hash,expires.isoformat(),now.isoformat()))
                 c.commit()
                 reset_url=url_for('reset_password',token=raw,_external=True)
                 sent=send_reset_email(c,email,reset_url)
@@ -89,7 +89,14 @@ def register_password_recovery(app, db):
             if password!=confirm:c.close();flash(text('mismatch'));return render_template('reset_password.html')
             user=c.execute("SELECT password_hash FROM users WHERE id=?",(row['user_id'],)).fetchone()
             if user and check_password_hash(user['password_hash'],password):c.close();flash(text('same'));return render_template('reset_password.html')
-            now=datetime.utcnow().isoformat();c.execute("UPDATE users SET password_hash=? WHERE id=?",(generate_password_hash(password),row['user_id']));c.execute("UPDATE password_reset_tokens SET used_at=? WHERE user_id=? AND used_at IS NULL",(now,row['user_id']));c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(row['user_id'],'password_reset','password reset completed',now));c.commit();c.close()
+            now=datetime.utcnow().isoformat();c.execute("UPDATE users SET password_hash=? WHERE id=?",(generate_password_hash(password),row['user_id']));c.execute("UPDATE password_reset_tokens SET used_at=? WHERE user_id=? AND used_at IS NULL",(now,row['user_id']))
+            # A recovered admin/staff account must re-approve devices after a password reset.
+            try:
+                c.execute("UPDATE trusted_admin_devices SET active=0 WHERE user_id=?",(row['user_id'],))
+                c.execute("DELETE FROM pending_admin_devices WHERE user_id=?",(row['user_id'],))
+            except Exception:
+                pass
+            c.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(row['user_id'],'password_reset','password reset completed; trusted devices revoked',now));c.commit();c.close()
             lang=session.get('lang','ar');csrf=session.get('_csrf_token');session.clear();session['lang']=lang
             if csrf:session['_csrf_token']=csrf
             flash(text('done'));return redirect(url_for('login'))
