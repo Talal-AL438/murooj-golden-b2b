@@ -53,7 +53,7 @@ def register_password_recovery(app, db):
             'short':{'ar':'يجب أن تكون كلمة المرور 8 أحرف على الأقل.','en':'Password must be at least 8 characters.','id':'Kata sandi minimal 8 karakter.','ms':'Kata laluan mestilah sekurang-kurangnya 8 aksara.'},
             'mismatch':{'ar':'كلمتا المرور غير متطابقتين.','en':'Passwords do not match.','id':'Kata sandi tidak cocok.','ms':'Kata laluan tidak sepadan.'},
             'same':{'ar':'اختر كلمة مرور جديدة مختلفة عن كلمة المرور الحالية.','en':'Choose a new password different from your current password.','id':'Pilih kata sandi baru yang berbeda dari kata sandi saat ini.','ms':'Pilih kata laluan baharu yang berbeza daripada kata laluan semasa.'},
-            'done':{'ar':'تم تغيير كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.','en':'Password changed successfully. You can log in now.','id':'Kata sandi berhasil diubah. Anda sekarang dapat masuk.','ms':'Kata laluan berjaya diubah. Anda boleh log masuk sekarang.'}}
+            'done':{'ar':'تم تغيير كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.','en':'Password changed successfully. You can log in now.','id':'Kata sandi berhasil diubah. Anda sekarang dapat masuk.','ms':'Kata laluan berjaya ditukar. Anda boleh log masuk sekarang.'}}
         return messages[key].get(lang,messages[key]['ar'])
 
     @app.route('/forgot-password',methods=['GET','POST'])
@@ -100,3 +100,6 @@ def register_password_recovery(app, db):
             if csrf:session['_csrf_token']=csrf
             flash(text('done'));return redirect(url_for('login'))
         c.close();return render_template('reset_password.html')
+
+    from portal_hardening import apply_portal_hardening
+    apply_portal_hardening(app,db)
