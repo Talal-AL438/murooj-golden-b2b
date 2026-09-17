@@ -1,5 +1,24 @@
-{% extends 'base.html' %}{% block body %}<main><h1>{{T.login}}</h1><form method="post" class="card form narrow">
-<input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
-<label>{{T.email}}<input type="email" name="email" autocomplete="email" required></label><label>{{T.password}}<input type="password" name="password" autocomplete="current-password" required></label>
-<a href="{{url_for('forgot_password')}}">{{ {'ar':'نسيت كلمة المرور؟','en':'Forgot password?','id':'Lupa kata sandi?','ms':'Lupa kata laluan?'}[session.get('lang','ar')] }}</a>
-<button class="btn gold">{{T.login}}</button><a class="btn dark" href="{{url_for('register')}}">{{T.register}}</a></form></main>{% endblock %}
+{% extends 'base.html' %}
+{% block body %}
+<main class="page-shell">
+  <section class="page-intro">
+    <span class="eyebrow">MUROOJ GOLDEN B2B</span>
+    <h1>{{ T.login }}</h1>
+    <p>{% if lang=='ar' %}سجّل الدخول للوصول إلى فنادق مكة والمدينة وحجوزات وكالتك.{% elif lang=='id' %}Masuk untuk mengakses hotel Makkah dan Madinah serta pemesanan agen Anda.{% elif lang=='ms' %}Log masuk untuk mengakses hotel Makkah dan Madinah serta tempahan agensi anda.{% else %}Sign in to access Makkah and Madinah hotels and your agency bookings.{% endif %}</p>
+  </section>
+
+  {% with messages = get_flashed_messages() %}{% if messages %}<section class="card narrow" style="margin:0 auto 16px">{% for message in messages %}<p><b>{{ message }}</b></p>{% endfor %}</section>{% endif %}{% endwith %}
+
+  <form method="post" class="card form narrow" autocomplete="on">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+    <label>{{ T.email }}<input type="email" name="email" autocomplete="email" required autofocus></label>
+    <label>{{ T.password }}<input type="password" name="password" autocomplete="current-password" required></label>
+    <div style="display:flex;justify-content:flex-end;margin-top:-4px">
+      <a href="{{ url_for('forgot_password') }}">{{ {'ar':'نسيت كلمة المرور؟','en':'Forgot password?','id':'Lupa kata sandi?','ms':'Lupa kata laluan?'}[session.get('lang','ar')] }}</a>
+    </div>
+    <button class="btn gold" type="submit">{{ T.login }}</button>
+    <p style="text-align:center;margin:8px 0 0;opacity:.78">{% if lang=='ar' %}ليس لديك حساب وكالة؟{% elif lang=='id' %}Belum memiliki akun agen?{% elif lang=='ms' %}Belum mempunyai akaun agensi?{% else %}Don't have an agency account?{% endif %}</p>
+    <a class="btn outline" href="{{ url_for('register') }}">{{ T.register }}</a>
+  </form>
+</main>
+{% endblock %}
