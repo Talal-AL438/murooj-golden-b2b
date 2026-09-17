@@ -4,29 +4,31 @@
   <section class="page-intro">
     <span class="eyebrow">MUROOJ GOLDEN B2B</span>
     <h1>{{ T.register }}</h1>
-    <p>{{ T.sub }}</p>
+    <p>{% if lang=='ar' %}أنشئ حساب وكالتك للوصول إلى فنادق مكة والمدينة والأسعار والعروض المخصصة للشركات.{% elif lang=='id' %}Buat akun agen untuk mengakses hotel Makkah dan Madinah serta penawaran khusus B2B.{% elif lang=='ms' %}Cipta akaun agensi untuk mengakses hotel Makkah dan Madinah serta tawaran khas B2B.{% else %}Create your agency account to access Makkah and Madinah hotels and B2B offers.{% endif %}</p>
   </section>
 
-  <form method="post" class="card form" autocomplete="on">
+  {% with messages = get_flashed_messages() %}{% if messages %}<section class="card" style="max-width:920px;margin:0 auto 16px">{% for message in messages %}<p><b>{{ message }}</b></p>{% endfor %}</section>{% endif %}{% endwith %}
+
+  <form method="post" class="card form" autocomplete="on" style="max-width:920px;margin-left:auto;margin-right:auto">
     <div class="form-grid">
       <label>{{ T.agency_name }}
-        <input name="agency_name" autocomplete="organization" required>
+        <input name="agency_name" minlength="2" maxlength="160" autocomplete="organization" required autofocus>
       </label>
 
       <label>{{ T.country }}
-        <input name="country" placeholder="Indonesia / Malaysia / Saudi Arabia / ..." autocomplete="country-name" required>
+        <input name="country" minlength="2" maxlength="100" placeholder="Indonesia / Malaysia / Saudi Arabia / ..." autocomplete="country-name" required>
       </label>
 
       <label>{{ T.contact_name }}
-        <input name="contact_name" autocomplete="name" required>
+        <input name="contact_name" minlength="2" maxlength="120" autocomplete="name" required>
       </label>
 
       <label>{{ T.whatsapp }}
-        <input name="whatsapp" type="tel" inputmode="tel" placeholder="+62 / +60 / +966 ..." autocomplete="tel" required>
+        <input name="whatsapp" type="tel" inputmode="tel" minlength="8" maxlength="24" placeholder="+62 / +60 / +966 ..." autocomplete="tel" required>
       </label>
 
       <label>{{ T.email }}
-        <input type="email" name="email" autocomplete="email" required>
+        <input type="email" name="email" maxlength="190" autocomplete="email" required>
       </label>
 
       <label>{{ T.password }}
@@ -36,10 +38,10 @@
 
       <label>{{ T.language }}
         <select name="language" required>
-          <option value="ar">العربية</option>
-          <option value="en">English</option>
-          <option value="id">Bahasa Indonesia</option>
-          <option value="ms">Bahasa Melayu</option>
+          <option value="ar" {{ 'selected' if lang=='ar' else '' }}>العربية</option>
+          <option value="en" {{ 'selected' if lang=='en' else '' }}>English</option>
+          <option value="id" {{ 'selected' if lang=='id' else '' }}>Bahasa Indonesia</option>
+          <option value="ms" {{ 'selected' if lang=='ms' else '' }}>Bahasa Melayu</option>
         </select>
       </label>
     </div>
@@ -50,6 +52,8 @@
     </div>
 
     <button class="btn gold" type="submit">{{ T.create_account }}</button>
+    <p style="text-align:center;margin:12px 0 0;opacity:.78">{% if lang=='ar' %}لديك حساب وكالة بالفعل؟{% elif lang=='id' %}Sudah memiliki akun agen?{% elif lang=='ms' %}Sudah mempunyai akaun agensi?{% else %}Already have an agency account?{% endif %}</p>
+    <a class="btn outline" href="{{ url_for('login') }}">{{ T.login }}</a>
   </form>
 </main>
 {% endblock %}
