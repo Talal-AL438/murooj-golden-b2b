@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash
 
 
 def apply_portal_hardening(app, db):
-    """Small validation layer applied after the main routes are registered."""
+    """Validation layer for agency registration, booking, account security and hotel gallery ordering."""
 
     def msg(ar, en, id_text=None, ms=None):
         lang=session.get('lang','ar')
@@ -48,6 +48,9 @@ def apply_portal_hardening(app, db):
                 if rooms<1 or persons<1 or not d1 or not d2 or d2<=d1:
                     flash(msg('تحقق من التواريخ وعدد الغرف والأشخاص. يجب أن يكون تاريخ الخروج بعد تاريخ الدخول.','Check the dates, rooms and persons. Check-out must be after check-in.','Periksa tanggal, kamar, dan jumlah orang. Check-out harus setelah check-in.','Semak tarikh, bilik dan bilangan orang. Daftar keluar mesti selepas daftar masuk.'))
                     return redirect(request.referrer or url_for('home',_anchor='hotels'))
+                if city not in ('Makkah','Madinah'):
+                    flash(msg('المدينة المختارة غير صالحة.','Invalid city selection.','Pilihan kota tidak valid.','Pilihan bandar tidak sah.'))
+                    return redirect(url_for('home',_anchor='hotels'))
                 hv=request.form.get('hotel_id','')
                 if hv!='any':
                     try:hid=int(hv)
@@ -65,6 +68,9 @@ def apply_portal_hardening(app, db):
         def safe_account(*args, **kwargs):
             if request.method=='POST' and request.form.get('action')=='password':
                 new=request.form.get('new_password','');confirm=request.form.get('confirm_password','')
+                if len(new)<8:
+                    flash(msg('يجب أن تكون كلمة المرور الجديدة 8 أحرف على الأقل.','New password must be at least 8 characters.','Kata sandi baru minimal 8 karakter.','Kata laluan baharu mestilah sekurang-kurangnya 8 aksara.'))
+                    return redirect(url_for('account'))
                 if new!=confirm:
                     flash(msg('كلمتا المرور الجديدتان غير متطابقتين.','New passwords do not match.','Kata sandi baru tidak cocok.','Kata laluan baharu tidak sepadan.'))
                     return redirect(url_for('account'))
@@ -89,7 +95,8 @@ def apply_portal_hardening(app, db):
                 except (TypeError,ValueError):
                     c.close();return redirect(url_for('admin_hotels'))
                 row=c.execute('SELECT id FROM hotel_images WHERE id=?',(iid,)).fetchone()
-                if row:c.execute('UPDATE hotel_images SET sort_order=? WHERE id=?',(order,iid));c.commit()
+                if row:
+                    c.execute('UPDATE hotel_images SET sort_order=? WHERE id=?',(order,iid));c.commit()
                 c.close();return redirect(url_for('admin_hotels'))
             return original_hotels(*args,**kwargs)
         app.view_functions['admin_hotels']=safe_admin_hotels
