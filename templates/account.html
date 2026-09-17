@@ -3,7 +3,7 @@
 <main class="page-shell">
   <div class="section-head">
     <div><span class="eyebrow">MUROOJ GOLDEN B2B</span><h1>{{ T.welcome }} — {{ agency.agency_name }}</h1></div>
-    <a class="btn gold" href="{{ url_for('new_request') }}">{{ T.quick_request }}</a>
+    <a class="btn gold" href="{{ url_for('home', _anchor='hotels') }}">{% if lang=='ar' %}تصفح الفنادق{% elif lang=='id' %}Lihat Hotel{% elif lang=='ms' %}Lihat Hotel{% else %}Browse Hotels{% endif %}</a>
   </div>
 
   {% with messages = get_flashed_messages() %}{% if messages %}<section class="card" style="margin-bottom:18px">{% for message in messages %}<p><b>{{ message }}</b></p>{% endfor %}</section>{% endif %}{% endwith %}
@@ -34,13 +34,13 @@
         <button class="btn gold" type="submit">{{ T.save }}</button>
       </form>
       <hr>
-      <h3>{{ T.quick_request }}</h3>
-      <p>{% if lang=='ar' %}يتم تأكيد التوفر والأسعار عبر WhatsApp.{% elif lang=='id' %}Ketersediaan dan harga dikonfirmasi melalui WhatsApp.{% elif lang=='ms' %}Ketersediaan dan harga disahkan melalui WhatsApp.{% else %}Hotel availability and prices are confirmed through WhatsApp.{% endif %}</p>
-      <a class="btn outline" href="{{ url_for('new_request') }}">{{ T.send_request }}</a>
+      <h3>{% if lang=='ar' %}حجز جديد{% elif lang=='id' %}Pemesanan Baru{% elif lang=='ms' %}Tempahan Baharu{% else %}New Booking{% endif %}</h3>
+      <p>{% if lang=='ar' %}اختر الفندق أولاً، ثم اضغط «احجز الآن». يتم تأكيد التوفر والسعر عبر WhatsApp.{% elif lang=='id' %}Pilih hotel terlebih dahulu, lalu tekan Pesan Sekarang. Ketersediaan dan harga dikonfirmasi melalui WhatsApp.{% elif lang=='ms' %}Pilih hotel dahulu, kemudian tekan Tempah Sekarang. Ketersediaan dan harga disahkan melalui WhatsApp.{% else %}Choose a hotel first, then select Book Now. Availability and pricing are confirmed through WhatsApp.{% endif %}</p>
+      <a class="btn outline" href="{{ url_for('home', _anchor='hotels') }}">{% if lang=='ar' %}تصفح الفنادق{% elif lang=='id' %}Lihat Hotel{% elif lang=='ms' %}Lihat Hotel{% else %}Browse Hotels{% endif %}</a>
     </section>
   </div>
 
-  <h2>{{ T.quick_request }}</h2>
+  <h2>{% if lang=='ar' %}حجوزاتي وطلباتي{% elif lang=='id' %}Pemesanan & Permintaan Saya{% elif lang=='ms' %}Tempahan & Permintaan Saya{% else %}My Bookings & Requests{% endif %}</h2>
   {% set wa_num=portal_settings.get('whatsapp','966550558014') if portal_settings else '966550558014' %}
   <div class="tablewrap"><table>
     <tr><th>#</th><th>{{ T.hotel }}</th><th>{{ T.date }}</th><th>{{ T.rooms }}</th><th>{{ T.persons }}</th><th>{{ T.status }}</th><th>{{ T.actions }}</th></tr>
