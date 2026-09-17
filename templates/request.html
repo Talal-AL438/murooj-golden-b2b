@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block body %}
-<main class="page-shell">
-  <section class="page-intro">
+<main class="page-shell booking-page">
+  <section class="page-intro booking-intro">
     <span class="eyebrow">MUROOJ GOLDEN B2B</span>
-    <h1>{{ T.quick_request }}</h1>
-    <p>{{ T.sub }}</p>
+    <h1>{{ 'طلب حجز فندق' if lang=='ar' else ('Permintaan Tempahan Hotel' if lang=='ms' else ('Permintaan Pemesanan Hotel' if lang=='id' else 'Hotel Booking Request')) }}</h1>
+    <p>{{ 'أكمل بيانات الحجز وسيقوم فريق مروج الذهبية بتأكيد التوفر والسعر عبر WhatsApp.' if lang=='ar' else ('Lengkapkan butiran tempahan. Pasukan Murooj Golden akan mengesahkan ketersediaan dan harga melalui WhatsApp.' if lang=='ms' else ('Lengkapi detail pemesanan. Tim Murooj Golden akan mengonfirmasi ketersediaan dan harga melalui WhatsApp.' if lang=='id' else 'Complete the booking details. Murooj Golden will confirm availability and pricing through WhatsApp.')) }}</p>
   </section>
 
-  <form method="post" class="card form" id="quick-request-form">
+  <form method="post" class="card form booking-form" id="quick-request-form">
     <div class="form-grid">
       <label>{{ T.city }}
         <select name="city" id="request-city" required>
@@ -15,16 +15,12 @@
           <option value="Madinah" {{ 'selected' if request.args.get('city') == 'Madinah' }}>{{ T.madinah }}</option>
         </select>
       </label>
-
       <label>{{ T.hotel }}
         <select name="hotel_id" id="request-hotel" required>
           <option value="any" {{ 'selected' if request.args.get('hotel','any') == 'any' }}>{{ T.any_hotel }}</option>
-          {% for h in hotels %}
-          <option value="{{ h.id }}" data-city="{{ h.city }}" {{ 'selected' if request.args.get('hotel') == h.id|string }}>{{ h.name_ar }} / {{ h.name_en }}</option>
-          {% endfor %}
+          {% for h in hotels %}<option value="{{ h.id }}" data-city="{{ h.city }}" {{ 'selected' if request.args.get('hotel') == h.id|string }}>{{ h.name_ar }} / {{ h.name_en }}</option>{% endfor %}
         </select>
       </label>
-
       <label>{{ T.checkin }}<input type="date" name="checkin" id="checkin" value="{{ request.args.get('checkin','') }}" required></label>
       <label>{{ T.checkout }}<input type="date" name="checkout" id="checkout" value="{{ request.args.get('checkout','') }}" required></label>
       <label>{{ T.rooms }}<input type="number" min="1" step="1" name="rooms" id="rooms" value="{{ request.args.get('rooms','') }}" inputmode="numeric" required></label>
@@ -38,102 +34,26 @@
         </select>
       </label>
     </div>
-
     <label class="full">{{ T.notes }}<textarea name="notes" rows="5">{{ request.args.get('notes','') }}</textarea></label>
-
-    <section class="card" style="margin:18px 0;background:rgba(255,255,255,.03)">
-      <small class="eyebrow">{{ 'ملخص الطلب' if lang=='ar' else ('Ringkasan Permintaan' if lang=='id' else ('Ringkasan Permintaan' if lang=='ms' else 'Request Summary')) }}</small>
+    <section class="card booking-summary" style="margin:18px 0;background:rgba(255,255,255,.03)">
+      <small class="eyebrow">{{ 'ملخص الحجز' if lang=='ar' else ('Ringkasan Tempahan' if lang=='ms' else ('Ringkasan Pemesanan' if lang=='id' else 'Booking Summary')) }}</small>
       <div class="hotel-tags" id="request-summary"></div>
-      <p style="margin-bottom:0">{{ 'سيتم تأكيد التوفر والسعر عبر WhatsApp بعد إرسال الطلب.' if lang=='ar' else ('Ketersediaan dan harga akan dikonfirmasi melalui WhatsApp setelah permintaan dikirim.' if lang=='id' else ('Ketersediaan dan harga akan disahkan melalui WhatsApp selepas permintaan dihantar.' if lang=='ms' else 'Availability and pricing will be confirmed through WhatsApp after submission.')) }}</p>
+      <p style="margin-bottom:0">{{ 'هذا طلب حجز مبدئي، وسيتم تأكيد التوفر والسعر عبر WhatsApp قبل اعتماد الحجز.' if lang=='ar' else ('Ini ialah permintaan tempahan awal. Ketersediaan dan harga akan disahkan melalui WhatsApp sebelum tempahan dimuktamadkan.' if lang=='ms' else ('Ini adalah permintaan pemesanan awal. Ketersediaan dan harga akan dikonfirmasi melalui WhatsApp sebelum pemesanan difinalisasi.' if lang=='id' else 'This is a preliminary booking request. Availability and pricing will be confirmed through WhatsApp before the booking is finalized.')) }}</p>
     </section>
-
-    <button class="btn gold" type="submit">{{ T.submit }}</button>
+    <button class="btn gold" type="submit">{{ 'إرسال طلب الحجز' if lang=='ar' else ('Hantar Permintaan Tempahan' if lang=='ms' else ('Kirim Permintaan Pemesanan' if lang=='id' else 'Send Booking Request')) }}</button>
   </form>
 </main>
-
 <script>
-(function () {
-  const form = document.getElementById('quick-request-form');
-  const city = document.getElementById('request-city');
-  const hotel = document.getElementById('request-hotel');
-  const checkin = document.getElementById('checkin');
-  const checkout = document.getElementById('checkout');
-  const rooms = document.getElementById('rooms');
-  const persons = document.getElementById('persons');
-  const meal = document.getElementById('meal');
-  const summary = document.getElementById('request-summary');
-
-  const now = new Date();
-  const today = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
-  checkin.min = today;
-
-  function nextDay(dateString) {
-    if (!dateString) return today;
-    const d = new Date(dateString + 'T00:00:00');
-    d.setDate(d.getDate() + 1);
-    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-  }
-
-  function syncDates() {
-    checkout.min = nextDay(checkin.value);
-    if (checkout.value && checkout.value < checkout.min) checkout.value = '';
-  }
-
-  function selectedHotelCity() {
-    const option = hotel.options[hotel.selectedIndex];
-    return option && option.dataset ? option.dataset.city : '';
-  }
-
-  function syncHotels(resetInvalid) {
-    let selectedVisible = hotel.value === 'any';
-    Array.from(hotel.options).forEach(function (option) {
-      if (option.value === 'any') return;
-      const visible = option.dataset.city === city.value;
-      option.hidden = !visible;
-      option.disabled = !visible;
-      if (visible && option.selected) selectedVisible = true;
-    });
-    if (resetInvalid && !selectedVisible) hotel.value = 'any';
-  }
-
-  function syncCityFromHotel() {
-    const hCity = selectedHotelCity();
-    if (hotel.value !== 'any' && hCity && city.value !== hCity) {
-      city.value = hCity;
-      syncHotels(false);
-    }
-  }
-
-  function updateSummary() {
-    const items = [];
-    const hotelText = hotel.options[hotel.selectedIndex] ? hotel.options[hotel.selectedIndex].text : '';
-    if (hotelText) items.push(hotelText);
-    if (checkin.value && checkout.value) items.push(checkin.value + ' → ' + checkout.value);
-    if (rooms.value) items.push('{{ T.rooms }}: ' + rooms.value);
-    if (persons.value) items.push('{{ T.persons }}: ' + persons.value);
-    if (meal.value) items.push('{{ T.meal }}: ' + meal.options[meal.selectedIndex].text);
-    summary.innerHTML = items.map(function (x) { return '<span class="tag">' + x.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>'; }).join('');
-  }
-
-  checkin.addEventListener('change', function () { syncDates(); updateSummary(); });
-  checkout.addEventListener('change', updateSummary);
-  city.addEventListener('change', function () { syncHotels(true); updateSummary(); });
-  hotel.addEventListener('change', function () { syncCityFromHotel(); updateSummary(); });
-  [rooms, persons, meal].forEach(function (el) { el.addEventListener('input', updateSummary); el.addEventListener('change', updateSummary); });
-
-  form.addEventListener('submit', function (event) {
-    syncDates();
-    if (!checkin.value || !checkout.value || checkout.value <= checkin.value) {
-      event.preventDefault();
-      checkout.focus();
-      checkout.reportValidity();
-    }
-  });
-
-  syncCityFromHotel();
-  syncHotels(false);
-  syncDates();
-  updateSummary();
+(function(){
+ const form=document.getElementById('quick-request-form'),city=document.getElementById('request-city'),hotel=document.getElementById('request-hotel'),checkin=document.getElementById('checkin'),checkout=document.getElementById('checkout'),rooms=document.getElementById('rooms'),persons=document.getElementById('persons'),meal=document.getElementById('meal'),summary=document.getElementById('request-summary');
+ const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');checkin.min=today;
+ function nextDay(v){if(!v)return today;const d=new Date(v+'T00:00:00');d.setDate(d.getDate()+1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+ function syncDates(){checkout.min=nextDay(checkin.value);if(checkout.value&&checkout.value<checkout.min)checkout.value=''}
+ function hotelCity(){const o=hotel.options[hotel.selectedIndex];return o&&o.dataset?o.dataset.city:''}
+ function syncHotels(reset){let ok=hotel.value==='any';Array.from(hotel.options).forEach(function(o){if(o.value==='any')return;const visible=o.dataset.city===city.value;o.hidden=!visible;o.disabled=!visible;if(visible&&o.selected)ok=true});if(reset&&!ok)hotel.value='any'}
+ function syncCity(){const c=hotelCity();if(hotel.value!=='any'&&c&&city.value!==c){city.value=c;syncHotels(false)}}
+ function update(){const a=[],ht=hotel.options[hotel.selectedIndex]?hotel.options[hotel.selectedIndex].text:'';if(ht)a.push(ht);if(checkin.value&&checkout.value)a.push(checkin.value+' → '+checkout.value);if(rooms.value)a.push('{{ T.rooms }}: '+rooms.value);if(persons.value)a.push('{{ T.persons }}: '+persons.value);if(meal.value)a.push('{{ T.meal }}: '+meal.options[meal.selectedIndex].text);summary.innerHTML=a.map(x=>'<span class="tag">'+x.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</span>').join('')}
+ checkin.addEventListener('change',()=>{syncDates();update()});checkout.addEventListener('change',update);city.addEventListener('change',()=>{syncHotels(true);update()});hotel.addEventListener('change',()=>{syncCity();update()});[rooms,persons,meal].forEach(el=>{el.addEventListener('input',update);el.addEventListener('change',update)});form.addEventListener('submit',function(e){syncDates();if(!checkin.value||!checkout.value||checkout.value<=checkin.value){e.preventDefault();checkout.focus();checkout.reportValidity()}});syncCity();syncHotels(false);syncDates();update();
 })();
 </script>
 {% endblock %}
