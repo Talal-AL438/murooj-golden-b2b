@@ -144,12 +144,12 @@ def logout():session.clear();return redirect(url_for("home"))
 @app.route("/setup-admin",methods=["GET","POST"])
 def setup_admin():
     c=db();exists=c.execute("SELECT 1 FROM users WHERE role='super_admin'").fetchone()
+    if exists:c.close();return redirect(url_for("login"))
     setup_token=os.environ.get("SETUP_ADMIN_TOKEN","").strip()
     if not setup_token:
         c.close();return "Admin setup is disabled.",404
     if request.args.get("token","")!=setup_token:
         c.close();return "Admin setup is not available.",404
-    if exists:c.close();return redirect(url_for("login"))
     if request.method=="POST":
         email=request.form["email"].strip().lower()
         if email!="talal_alaqely@icloud.com":
