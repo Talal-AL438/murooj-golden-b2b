@@ -144,8 +144,13 @@ def setup_admin():
     if exists:c.close();return redirect(url_for("login"))
     if request.method=="POST":
         email=request.form["email"].strip().lower()
-        if email!="talal_alaqely@icloud.com":c.close();flash("Use the approved temporary admin email.");return redirect(url_for("setup_admin"))
-        c.execute("INSERT INTO users(email,password_hash,role,name,language,created_at) VALUES(?,?,?,?,?,?)",(email,generate_password_hash(request.form["password"]),"super_admin",request.form.get("name","Super Admin"),"ar",datetime.utcnow().isoformat()));c.commit();c.close();flash("Super Admin account created. You can now log in.");return redirect(url_for("login"))
+        if email!="talal_alaqely@icloud.com":
+            c.close()
+            setup_email_messages={"ar":"استخدم البريد الإداري المؤقت المعتمد.","en":"Use the approved temporary admin email.","id":"Gunakan email admin sementara yang disetujui.","ms":"Gunakan e-mel pentadbir sementara yang diluluskan."}
+            flash(setup_email_messages.get(session.get("lang","ar"),setup_email_messages["ar"]));return redirect(url_for("setup_admin"))
+        c.execute("INSERT INTO users(email,password_hash,role,name,language,created_at) VALUES(?,?,?,?,?,?)",(email,generate_password_hash(request.form["password"]),"super_admin",request.form.get("name","Super Admin"),session.get("lang","ar"),datetime.utcnow().isoformat()));c.commit();c.close()
+        setup_success_messages={"ar":"تم إنشاء حساب المدير الرئيسي بنجاح. يمكنك تسجيل الدخول الآن.","en":"Super Admin account created. You can now log in.","id":"Akun Super Admin berhasil dibuat. Anda sekarang dapat masuk.","ms":"Akaun Super Admin berjaya diwujudkan. Anda kini boleh log masuk."}
+        flash(setup_success_messages.get(session.get("lang","ar"),setup_success_messages["ar"]));return redirect(url_for("login"))
     c.close();return render_template("setup_admin.html",user=None)
 
 @app.route("/request",methods=["GET","POST"])
