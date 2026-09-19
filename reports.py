@@ -87,7 +87,7 @@ def register_reports(app, admin_required, db, current_user):
         u=current_user()
         if not u or u['role']!='staff':return None
         path=request.path;needed=None
-        if path.startswith('/admin/reports'):needed='reports'
+        if path.startswith('/admin/reports') or path.startswith('/admin/request/'):needed='reports'
         elif path.startswith('/admin/agencies'):needed='agencies'
         elif path.startswith('/admin/hotels') or path.startswith('/admin/hotel/'):needed='hotels'
         elif path.startswith('/admin/offers'):needed='offers'
