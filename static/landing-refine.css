@@ -12,3 +12,10 @@
 .flag-ar .sa-shahada{display:block;position:absolute;top:2px;left:3px;right:3px;text-align:center;color:#fff;font-family:serif;font-size:5px;font-weight:700;line-height:1;letter-spacing:-.3px}.flag-icon:not(.flag-ar) .sa-shahada{display:none}.flag-ar:before{left:5px;right:5px;bottom:3px;height:1px;background:#fff}.flag-ar:after{width:9px;height:1px;bottom:2px;right:4px;background:#fff;transform:rotate(-4deg)}
 
 .flag-svg{width:25px;height:17px;display:inline-block;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.18);flex:none;vertical-align:middle}.lang-current .flag-svg{width:24px;height:16px}.language-options .flag-svg{width:27px;height:18px}
+
+/* Approved WhatsApp contact icon */
+.footer-wa-badge{width:34px;height:34px;background:#25D366;border-radius:9px;box-shadow:0 4px 14px rgba(37,211,102,.3)}
+.footer-wa-badge .footer-wa-icon{width:29px;height:29px;stroke:none;fill:none}
+.footer-wa-badge .wa-bubble{fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.footer-wa-badge .wa-phone{fill:#fff}
+.footer-whatsapp:hover .footer-wa-badge{background:#20bd5a;transform:translateY(-1px)}
