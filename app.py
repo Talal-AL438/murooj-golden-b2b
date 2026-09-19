@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
 APP_DIR=os.path.dirname(os.path.abspath(__file__))
-DB_PATH=os.path.join(APP_DIR,"murooj.db")
+DB_PATH=os.environ.get("DATABASE_PATH",os.path.join(APP_DIR,"murooj.db"))
 app=Flask(__name__)
 app.secret_key=os.environ.get("SECRET_KEY","change-this-secret-before-public-deployment")
 
