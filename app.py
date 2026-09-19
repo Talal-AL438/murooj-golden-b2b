@@ -121,9 +121,12 @@ def legal():return render_template("legal.html",user=current_user())
 @app.route("/register",methods=["GET","POST"])
 def register():
     if request.method=="POST":
-        if not request.form.get("privacy") or not request.form.get("marketing"):\n            consent_messages={"ar":"يلزم الموافقة على سياسة الخصوصية واستلام رسائل WhatsApp التسويقية.","en":"Privacy and WhatsApp marketing consent are required.","id":"Persetujuan privasi dan pemasaran WhatsApp diperlukan.","ms":"Persetujuan privasi dan pemasaran WhatsApp diperlukan."}\n            flash(consent_messages.get(session.get("lang","ar"),consent_messages["ar"]));return redirect(url_for("register"))
+        if not request.form.get("privacy") or not request.form.get("marketing"):
+            consent_messages={"ar":"يلزم الموافقة على سياسة الخصوصية واستلام رسائل WhatsApp التسويقية.","en":"Privacy and WhatsApp marketing consent are required.","id":"Persetujuan privasi dan pemasaran WhatsApp diperlukan.","ms":"Persetujuan privasi dan pemasaran WhatsApp diperlukan."}
+            flash(consent_messages.get(session.get("lang","ar"),consent_messages["ar"]));return redirect(url_for("register"))
         email=request.form["email"].strip().lower();c=db()
-        if c.execute("SELECT 1 FROM users WHERE email=?",(email,)).fetchone():\n            c.close();registered_messages={"ar":"البريد الإلكتروني مسجل مسبقاً.","en":"Email already registered.","id":"Email sudah terdaftar.","ms":"E-mel telah didaftarkan."};flash(registered_messages.get(session.get("lang","ar"),registered_messages["ar"]));return redirect(url_for("register"))
+        if c.execute("SELECT 1 FROM users WHERE email=?",(email,)).fetchone():
+            c.close();registered_messages={"ar":"البريد الإلكتروني مسجل مسبقاً.","en":"Email already registered.","id":"Email sudah terdaftar.","ms":"E-mel telah didaftarkan."};flash(registered_messages.get(session.get("lang","ar"),registered_messages["ar"]));return redirect(url_for("register"))
         now=datetime.utcnow().isoformat();cur=c.execute("INSERT INTO users(email,password_hash,role,name,mobile,language,created_at) VALUES(?,?,?,?,?,?,?)",(email,generate_password_hash(request.form["password"]),"agency",request.form["contact_name"],request.form["whatsapp"],request.form.get("language","ar"),now));uid=cur.lastrowid;c.execute("INSERT INTO agencies(user_id,agency_name,country,contact_name,whatsapp,marketing_consent,created_at) VALUES(?,?,?,?,?,?,?)",(uid,request.form["agency_name"],request.form["country"],request.form["contact_name"],request.form["whatsapp"],1,now));c.commit();c.close();session["user_id"]=uid;session["lang"]=request.form.get("language","ar");return redirect(url_for("home", _anchor="hotels"))
     return render_template("register.html",user=current_user())
 @app.route("/login",methods=["GET","POST"])
@@ -140,7 +143,12 @@ def login():
 def logout():session.clear();return redirect(url_for("home"))
 @app.route("/setup-admin",methods=["GET","POST"])
 def setup_admin():
-    c=db();exists=c.execute("SELECT 1 FROM users WHERE role='super_admin'").fetchone()\n    setup_token=os.environ.get("SETUP_ADMIN_TOKEN","").strip()\n    if not setup_token:\n        c.close();return "Admin setup is disabled.",404\n    if request.args.get("token","")!=setup_token:\n        c.close();return "Admin setup is not available.",404
+    c=db();exists=c.execute("SELECT 1 FROM users WHERE role='super_admin'").fetchone()
+    setup_token=os.environ.get("SETUP_ADMIN_TOKEN","").strip()
+    if not setup_token:
+        c.close();return "Admin setup is disabled.",404
+    if request.args.get("token","")!=setup_token:
+        c.close();return "Admin setup is not available.",404
     if exists:c.close();return redirect(url_for("login"))
     if request.method=="POST":
         email=request.form["email"].strip().lower()
