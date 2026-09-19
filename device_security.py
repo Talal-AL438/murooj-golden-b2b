@@ -122,6 +122,36 @@ def register_device_security(app, db, current_user):
             return response
         return send_file(tmp_path,as_attachment=True,download_name='murooj-golden-backup-'+datetime.utcnow().strftime('%Y%m%d-%H%M%S')+'.db',mimetype='application/octet-stream',max_age=0)
 
+    @app.route('/admin/database-restore',methods=['POST'])
+    def admin_database_restore():
+        u=current_user()
+        if not u or u['role']!='super_admin' or session.get('_pending_admin_device_id') or not current_device_row(u['id']):return redirect(url_for('admin'))
+        upload=request.files.get('backup_file')
+        if not upload or not upload.filename:
+            flash('اختر ملف النسخة الاحتياطية أولاً.');return redirect(url_for('admin_device_requests'))
+        tmp=tempfile.NamedTemporaryFile(prefix='murooj-restore-',suffix='.db',delete=False);tmp_path=tmp.name;tmp.close()
+        try:
+            upload.save(tmp_path)
+            if os.path.getsize(tmp_path)>100*1024*1024:raise ValueError('backup too large')
+            with open(tmp_path,'rb') as fh:
+                if fh.read(16)!=b'SQLite format 3\\x00':raise ValueError('invalid sqlite header')
+            check=sqlite3.connect(tmp_path);check.row_factory=sqlite3.Row
+            integrity=check.execute('PRAGMA integrity_check').fetchone()[0]
+            required={'settings','users','agencies','hotels','hotel_images','requests','offers','notifications','audit'}
+            tables={r[0] for r in check.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
+            admin=check.execute("SELECT id FROM users WHERE role='super_admin' AND active=1 LIMIT 1").fetchone() if 'users' in tables else None
+            if integrity!='ok' or not required.issubset(tables) or not admin:raise ValueError('invalid portal backup')
+            check.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(admin['id'],'database_restore','sqlite backup restored',datetime.utcnow().isoformat()));check.commit();check.close()
+            live=db();db_path=live.execute('PRAGMA database_list').fetchone()[2];live.close()
+            os.replace(tmp_path,db_path);tmp_path=None
+            lang=session.get('lang','ar');session.clear();session['lang']=lang;flash('تمت استعادة النسخة الاحتياطية بنجاح. سجّل الدخول مرة أخرى.');return redirect(url_for('login'))
+        except Exception:
+            flash('تعذر استعادة النسخة. تأكد من اختيار نسخة احتياطية صحيحة للبوابة.');return redirect(url_for('admin_device_requests'))
+        finally:
+            if tmp_path:
+                try:os.remove(tmp_path)
+                except OSError:pass
+
     @app.route('/admin/device-request/<int:pid>/approve',methods=['POST'])
     def approve_admin_device(pid):
         u=current_user()
