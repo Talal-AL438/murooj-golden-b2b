@@ -1,5 +1,18 @@
-
-{% extends 'base.html' %}{% block body %}<main><h1>Super Admin Setup</h1><div class="notice">This page only works once, before a Super Admin exists.</div>
-<form method="post" class="card form narrow"><label>Name<input name="name" required></label>
-<label>Email<input type="email" name="email" value="talal_alaqely@icloud.com" required></label>
-<label>Create password<input type="password" name="password" minlength="10" required></label><button class="btn gold">Create Super Admin</button></form></main>{% endblock %}
+{% extends 'base.html' %}
+{% block body %}
+<main class="narrow">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">MUROOJ GOLDEN B2B</span>
+      <h1>{{ 'إعداد المدير الرئيسي' if lang=='ar' else ('Super Admin Setup' if lang=='en' else ('Pengaturan Super Admin' if lang=='id' else 'Persediaan Super Admin')) }}</h1>
+    </div>
+  </div>
+  <div class="notice">{{ 'تعمل هذه الصفحة مرة واحدة فقط قبل إنشاء حساب المدير الرئيسي.' if lang=='ar' else ('This page only works once, before a Super Admin exists.' if lang=='en' else ('Halaman ini hanya berfungsi sekali sebelum akun Super Admin dibuat.' if lang=='id' else 'Halaman ini hanya berfungsi sekali sebelum akaun Super Admin diwujudkan.')) }}</div>
+  <form method="post" class="card form" style="margin-top:18px">
+    <label>{{ 'الاسم' if lang=='ar' else ('Name' if lang=='en' else ('Nama' if lang=='id' else 'Nama')) }}<input name="name" required></label>
+    <label>{{ 'البريد الإلكتروني' if lang=='ar' else ('Email' if lang=='en' else ('Email' if lang=='id' else 'E-mel')) }}<input type="email" name="email" value="talal_alaqely@icloud.com" required></label>
+    <label>{{ 'إنشاء كلمة المرور' if lang=='ar' else ('Create password' if lang=='en' else ('Buat kata sandi' if lang=='id' else 'Cipta kata laluan')) }}<input type="password" name="password" minlength="10" required></label>
+    <button class="btn gold">{{ 'إنشاء حساب المدير الرئيسي' if lang=='ar' else ('Create Super Admin' if lang=='en' else ('Buat Super Admin' if lang=='id' else 'Cipta Super Admin')) }}</button>
+  </form>
+</main>
+{% endblock %}
