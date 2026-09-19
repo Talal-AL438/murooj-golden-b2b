@@ -26,7 +26,7 @@
   <section class="card" style="margin:22px 0">
     <div class="section-head">
       <div><h2>{{ 'الأمان والنسخ الاحتياطي' if lang=='ar' else 'Security & Backup' }}</h2><p>{{ 'إدارة أجهزة الدخول المعتمدة وتنزيل نسخة احتياطية يدوية من قاعدة البيانات الحالية.' if lang=='ar' else 'Manage trusted admin devices and download a manual backup of the current database.' }}</p></div>
-      <div class="hotel-actions"><a class="btn outline" href="{{ url_for('admin_device_requests') }}">{{ 'أجهزة الإدارة' if lang=='ar' else 'Admin Devices' }}</a><a class="btn dark" href="{{ url_for('admin_database_backup') }}">{{ 'تنزيل نسخة احتياطية' if lang=='ar' else 'Download Backup' }}</a></div>
+      <div class="admin-report-actions"><a class="btn gold" href="{{ url_for('admin_device_requests') }}">{{ 'أجهزة الإدارة' if lang=='ar' else 'Admin Devices' }}</a><a class="btn dark" href="{{ url_for('admin_database_backup') }}">{{ 'تنزيل نسخة احتياطية' if lang=='ar' else 'Download Backup' }}</a></div>
     </div>
   </section>
   {% endif %}
