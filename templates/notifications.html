@@ -1,11 +1,12 @@
 {% extends 'base.html' %}{% block body %}
-<main class="page-shell">
+<main class="page-shell notifications-page">
 <div class="section-head"><div><span class="eyebrow">MUROOJ GOLDEN B2B</span><h1>{{ 'الإشعارات' if lang=='ar' else ('Notifications' if lang=='en' else ('Notifikasi' if lang=='id' else 'Pemberitahuan')) }}</h1></div>{% if unread_count %}<form method="post" action="{{url_for('notifications_read_all')}}"><button class="btn outline">{{ 'تحديد الكل كمقروء' if lang=='ar' else ('Mark all as read' if lang=='en' else ('Tandai semua sudah dibaca' if lang=='id' else 'Tandakan semua telah dibaca')) }}</button></form>{% endif %}</div>
-<div class="grid">
+<div class="grid notification-grid">
 {% for n in notifications %}
-<a class="card" style="display:block;text-decoration:none;{% if not n.read_at %}border-color:#caa44d{% endif %}" href="{{url_for('notification_open',nid=n.id)}}">
-<div class="section-head"><div><h3>{{n.title}}</h3><p>{{n.body}}</p></div>{% if not n.read_at %}<span class="status active">{{ 'جديد' if lang=='ar' else ('New' if lang=='en' else ('Baru' if lang=='id' else 'Baharu')) }}</span>{% endif %}</div>
-<small>{{n.created_at[:16].replace('T',' ')}}</small>
+<a class="card notification-card{% if not n.read_at %} unread{% endif %}" href="{{url_for('notification_open',nid=n.id)}}">
+<div class="notification-top"><div><span class="notification-kind">{{ 'طلب حجز' if n.type=='request' and lang=='ar' else ('Booking request' if n.type=='request' and lang=='en' else ('Permintaan tempahan' if n.type=='request' else '')) }}</span><h3>{{n.title}}</h3></div>{% if not n.read_at %}<span class="status active">{{ 'جديد' if lang=='ar' else ('New' if lang=='en' else ('Baru' if lang=='id' else 'Baharu')) }}</span>{% endif %}</div>
+<p class="notification-body">{{ n.body if n.body else (('تم تحديث حالة الطلب رقم #' ~ n.ref_id ~ '.') if lang=='ar' else ('Request #' ~ n.ref_id ~ ' has been updated.')) }}</p>
+<div class="notification-meta"><strong>#{{n.ref_id}}</strong><small dir="ltr">{{n.created_at[:16].replace('T',' ')}}</small></div>
 </a>
 {% else %}<div class="card">{{ 'لا توجد إشعارات حتى الآن.' if lang=='ar' else ('No notifications yet.' if lang=='en' else ('Belum ada notifikasi.' if lang=='id' else 'Belum ada pemberitahuan.')) }}</div>{% endfor %}
 </div>
