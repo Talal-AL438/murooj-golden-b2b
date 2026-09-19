@@ -4,8 +4,8 @@
 <div class="grid notification-grid">
 {% for n in notifications %}
 <a class="card notification-card{% if not n.read_at %} unread{% endif %}" href="{{url_for('notification_open',nid=n.id)}}">
-<div class="notification-top"><div><span class="notification-kind">{{ 'طلب حجز' if n.type=='request' and lang=='ar' else ('Booking request' if n.type=='request' and lang=='en' else ('Permintaan tempahan' if n.type=='request' else '')) }}</span><h3>{{n.title}}</h3></div>{% if not n.read_at %}<span class="status active">{{ 'جديد' if lang=='ar' else ('New' if lang=='en' else ('Baru' if lang=='id' else 'Baharu')) }}</span>{% endif %}</div>
-<p class="notification-body">{{ n.body if n.body else (('تم تحديث حالة الطلب رقم #' ~ n.ref_id ~ '.') if lang=='ar' else ('Request #' ~ n.ref_id ~ ' has been updated.')) }}</p>
+<div class="notification-top"><div><span class="notification-kind">{{ 'طلب حجز' if n.type=='request' and lang=='ar' else ('Booking request' if n.type=='request' and lang=='en' else ('Permintaan pemesanan' if n.type=='request' and lang=='id' else ('Permintaan tempahan' if n.type=='request' and lang=='ms' else ''))) }}</span><h3>{{n.title}}</h3></div>{% if not n.read_at %}<span class="status active">{{ 'جديد' if lang=='ar' else ('New' if lang=='en' else ('Baru' if lang=='id' else 'Baharu')) }}</span>{% endif %}</div>
+<p class="notification-body">{{ n.body if n.body else (('تم تحديث حالة الطلب رقم #' ~ n.ref_id ~ '.') if lang=='ar' else (('Request #' ~ n.ref_id ~ ' has been updated.') if lang=='en' else (('Permintaan #' ~ n.ref_id ~ ' telah diperbarui.') if lang=='id' else ('Permintaan #' ~ n.ref_id ~ ' telah dikemas kini.')))) }}</p>
 <div class="notification-meta"><strong>#{{n.ref_id}}</strong><small dir="ltr">{{n.created_at[:16].replace('T',' ')}}</small></div>
 </a>
 {% else %}<div class="card">{{ 'لا توجد إشعارات حتى الآن.' if lang=='ar' else ('No notifications yet.' if lang=='en' else ('Belum ada notifikasi.' if lang=='id' else 'Belum ada pemberitahuan.')) }}</div>{% endfor %}
