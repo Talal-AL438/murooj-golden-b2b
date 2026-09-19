@@ -3,12 +3,12 @@
 <main class="page-shell">
   <section class="page-intro">
     <span class="eyebrow">MUROOJ GOLDEN · {{ T.makkah if hotel.city=='Makkah' else T.madinah }}</span>
-    <h1><span>{{hotel.name_ar}}</span><br><span translate="no">{{hotel.name_en}}</span></h1>
+    <h1><span>{{hotel.name_ar}}</span><br><span translate="no">{{hotel.name_en}}</span></h1><div class="hotel-stars" aria-label="{{hotel.stars or 3}} stars">{{"★" * (hotel.stars or 3)}}<span>{{hotel.stars or 3}}/5</span></div>
   </section>
 
   {% if images %}
   <section class="hotel-gallery">
-    {% for image in images %}<img class="hotel-image" src="{{image.image_url}}" alt="{{hotel.name_en}}">{% endfor %}
+    {% for image in images %}<button class="gallery-open" type="button" data-src="{{image.image_url}}" aria-label="Open image"><img class="hotel-image" src="{{image.image_url}}" alt="{{hotel.name_en}}"></button>{% endfor %}
   </section>
   {% endif %}
 
@@ -32,5 +32,5 @@
     {% if hotel.map_url %}<a class="btn dark" target="_blank" rel="noopener" href="{{hotel.map_url}}">{{T.location}}</a>{% endif %}
     {% if user and user['role']=='agency' %}<a class="btn gold" href="{{url_for('new_request',hotel=hotel.id,city=hotel.city)}}">{{T.send_request}}</a>{% else %}<a class="btn gold" href="{{url_for('login')}}">{{T.login}}</a>{% endif %}
   </div>
-</main>
+</main><div class="image-lightbox" id="imageLightbox" hidden><button class="lightbox-close" type="button" aria-label="Close">×</button><img alt="{{hotel.name_en}}"></div><script>(function(){var box=document.getElementById("imageLightbox");if(!box)return;var img=box.querySelector("img");function close(){box.hidden=true;document.body.classList.remove("lightbox-active")}document.querySelectorAll(".gallery-open").forEach(function(b){b.addEventListener("click",function(){img.src=b.dataset.src;box.hidden=false;document.body.classList.add("lightbox-active")})});box.querySelector(".lightbox-close").addEventListener("click",close);box.addEventListener("click",function(e){if(e.target===box)close()});document.addEventListener("keydown",function(e){if(e.key==="Escape")close()})})();</script>
 {% endblock %}
