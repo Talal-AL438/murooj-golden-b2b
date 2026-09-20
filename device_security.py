@@ -134,7 +134,7 @@ def register_device_security(app, db, current_user):
             upload.save(tmp_path)
             if os.path.getsize(tmp_path)>100*1024*1024:raise ValueError('backup too large')
             with open(tmp_path,'rb') as fh:
-                if fh.read(16)!=b'SQLite format 3\\x00':raise ValueError('invalid sqlite header')
+                if fh.read(16)!=b'SQLite format 3\x00':raise ValueError('invalid sqlite header')
             check=sqlite3.connect(tmp_path);check.row_factory=sqlite3.Row
             integrity=check.execute('PRAGMA integrity_check').fetchone()[0]
             required={'settings','users','agencies','hotels','hotel_images','requests','offers','notifications','audit'}
