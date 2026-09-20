@@ -143,7 +143,12 @@ def register_device_security(app, db, current_user):
             tables={r[0] for r in check.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()}
             admin=check.execute("SELECT id FROM users WHERE role='super_admin' AND active=1 LIMIT 1").fetchone() if 'users' in tables else None
             if integrity!='ok' or not required.issubset(tables) or not admin:raise ValueError('invalid portal backup')
-            check.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(admin['id'],'database_restore','sqlite backup restored',datetime.utcnow().isoformat()));check.commit();check.close()
+            check.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(admin['id'],'database_restore','sqlite backup restored',datetime.utcnow().isoformat()))
+            # Device trust is installation/session-specific and must not be restored.
+            # Clearing it prevents a valid Super Admin from being locked out by stale device tokens.
+            if 'pending_admin_devices' in tables: check.execute("DELETE FROM pending_admin_devices")
+            if 'trusted_admin_devices' in tables: check.execute("DELETE FROM trusted_admin_devices")
+            check.commit();check.close()
             os.replace(tmp_path,db_path);tmp_path=None
             lang=session.get('lang','ar');session.clear();session['lang']=lang;flash('تمت استعادة النسخة الاحتياطية بنجاح. سجّل الدخول مرة أخرى.');return redirect(url_for('login'))
         except Exception:
