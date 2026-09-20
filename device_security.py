@@ -129,7 +129,9 @@ def register_device_security(app, db, current_user):
         upload=request.files.get('backup_file')
         if not upload or not upload.filename:
             flash('اختر ملف النسخة الاحتياطية أولاً.');return redirect(url_for('admin_device_requests'))
-        tmp=tempfile.NamedTemporaryFile(prefix='murooj-restore-',suffix='.db',delete=False);tmp_path=tmp.name;tmp.close()
+        live=db();db_path=live.execute('PRAGMA database_list').fetchone()[2];live.close()
+        db_dir=os.path.dirname(os.path.abspath(db_path)) or '.'
+        tmp=tempfile.NamedTemporaryFile(prefix='murooj-restore-',suffix='.db',delete=False,dir=db_dir);tmp_path=tmp.name;tmp.close()
         try:
             upload.save(tmp_path)
             if os.path.getsize(tmp_path)>100*1024*1024:raise ValueError('backup too large')
@@ -142,10 +144,10 @@ def register_device_security(app, db, current_user):
             admin=check.execute("SELECT id FROM users WHERE role='super_admin' AND active=1 LIMIT 1").fetchone() if 'users' in tables else None
             if integrity!='ok' or not required.issubset(tables) or not admin:raise ValueError('invalid portal backup')
             check.execute("INSERT INTO audit(user_id,action,details,created_at) VALUES(?,?,?,?)",(admin['id'],'database_restore','sqlite backup restored',datetime.utcnow().isoformat()));check.commit();check.close()
-            live=db();db_path=live.execute('PRAGMA database_list').fetchone()[2];live.close()
             os.replace(tmp_path,db_path);tmp_path=None
             lang=session.get('lang','ar');session.clear();session['lang']=lang;flash('تمت استعادة النسخة الاحتياطية بنجاح. سجّل الدخول مرة أخرى.');return redirect(url_for('login'))
         except Exception:
+            app.logger.exception('Database restore failed')
             flash('تعذر استعادة النسخة. تأكد من اختيار نسخة احتياطية صحيحة للبوابة.');return redirect(url_for('admin_device_requests'))
         finally:
             if tmp_path:
