@@ -29,7 +29,11 @@ def register_device_security(app, db, current_user):
     def current_device_row(user_id):
         token=request.cookies.get(COOKIE_NAME,'')
         if not token:return None
-        c=db();row=c.execute("SELECT * FROM trusted_admin_devices WHERE user_id=? AND token_hash=? AND active=1",(user_id,token_hash(token))).fetchone();c.close();return row
+        # Trust belongs to the browser/device, not to one admin account.
+        # This prevents switching between staff and Super Admin on the same
+        # approved browser from replacing the device cookie and causing a
+        # false "new device" approval loop.
+        c=db();row=c.execute("SELECT * FROM trusted_admin_devices WHERE token_hash=? AND active=1",(token_hash(token),)).fetchone();c.close();return row
 
     def trusted_count(user_id):
         c=db();count=c.execute("SELECT COUNT(*) c FROM trusted_admin_devices WHERE user_id=? AND active=1",(user_id,)).fetchone()['c'];c.close();return count
