@@ -314,6 +314,8 @@ def admin_settings():
 @super_required
 def admin_audit():
     c=db();rows=c.execute("SELECT a.*,u.email,u.name FROM audit a LEFT JOIN users u ON u.id=a.user_id ORDER BY a.id DESC LIMIT 300").fetchall();c.close();return render_template("admin_audit.html",user=current_user(),rows=rows)
+from marketing_extensions import register_marketing_extensions
+register_marketing_extensions(app,db,current_user)
 from password_recovery import register_password_recovery
 register_password_recovery(app,db)
 from reports import register_reports
