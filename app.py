@@ -170,9 +170,9 @@ def new_request():
     if u["role"]!="agency":return redirect(url_for("admin"))
     c=db();agency=c.execute("SELECT * FROM agencies WHERE user_id=?",(u["id"],)).fetchone();hotels=c.execute("SELECT * FROM hotels WHERE active=1 ORDER BY sort_order,id").fetchall()
     if request.method=="POST":
-        hv=request.form.get("hotel_id","");any_hotel=1 if hv=="any" else 0;hotel_id=None if any_hotel else int(hv);rooms=int(request.form["rooms"]);persons=int(request.form["persons"])
-        if rooms<1 or persons<1 or request.form["checkout"]<request.form["checkin"]:c.close();return "invalid request",400
-        cur=c.execute("INSERT INTO requests(agency_id,hotel_id,any_hotel,city,checkin,checkout,rooms,persons,nationality,meal,notes,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",(agency["id"],hotel_id,any_hotel,request.form["city"],request.form["checkin"],request.form["checkout"],rooms,persons,request.form["nationality"],request.form["meal"],request.form.get("notes",""),"sent",datetime.utcnow().isoformat()));notify_request_status(c,cur.lastrowid,"sent");c.commit();flash(t()["success_request"]);c.close();return redirect(url_for("account"))
+        hv=request.form.get("hotel_id","");custom_hotel=hv=="custom";any_hotel=1 if hv in ("any","custom") else 0;hotel_id=None if any_hotel else int(hv);rooms=int(request.form["rooms"]);persons=int(request.form["persons"])
+        if custom_hotel and len(request.form.get("requested_hotel_name","").strip())<2:c.close();return "hotel name required",400\n        if rooms<1 or persons<1 or request.form["checkout"]<request.form["checkin"]:c.close();return "invalid request",400
+        cur=c.execute("INSERT INTO requests(agency_id,hotel_id,any_hotel,city,checkin,checkout,rooms,persons,nationality,meal,notes,status,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",(agency["id"],hotel_id,any_hotel,request.form["city"],request.form["checkin"],request.form["checkout"],rooms,persons,request.form["nationality"],request.form["meal"],(فندق مطلوب: "+request.form.get("requested_hotel_name","").strip()+" | " if custom_hotel else "")+request.form.get("notes",""),"sent",datetime.utcnow().isoformat()));notify_request_status(c,cur.lastrowid,"sent");c.commit();flash(t()["success_request"]);c.close();return redirect(url_for("account"))
     c.close();return render_template("request.html",hotels=hotels,user=u)
 @app.route("/account",methods=["GET","POST"])
 @login_required
