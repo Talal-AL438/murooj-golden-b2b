@@ -57,3 +57,7 @@ header{justify-content:center!important}header>nav{width:min(1120px,94%)!importa
 
 /* True official logo presentation — preserve artwork proportions, no duplicate typed brand */
 .approved-hero .hero-brand-official{width:min(430px,86%)!important;height:150px!important;margin:0 auto 18px!important;display:flex!important;align-items:center!important;justify-content:center!important}.approved-hero .hero-brand-official>.official-brand-logo{display:block!important;width:100%!important;height:100%!important;max-width:430px!important;object-fit:contain!important;object-position:center!important;transform:none!important;margin:0!important;filter:none!important}.approved-hero .hero-brand-official .brand-title{display:none!important}@media(max-width:900px){.approved-hero .hero-brand-official{width:min(350px,92%)!important;height:125px!important}}
+
+/* Official hero logo sizing refinement — 2026-09-30 */
+@media(min-width:901px){.approved-hero .hero-brand-official{width:min(470px,92%)!important;height:178px!important;margin:0 auto 14px!important}.approved-hero .hero-brand-official>.official-brand-logo{max-width:470px!important;width:100%!important;height:100%!important;object-fit:contain!important;object-position:center!important}}
+@media(max-width:900px){.approved-hero .hero-brand-official{width:min(370px,94%)!important;height:138px!important;margin-bottom:14px!important}}
