@@ -794,3 +794,12 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
 /* Approved Makkah artwork already includes its own text panel */
 .makkah-feature-copy{display:none!important}
 .makkah-feature:after{display:none!important}
+
+/* Final Makkah destination card: high-resolution panorama + one HTML text panel */
+.makkah-art.photo-hero{
+  background-image:url("https://commons.wikimedia.org/wiki/Special:FilePath/Maghrib%20Prayer%20in%20Masjid%20Al-Haram.jpg?width=1920")!important;
+  background-size:cover!important;
+  background-position:center 54%!important;
+}
+.makkah-feature-copy{display:block!important}
+.makkah-feature:after{display:none!important}
