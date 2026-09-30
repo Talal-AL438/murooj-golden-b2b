@@ -790,3 +790,7 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   background-size:cover!important;
   background-position:center center!important;
 }
+
+/* Approved Makkah artwork already includes its own text panel */
+.makkah-feature-copy{display:none!important}
+.makkah-feature:after{display:none!important}
