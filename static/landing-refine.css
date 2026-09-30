@@ -22,3 +22,6 @@
 
 /* Official Murooj Golden logo */
 .official-brand-logo{width:190px;height:50px;object-fit:contain;object-position:center;display:block;flex:none}.official-brand .brand-title{display:none}.official-footer-brand .official-brand-logo{width:220px;height:150px;object-fit:contain;margin:0 auto 8px}.official-footer-brand>strong,.official-footer-brand>small{display:none}@media(max-width:760px){.official-brand-logo{width:150px;height:42px}.official-footer-brand .official-brand-logo{width:190px;height:130px}}@media(max-width:420px){.official-brand-logo{width:125px;height:38px}}
+
+/* Approved header logo placement: contained entirely inside black navigation bar */
+header{position:relative;z-index:20;overflow:visible}.official-brand{height:66px;min-width:210px;padding:3px 0;display:flex;align-items:center;justify-content:center;overflow:hidden}.official-brand-logo{width:205px;height:60px;object-fit:contain;object-position:center;display:block;flex:none}.hero{position:relative;z-index:1}@media(max-width:900px){.official-brand{height:58px;min-width:170px}.official-brand-logo{width:168px;height:52px}}@media(max-width:420px){.official-brand{height:52px;min-width:142px}.official-brand-logo{width:140px;height:46px}}
