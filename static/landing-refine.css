@@ -986,3 +986,14 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
 }
 .makkah-feature-copy{display:none!important}
 .makkah-feature:before,.makkah-feature:after{display:none!important;content:none!important}
+
+/* Crop the baked white edge from the approved artwork so photo meets gold frame */
+.makkah-art.photo-hero{
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  background-size:102% auto!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+  background-color:#061322!important;
+}
