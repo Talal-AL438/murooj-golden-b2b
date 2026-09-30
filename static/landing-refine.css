@@ -849,3 +849,27 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   backdrop-filter:blur(5px)!important;
 }
 .makkah-feature:after{display:none!important}
+
+/* Makkah card cleanup: image fills frame and only one description panel */
+.makkah-feature{
+  width:min(760px,92%)!important;
+  height:250px!important;
+  padding:0!important;
+  margin:0 auto 30px!important;
+  overflow:hidden!important;
+}
+.makkah-art.photo-hero{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  background-image:url("/static/makkah-night-approved.jpg")!important;
+  background-size:cover!important;
+  background-position:center center!important;
+  filter:none!important;
+}
+.makkah-feature-copy{display:none!important}
+.makkah-feature:before,.makkah-feature:after{display:none!important;content:none!important}
