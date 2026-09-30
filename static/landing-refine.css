@@ -1019,3 +1019,14 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   background-position:center bottom!important;
   background-repeat:no-repeat!important;
 }
+
+/* Approved final Makkah card artwork */
+.makkah-art.photo-hero{
+  background-image:url("/static/makkah-final-approved-new.jpg")!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  background-size:cover!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+}
