@@ -283,3 +283,19 @@ header{justify-content:center!important}header>nav{width:min(1120px,94%)!importa
   .hotels-section .section-head h2,.hotels-section .section-head .eyebrow{max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
   img{max-width:100%!important}
 }
+
+/* Compact mobile benefit icons — 2026-09-30 */
+@media(max-width:600px){
+  .approved-hero .hero-content .auth-benefits{align-items:center!important}
+  .approved-hero .hero-content .auth-benefits span{
+    min-height:32px!important;
+    height:auto!important;
+    padding:2px 3px!important;
+    border-inline-start:0!important;
+  }
+  .approved-hero .hero-content .auth-benefits span+span{
+    border-inline-start:1px solid rgba(216,169,54,.45)!important;
+  }
+  .approved-hero .hero-content .auth-benefits b{margin-bottom:2px!important}
+  .hero-benefits .line-icon{width:12px!important;height:12px!important}
+}
