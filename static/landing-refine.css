@@ -911,3 +911,24 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   width:calc(100% + 2px)!important;
   height:calc(100% + 2px)!important;
 }
+
+/* Match Makkah card frame exactly to the approved dark image proportions */
+.makkah-feature{
+  width:min(760px,92%)!important;
+  height:auto!important;
+  aspect-ratio:3 / 1!important;
+  min-height:0!important;
+  padding:0!important;
+  border:1px solid rgba(201,151,47,.9)!important;
+  border-radius:16px!important;
+  overflow:hidden!important;
+}
+.makkah-art.photo-hero{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  border-radius:inherit!important;
+  background-size:cover!important;
+  background-position:center!important;
+}
