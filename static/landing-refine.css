@@ -956,3 +956,33 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   aspect-ratio:3 / 1!important;
   margin:0 auto 30px!important;
 }
+
+/* FINAL approved Makkah artwork */
+.makkah-feature{
+  width:min(760px,92%)!important;
+  max-width:760px!important;
+  aspect-ratio:3 / 1!important;
+  height:auto!important;
+  margin:0 auto 30px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:1px solid rgba(201,151,47,.92)!important;
+  border-radius:16px!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.makkah-art.photo-hero{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  background-image:url("/static/makkah-final-approved.jpg")!important;
+  background-size:cover!important;
+  background-position:center!important;
+  border-radius:inherit!important;
+  filter:none!important;
+}
+.makkah-feature-copy{display:none!important}
+.makkah-feature:before,.makkah-feature:after{display:none!important;content:none!important}
