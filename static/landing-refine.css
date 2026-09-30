@@ -600,3 +600,52 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   .makkah-feature-copy h3{font-size:21px!important;margin:7px 0 10px!important}
   .makkah-feature-copy p{font-size:13px!important;line-height:1.5!important}
 }
+
+/* Makkah feature premium compact redesign — based on live screenshot 2026-09-30 */
+.makkah-feature{
+  width:min(980px,90%)!important;
+  min-height:235px!important;
+  grid-template-columns:minmax(0,55%) minmax(0,45%)!important;
+  border-radius:18px!important;
+  border:1px solid rgba(201,151,47,.72)!important;
+  box-shadow:0 14px 34px rgba(49,38,20,.08)!important;
+  background:#fffdf9!important;
+}
+.makkah-art.photo-hero{
+  min-height:235px!important;
+  background-size:cover!important;
+  background-position:center 64%!important;
+}
+.makkah-feature-copy{
+  padding:20px 24px!important;
+  justify-content:center!important;
+}
+.makkah-feature-copy .coming-icon{
+  width:38px!important;height:38px!important;margin:0 auto 7px!important;
+}
+.makkah-feature-copy .coming-icon .line-icon{width:20px!important;height:20px!important}
+.makkah-feature-copy small{
+  font-size:10px!important;letter-spacing:.24em!important;
+}
+.makkah-feature-copy h3{
+  font-size:24px!important;line-height:1.25!important;
+  margin:8px 0 10px!important;font-weight:900!important;
+}
+.makkah-feature-copy p{
+  font-size:13.5px!important;line-height:1.55!important;
+  font-weight:800!important;max-width:360px!important;margin:0 auto!important;
+}
+@media(max-width:900px){
+  .makkah-feature{width:min(620px,92%)!important;grid-template-columns:1fr!important;min-height:0!important}
+  .makkah-art.photo-hero{min-height:250px!important;background-position:center 62%!important}
+  .makkah-feature-copy{padding:20px 18px 23px!important}
+}
+@media(max-width:600px){
+  .makkah-feature{width:calc(100% - 28px)!important;border-radius:14px!important}
+  .makkah-art.photo-hero{min-height:180px!important;background-position:center 62%!important}
+  .makkah-feature-copy{padding:17px 13px 19px!important}
+  .makkah-feature-copy .coming-icon{width:34px!important;height:34px!important}
+  .makkah-feature-copy small{font-size:8px!important}
+  .makkah-feature-copy h3{font-size:19px!important;margin:6px 0 8px!important}
+  .makkah-feature-copy p{font-size:12px!important;line-height:1.5!important}
+}
