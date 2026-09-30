@@ -946,3 +946,13 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
 @media(max-width:900px){
   .makkah-feature{width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important}
 }
+
+/* Restore the approved compact Makkah card size */
+#hotels.home-section{padding-left:18px!important;padding-right:18px!important}
+.makkah-feature{
+  width:min(760px,92%)!important;
+  max-width:760px!important;
+  height:auto!important;
+  aspect-ratio:3 / 1!important;
+  margin:0 auto 30px!important;
+}
