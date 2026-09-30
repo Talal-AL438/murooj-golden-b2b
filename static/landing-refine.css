@@ -765,3 +765,14 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   .makkah-feature-copy h3{font-size:12px!important;margin:3px 0!important}
   .makkah-feature-copy p{font-size:7.2px!important;line-height:1.3!important}
 }
+
+/* Final approved premium Makkah panorama — 2026-09-30 */
+.makkah-art.photo-hero{
+  background-image:url("https://commons.wikimedia.org/wiki/Special:FilePath/Maghrib%20Prayer%20in%20Masjid%20Al-Haram.jpg?width=1600")!important;
+  background-size:cover!important;
+  background-position:center center!important;
+}
+.makkah-feature-copy{
+  left:50%!important;right:auto!important;inset-inline-end:auto!important;
+  top:50%!important;transform:translate(-50%,-50%)!important;
+}
