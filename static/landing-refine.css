@@ -260,3 +260,26 @@ header{justify-content:center!important}header>nav{width:min(1120px,94%)!importa
   .approved-hero .hero-auth-btn{font-size:10px!important;min-height:35px!important}
   .approved-hero .hero-content .auth-benefits span{font-size:5.8px!important}
 }
+
+/* Mobile overflow hotfix — keep entire page inside viewport 2026-09-30 */
+@media(max-width:600px){
+  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+  body>*{max-width:100%!important}
+  main,.landing-main,.home-main,.hotels-section{width:100%!important;max-width:100%!important;overflow-x:hidden!important;box-sizing:border-box!important}
+  .approved-hero{
+    width:calc(100vw - 20px)!important;
+    max-width:calc(100vw - 20px)!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    grid-template-columns:minmax(0,46%) minmax(0,54%)!important;
+  }
+  .approved-hero>*{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+  .approved-hero .hero-content,.approved-hero .hero-auth-panel{min-width:0!important;overflow:hidden!important}
+  .approved-hero .hero-content h1,.approved-hero .hero-content p{max-width:100%!important;overflow-wrap:anywhere!important}
+  .hotels-section,.hotels-wrap,.hotel-grid,.hotel-card{max-width:100%!important;box-sizing:border-box!important}
+  .hotels-section .section-head{width:calc(100% - 24px)!important;max-width:100%!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box!important}
+  .hotels-section .section-head h2,.hotels-section .section-head .eyebrow{max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  img{max-width:100%!important}
+}
