@@ -932,3 +932,17 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   background-size:cover!important;
   background-position:center!important;
 }
+
+/* Remove the OUTER white space around the whole Makkah destination card */
+#hotels.home-section{padding-left:0!important;padding-right:0!important}
+#makkah-hotels{padding-left:18px!important;padding-right:18px!important}
+.makkah-feature{
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  border-radius:16px!important;
+}
+@media(max-width:900px){
+  .makkah-feature{width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important}
+}
