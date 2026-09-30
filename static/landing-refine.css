@@ -559,3 +559,44 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   .makkah-feature-copy h3{font-size:22px!important}
   .makkah-feature-copy p{font-size:14px!important;line-height:1.6!important}
 }
+
+/* Makkah feature compact balanced card — 2026-09-30 */
+.makkah-feature{
+  width:min(1040px,92%)!important;
+  min-height:270px!important;
+  grid-template-columns:minmax(0,48%) minmax(0,52%)!important;
+  border-radius:14px!important;
+}
+.makkah-art.photo-hero{
+  min-height:270px!important;
+  background-size:cover!important;
+  background-position:center 58%!important;
+}
+.makkah-feature-copy{
+  padding:24px 26px!important;
+}
+.makkah-feature-copy .coming-icon{
+  width:42px!important;height:42px!important;margin-bottom:8px!important;
+}
+.makkah-feature-copy h3{
+  font-size:26px!important;
+  margin:9px 0 14px!important;
+}
+.makkah-feature-copy p{
+  font-size:15px!important;
+  line-height:1.55!important;
+  max-width:400px!important;
+}
+@media(max-width:900px){
+  .makkah-feature{width:92%!important;grid-template-columns:1fr!important;min-height:0!important}
+  .makkah-art.photo-hero{min-height:260px!important;background-size:cover!important;background-position:center 58%!important}
+  .makkah-feature-copy{padding:23px 18px!important}
+}
+@media(max-width:600px){
+  .makkah-feature{width:calc(100% - 24px)!important;border-radius:12px!important}
+  .makkah-art.photo-hero{min-height:190px!important;background-size:cover!important;background-position:center 58%!important}
+  .makkah-feature-copy{padding:19px 14px 21px!important}
+  .makkah-feature-copy .coming-icon{width:36px!important;height:36px!important}
+  .makkah-feature-copy h3{font-size:21px!important;margin:7px 0 10px!important}
+  .makkah-feature-copy p{font-size:13px!important;line-height:1.5!important}
+}
