@@ -873,3 +873,25 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
 }
 .makkah-feature-copy{display:none!important}
 .makkah-feature:before,.makkah-feature:after{display:none!important;content:none!important}
+
+/* Remove all outer white/empty spacing around the Makkah image card */
+.makkah-feature{
+  width:min(760px,100%)!important;
+  padding:0!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  border-radius:16px!important;
+  overflow:hidden!important;
+  background:#061322!important;
+  line-height:0!important;
+}
+.makkah-art.photo-hero{
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:inherit!important;
+  background-size:cover!important;
+}
