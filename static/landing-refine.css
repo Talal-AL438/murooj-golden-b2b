@@ -1009,3 +1009,13 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   background-size:103% auto!important;
   background-position:center 46%!important;
 }
+
+/* Force the Makkah artwork to bleed beneath the bottom gold border */
+.makkah-art.photo-hero{
+  inset:-2px!important;
+  width:calc(100% + 4px)!important;
+  height:calc(100% + 4px)!important;
+  background-size:cover!important;
+  background-position:center bottom!important;
+  background-repeat:no-repeat!important;
+}
