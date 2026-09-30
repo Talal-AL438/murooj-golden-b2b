@@ -54,3 +54,6 @@ header{justify-content:center!important}header>nav{width:min(1120px,94%)!importa
 
 /* Improve hero benefit label readability */
 .approved-hero .hero-content .auth-benefits span{font-size:14px!important;font-weight:700!important;line-height:1.55!important}.approved-hero .hero-content .auth-benefits b{transform:scale(1.08);transform-origin:center;margin-bottom:9px!important}@media(max-width:1100px){.approved-hero .hero-content .auth-benefits span{font-size:13px!important}}@media(max-width:900px){.approved-hero .hero-content .auth-benefits span{font-size:14px!important}}
+
+/* True official logo presentation — preserve artwork proportions, no duplicate typed brand */
+.approved-hero .hero-brand-official{width:min(430px,86%)!important;height:150px!important;margin:0 auto 18px!important;display:flex!important;align-items:center!important;justify-content:center!important}.approved-hero .hero-brand-official>.official-brand-logo{display:block!important;width:100%!important;height:100%!important;max-width:430px!important;object-fit:contain!important;object-position:center!important;transform:none!important;margin:0!important;filter:none!important}.approved-hero .hero-brand-official .brand-title{display:none!important}@media(max-width:900px){.approved-hero .hero-brand-official{width:min(350px,92%)!important;height:125px!important}}
