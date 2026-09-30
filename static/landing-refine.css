@@ -472,3 +472,40 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   header>nav{gap:44px!important}
   header nav>a{font-size:16px!important}
 }
+
+/* Approved Makkah feature proportions and readability — 2026-09-30 */
+.makkah-feature{
+  width:min(1120px,94%)!important;
+  margin-left:auto!important;margin-right:auto!important;
+  grid-template-columns:40% 60%!important;
+  min-height:300px!important;
+  border-radius:16px!important;
+  overflow:hidden!important;
+}
+.makkah-art.photo-hero{
+  min-height:300px!important;
+  background-size:cover!important;
+  background-position:center center!important;
+  filter:saturate(1) contrast(1.03)!important;
+}
+.makkah-feature-copy{padding:32px 28px!important}
+.makkah-feature-copy p{
+  font-size:15px!important;
+  line-height:1.75!important;
+  font-weight:800!important;
+  color:#3f372c!important;
+  max-width:440px!important;
+  margin-inline:auto!important;
+}
+@media(max-width:900px){
+  .makkah-feature{width:94%!important;grid-template-columns:1fr!important}
+  .makkah-art.photo-hero{min-height:270px!important;order:1!important}
+  .makkah-feature-copy{order:2!important;padding:26px 20px!important}
+  .makkah-feature-copy p{font-size:14px!important;line-height:1.7!important}
+}
+@media(max-width:600px){
+  .makkah-feature{width:calc(100% - 20px)!important;border-radius:13px!important}
+  .makkah-art.photo-hero{min-height:210px!important;background-position:center 46%!important}
+  .makkah-feature-copy{padding:22px 15px!important}
+  .makkah-feature-copy p{font-size:13px!important;line-height:1.65!important;font-weight:800!important}
+}
