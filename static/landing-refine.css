@@ -803,3 +803,19 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
 }
 .makkah-feature-copy{display:block!important}
 .makkah-feature:after{display:none!important}
+
+/* Approved dark Makkah card */
+.makkah-art.photo-hero{
+  background-image:url("https://commons.wikimedia.org/wiki/Special:FilePath/Mecca%20at%20night.jpg?width=1920")!important;
+  background-size:cover!important;
+  background-position:center 58%!important;
+  filter:brightness(.72) contrast(1.08) saturate(.92)!important;
+}
+.makkah-feature-copy{
+  display:block!important;
+  background:linear-gradient(145deg,rgba(5,18,34,.92),rgba(10,24,40,.86))!important;
+  border:1px solid rgba(201,151,47,.92)!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.34)!important;
+  backdrop-filter:blur(5px)!important;
+}
+.makkah-feature:after{display:none!important}
