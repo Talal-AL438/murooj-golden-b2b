@@ -1003,3 +1003,9 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   background-size:102% auto!important;
   background-position:center 49%!important;
 }
+
+/* Make the artwork meet the lower gold border exactly */
+.makkah-art.photo-hero{
+  background-size:103% auto!important;
+  background-position:center 46%!important;
+}
