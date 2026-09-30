@@ -997,3 +997,9 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   background-repeat:no-repeat!important;
   background-color:#061322!important;
 }
+
+/* Final edge crop: remove bottom baked whitespace to match side edges */
+.makkah-art.photo-hero{
+  background-size:102% auto!important;
+  background-position:center 49%!important;
+}
