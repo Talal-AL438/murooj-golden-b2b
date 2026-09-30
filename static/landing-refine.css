@@ -19,3 +19,6 @@
 .footer-wa-badge .wa-bubble{fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .footer-wa-badge .wa-phone{fill:#fff}
 .footer-whatsapp:hover .footer-wa-badge{background:#20bd5a;transform:translateY(-1px)}
+
+/* Official Murooj Golden logo */
+.official-brand-logo{width:190px;height:50px;object-fit:contain;object-position:center;display:block;flex:none}.official-brand .brand-title{display:none}.official-footer-brand .official-brand-logo{width:220px;height:150px;object-fit:contain;margin:0 auto 8px}.official-footer-brand>strong,.official-footer-brand>small{display:none}@media(max-width:760px){.official-brand-logo{width:150px;height:42px}.official-footer-brand .official-brand-logo{width:190px;height:130px}}@media(max-width:420px){.official-brand-logo{width:125px;height:38px}}
