@@ -1072,3 +1072,14 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
 @media(max-width:600px){
   .makkah-feature,.madinah-feature{border-radius:12px!important;margin-bottom:20px!important}
 }
+
+/* FINAL ASSET PATH FIX — use the uploaded approved Makkah artwork */
+.makkah-art.photo-hero{
+  background-image:url("/static/makkah-final-approved-new.jpg")!important;
+  background-size:cover!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+  filter:none!important;
+}
+.makkah-feature-copy{display:none!important}
+.makkah-feature:before,.makkah-feature:after{display:none!important}
