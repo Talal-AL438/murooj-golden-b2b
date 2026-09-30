@@ -341,3 +341,43 @@ header{justify-content:center!important}header>nav{width:min(1120px,94%)!importa
     line-height:1.25!important;
   }
 }
+
+/* Approved premium benefit icons — all devices 2026-09-30 */
+.approved-hero .hero-content .auth-benefits{
+  gap:0!important;
+  padding:10px 7px 8px!important;
+  border:1px solid rgba(216,169,54,.65)!important;
+  border-radius:11px!important;
+  background:rgba(8,8,8,.42)!important;
+}
+.approved-hero .hero-content .auth-benefits span{
+  padding:5px 7px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-inline-start:0!important;
+}
+.approved-hero .hero-content .auth-benefits span+span{
+  border-inline-start:1px solid rgba(216,169,54,.38)!important;
+}
+.approved-hero .hero-content .auth-benefits b{
+  width:34px!important;
+  height:34px!important;
+  margin:0 auto 6px!important;
+  border:1px solid rgba(226,181,66,.8)!important;
+  border-radius:50%!important;
+  background:radial-gradient(circle at 35% 30%,rgba(255,224,135,.24),rgba(216,169,54,.08) 60%,transparent 62%)!important;
+  display:grid!important;
+  place-items:center!important;
+}
+.hero-benefits .line-icon{width:19px!important;height:19px!important;stroke-width:1.8!important}
+@media(min-width:601px) and (max-width:1024px){
+  .approved-hero .hero-content .auth-benefits b{width:30px!important;height:30px!important}
+  .hero-benefits .line-icon{width:17px!important;height:17px!important}
+}
+@media(max-width:600px){
+  .approved-hero .hero-content .auth-benefits{padding:8px 5px 6px!important;border-radius:9px!important}
+  .approved-hero .hero-content .auth-benefits b{width:25px!important;height:25px!important;margin-bottom:4px!important}
+  .hero-benefits .line-icon{width:14px!important;height:14px!important}
+}
