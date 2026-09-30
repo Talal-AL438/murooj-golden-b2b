@@ -895,3 +895,19 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   border-radius:inherit!important;
   background-size:cover!important;
 }
+
+/* Makkah card: no white halo/gutter around the image */
+.makkah-feature{
+  box-shadow:none!important;
+  outline:0!important;
+  background:transparent!important;
+}
+.makkah-feature,
+.makkah-art.photo-hero{
+  border-radius:16px!important;
+}
+.makkah-art.photo-hero{
+  inset:-1px!important;
+  width:calc(100% + 2px)!important;
+  height:calc(100% + 2px)!important;
+}
