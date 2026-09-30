@@ -1036,3 +1036,39 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   width:min(820px,94%)!important;
   max-width:820px!important;
 }
+
+/* FINAL APPROVED MECCA + MADINAH CARDS — responsive */
+.makkah-feature{
+  width:min(1120px,96%)!important;max-width:1120px!important;
+  aspect-ratio:1200/212!important;height:auto!important;
+  margin:0 auto 30px!important;padding:0!important;overflow:hidden!important;
+  border:1px solid rgba(201,151,47,.92)!important;border-radius:18px!important;
+  background:transparent!important;
+}
+.makkah-art.photo-hero{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  background-image:url("/static/makkah-approved-portal.webp")!important;
+  background-size:cover!important;background-position:center!important;
+  background-repeat:no-repeat!important;filter:none!important;border-radius:inherit!important;
+}
+.makkah-feature-copy{display:none!important}
+.makkah-feature:before,.makkah-feature:after{display:none!important}
+.madinah-feature{
+  width:min(1120px,96%)!important;max-width:1120px!important;
+  aspect-ratio:1200/223!important;height:auto!important;
+  margin:0 auto 30px!important;padding:0!important;overflow:hidden!important;
+  border:1px solid rgba(201,151,47,.92)!important;border-radius:18px!important;
+  background:transparent!important;
+}
+.madinah-feature .premium-madinah-photo{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  background-image:url("/static/madinah-approved-portal.webp")!important;
+  background-size:cover!important;background-position:center!important;
+  background-repeat:no-repeat!important;border-radius:inherit!important;
+}
+@media(max-width:900px){
+  .makkah-feature,.madinah-feature{width:100%!important;max-width:none!important}
+}
+@media(max-width:600px){
+  .makkah-feature,.madinah-feature{border-radius:12px!important;margin-bottom:20px!important}
+}
