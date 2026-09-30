@@ -783,3 +783,10 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   background-size:cover!important;
   background-position:center center!important;
 }
+
+/* Use the approved Makkah image stored locally in the project */
+.makkah-art.photo-hero{
+  background-image:url("/static/makkah-approved-final.jpg")!important;
+  background-size:cover!important;
+  background-position:center center!important;
+}
