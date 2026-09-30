@@ -299,3 +299,45 @@ header{justify-content:center!important}header>nav{width:min(1120px,94%)!importa
   .approved-hero .hero-content .auth-benefits b{margin-bottom:2px!important}
   .hero-benefits .line-icon{width:12px!important;height:12px!important}
 }
+
+/* Approved premium benefit icons — 2026-09-30 */
+@media(max-width:600px){
+  .approved-hero .hero-content .auth-benefits{
+    gap:0!important;
+    padding:8px 5px 6px!important;
+    border:1px solid rgba(216,169,54,.65)!important;
+    border-radius:9px!important;
+    background:rgba(8,8,8,.42)!important;
+  }
+  .approved-hero .hero-content .auth-benefits span{
+    min-height:48px!important;
+    padding:4px 3px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    border-inline-start:0!important;
+  }
+  .approved-hero .hero-content .auth-benefits span+span{
+    border-inline-start:1px solid rgba(216,169,54,.38)!important;
+  }
+  .approved-hero .hero-content .auth-benefits b{
+    width:25px!important;
+    height:25px!important;
+    margin:0 auto 4px!important;
+    border:1px solid rgba(226,181,66,.8)!important;
+    border-radius:50%!important;
+    background:radial-gradient(circle at 35% 30%,rgba(255,224,135,.24),rgba(216,169,54,.08) 60%,transparent 62%)!important;
+    display:grid!important;
+    place-items:center!important;
+  }
+  .hero-benefits .line-icon{
+    width:14px!important;
+    height:14px!important;
+    stroke-width:1.8!important;
+  }
+  .approved-hero .hero-content .auth-benefits span{
+    font-size:6.4px!important;
+    line-height:1.25!important;
+  }
+}
