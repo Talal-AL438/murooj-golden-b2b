@@ -191,3 +191,72 @@ header{justify-content:center!important}header>nav{width:min(1120px,94%)!importa
   .approved-hero .hero-auth-btn{font-size:11px!important;min-height:38px!important}
   .approved-hero .hero-content .auth-benefits span{font-size:6.5px!important}
 }
+
+/* Polished mobile hero layout — 2026-09-30 */
+@media(max-width:600px){
+  .approved-hero{
+    width:calc(100% - 28px)!important;
+    grid-template-columns:46% 54%!important;
+    min-height:250px!important;
+    margin:18px auto 38px!important;
+    border-radius:14px!important;
+  }
+  .approved-hero .hero-auth-panel{
+    min-height:250px!important;
+    padding:18px 9px!important;
+    gap:7px!important;
+  }
+  .approved-hero .hero-brand-official{
+    width:min(128px,88%)!important;
+    height:58px!important;
+    margin:0 auto 8px!important;
+  }
+  .approved-hero .hero-auth-btn{
+    width:92%!important;
+    min-height:38px!important;
+    font-size:11px!important;
+    margin:4px auto!important;
+    padding:6px 4px!important;
+  }
+  .approved-hero .hero-content{
+    padding:17px 11px 14px!important;
+  }
+  .approved-hero .hero-content .eyebrow{
+    font-size:7px!important;
+    letter-spacing:1.7px!important;
+    margin-bottom:5px!important;
+  }
+  .approved-hero .hero-content h1{
+    font-size:clamp(16px,4.6vw,21px)!important;
+    line-height:1.35!important;
+    margin:0 auto 7px!important;
+  }
+  .approved-hero .hero-content p{
+    font-size:7.5px!important;
+    line-height:1.45!important;
+  }
+  .approved-hero .hero-content .auth-benefits{
+    margin-top:9px!important;
+    padding-top:8px!important;
+  }
+  .approved-hero .hero-content .auth-benefits span{
+    font-size:6.2px!important;
+    line-height:1.2!important;
+    min-height:39px!important;
+    padding:1px 2px!important;
+  }
+  .hero-benefits .line-icon{width:13px!important;height:13px!important}
+  .hotels-section{padding-top:28px!important}
+  .hotels-section .section-head{margin-bottom:24px!important}
+  .hotels-section .section-head h2{font-size:clamp(25px,7vw,34px)!important}
+}
+@media(max-width:390px){
+  .approved-hero{width:calc(100% - 20px)!important;grid-template-columns:45% 55%!important;min-height:238px!important}
+  .approved-hero .hero-auth-panel{min-height:238px!important;padding:15px 7px!important}
+  .approved-hero .hero-brand-official{width:min(116px,90%)!important;height:53px!important}
+  .approved-hero .hero-content{padding:15px 8px 12px!important}
+  .approved-hero .hero-content h1{font-size:15px!important}
+  .approved-hero .hero-content p{font-size:7px!important}
+  .approved-hero .hero-auth-btn{font-size:10px!important;min-height:35px!important}
+  .approved-hero .hero-content .auth-benefits span{font-size:5.8px!important}
+}
