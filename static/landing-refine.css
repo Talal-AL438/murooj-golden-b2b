@@ -833,3 +833,19 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   border:1px solid rgba(201,151,47,.92)!important;
   box-shadow:0 12px 30px rgba(0,0,0,.34)!important;
 }
+
+/* Final approved Makkah night image uploaded to repository */
+.makkah-art.photo-hero{
+  background-image:url("/static/makkah-night-approved.jpg")!important;
+  background-size:cover!important;
+  background-position:center center!important;
+  filter:none!important;
+}
+.makkah-feature-copy{
+  display:block!important;
+  background:linear-gradient(145deg,rgba(5,18,34,.94),rgba(10,24,40,.90))!important;
+  border:1px solid rgba(201,151,47,.92)!important;
+  box-shadow:0 12px 30px rgba(0,0,0,.34)!important;
+  backdrop-filter:blur(5px)!important;
+}
+.makkah-feature:after{display:none!important}
