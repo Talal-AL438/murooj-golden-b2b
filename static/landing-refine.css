@@ -776,3 +776,10 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   left:50%!important;right:auto!important;inset-inline-end:auto!important;
   top:50%!important;transform:translate(-50%,-50%)!important;
 }
+
+/* Approved premium Makkah card background — final */
+.makkah-art.photo-hero{
+  background-image:url("https://commons.wikimedia.org/wiki/Special:FilePath/Makkah%20Panorama.jpg?width=1920")!important;
+  background-size:cover!important;
+  background-position:center center!important;
+}
