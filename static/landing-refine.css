@@ -649,3 +649,49 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   .makkah-feature-copy h3{font-size:19px!important;margin:6px 0 8px!important}
   .makkah-feature-copy p{font-size:12px!important;line-height:1.5!important}
 }
+
+/* Approved compact horizontal destination card — 2026-09-30 */
+.makkah-feature{
+  position:relative!important;display:block!important;
+  width:min(760px,86%)!important;height:250px!important;min-height:0!important;
+  margin:0 auto 30px!important;border-radius:16px!important;overflow:hidden!important;
+  border:1px solid rgba(201,151,47,.78)!important;
+  background:transparent!important;box-shadow:0 12px 28px rgba(38,29,15,.11)!important;
+}
+.makkah-art.photo-hero{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;
+  background-size:cover!important;background-position:center 62%!important;filter:none!important;z-index:0!important;
+}
+.makkah-feature:after{
+  content:""!important;position:absolute!important;inset:0!important;z-index:1!important;pointer-events:none!important;
+  background:linear-gradient(90deg,rgba(0,0,0,.08),rgba(0,0,0,.12) 42%,rgba(0,0,0,.28))!important;
+}
+.makkah-feature-copy{
+  position:absolute!important;z-index:2!important;inset-block:50% auto!important;inset-inline-end:22px!important;
+  transform:translateY(-50%)!important;width:min(350px,48%)!important;
+  padding:18px 20px!important;border:1px solid rgba(224,177,59,.9)!important;border-radius:14px!important;
+  background:rgba(21,17,12,.76)!important;backdrop-filter:blur(5px)!important;
+  color:#fff!important;text-align:center!important;
+}
+.makkah-feature-copy .coming-icon{width:34px!important;height:34px!important;margin:0 auto 5px!important;color:#efbd3f!important;border-color:#efbd3f!important}
+.makkah-feature-copy .coming-icon .line-icon{width:18px!important;height:18px!important}
+.makkah-feature-copy small{font-size:8.5px!important;color:#efbd3f!important;letter-spacing:.22em!important}
+.makkah-feature-copy h3{font-size:20px!important;color:#fff!important;line-height:1.25!important;margin:6px 0 7px!important}
+.makkah-feature-copy p{font-size:11.5px!important;line-height:1.45!important;font-weight:800!important;color:#fff!important;margin:0 auto!important;max-width:290px!important}
+
+@media(max-width:900px){
+  .makkah-feature{width:min(680px,90%)!important;height:225px!important}
+  .makkah-feature-copy{width:min(320px,50%)!important;inset-inline-end:16px!important;padding:15px 16px!important}
+  .makkah-feature-copy h3{font-size:18px!important}
+  .makkah-feature-copy p{font-size:10.5px!important}
+}
+@media(max-width:600px){
+  .makkah-feature{width:calc(100% - 24px)!important;height:180px!important;border-radius:13px!important}
+  .makkah-art.photo-hero{background-position:center 62%!important}
+  .makkah-feature-copy{width:52%!important;inset-inline-end:9px!important;padding:10px 8px!important;border-radius:10px!important}
+  .makkah-feature-copy .coming-icon{width:27px!important;height:27px!important;margin-bottom:3px!important}
+  .makkah-feature-copy .coming-icon .line-icon{width:14px!important;height:14px!important}
+  .makkah-feature-copy small{font-size:6.5px!important}
+  .makkah-feature-copy h3{font-size:14px!important;margin:4px 0 5px!important}
+  .makkah-feature-copy p{font-size:8.5px!important;line-height:1.4!important}
+}
