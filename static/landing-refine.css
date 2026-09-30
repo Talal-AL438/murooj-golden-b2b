@@ -1030,3 +1030,9 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
   background-position:center center!important;
   background-repeat:no-repeat!important;
 }
+
+/* Slightly enlarge the approved Makkah card */
+.makkah-feature{
+  width:min(820px,94%)!important;
+  max-width:820px!important;
+}
