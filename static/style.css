@@ -165,3 +165,255 @@ html body .luxury-hotel-card .luxury-actions .services-button-icon{color:#f3c95c
   .luxury-hotel-heading .card-stars{font-size:14px!important;padding:6px 8px!important}
   .luxury-hotel-card .luxury-actions .btn{font-size:9px!important}
 }
+
+
+/* === FINAL PORTAL VISUAL — premium night city sections + clean hotel cards === */
+:root{--gold:#d7a52f;--gold-light:#f4cb62;--bg:#f7f4ee}
+.home-main{width:min(1440px,96%);padding:26px 0 70px}
+.home-section{margin:34px 0 68px}
+#makkah-hotels .premium-head,#madinah-hotels .premium-head{display:none}
+
+/* Night destination banners */
+.city-card{
+  width:min(1280px,100%);
+  min-height:205px!important;
+  margin:0 auto 20px!important;
+  border:1px solid rgba(215,165,47,.95)!important;
+  border-radius:18px!important;
+  overflow:hidden!important;
+  position:relative!important;
+  box-shadow:0 18px 45px rgba(24,18,7,.18)!important;
+  background-position:center!important;
+  background-size:cover!important;
+}
+.city-card-makkah{
+  background-image:
+    linear-gradient(90deg,rgba(2,7,15,.90) 0%,rgba(2,7,15,.66) 34%,rgba(2,7,15,.25) 72%,rgba(2,7,15,.12) 100%),
+    url('https://c.myholidays.com/packages/b7c590ec-8f4f-4033-a3a9-77bc8486393f/original/6f9ce3a1-acf4-4e6e-bbad-598d7409eb6b.webp')!important;
+}
+.city-card-madinah{
+  background-image:
+    linear-gradient(90deg,rgba(2,7,15,.90) 0%,rgba(2,7,15,.64) 35%,rgba(2,7,15,.28) 72%,rgba(2,7,15,.12) 100%),
+    url('https://www.madaninews.id/wp-content/uploads/2024/02/Al-Masjid-an-Nabawi-The-Prophets-Mosque-Medina-1.jpg')!important;
+}
+.city-card-overlay{
+  width:min(700px,72%)!important;
+  padding:26px 42px!important;
+  color:#fff!important;
+  text-align:start!important;
+}
+.city-card-overlay small{color:var(--gold-light)!important;letter-spacing:3.5px!important}
+.city-card-overlay h3{
+  color:#fff!important;
+  font-size:clamp(31px,3.5vw,50px)!important;
+  margin:5px 0!important;
+  line-height:1.12!important;
+  text-shadow:0 3px 18px rgba(0,0,0,.9)!important;
+}
+.city-card-overlay h3:after{background:var(--gold-light)!important;width:62px!important}
+.city-card-overlay p{font-size:15px!important;color:#fff!important;text-shadow:0 2px 10px #000!important}
+
+/* Clean premium hotel cards: image-first, no gray/black block */
+#makkah-hotels .hotel-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  width:min(1280px,100%)!important;
+  gap:20px!important;
+  margin-top:18px!important;
+}
+#madinah-hotels .hotel-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  width:min(1120px,100%)!important;
+  gap:20px!important;
+  margin-top:18px!important;
+}
+.luxury-hotel-card{
+  position:relative!important;
+  display:block!important;
+  background:#080808!important;
+  border:1px solid rgba(215,165,47,.9)!important;
+  border-radius:17px!important;
+  overflow:hidden!important;
+  padding:0!important;
+  box-shadow:0 18px 40px rgba(20,14,5,.18)!important;
+}
+.luxury-hotel-media{
+  position:relative!important;
+  height:315px!important;
+  background:#080808!important;
+  overflow:hidden!important;
+}
+.luxury-hotel-media .hotel-image{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  display:block!important;
+  filter:saturate(.95) contrast(1.02)!important;
+}
+.luxury-hotel-media:after{
+  content:""!important;
+  position:absolute!important;
+  inset:34% 0 0!important;
+  background:linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,.78))!important;
+  z-index:2!important;
+  pointer-events:none!important;
+}
+.luxury-hotel-heading{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  z-index:6!important;
+  min-height:112px!important;
+  padding:18px 18px 16px!important;
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:space-between!important;
+  gap:10px!important;
+  background:transparent!important;
+}
+.luxury-hotel-heading .hotel-name{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  margin:0!important;
+  text-align:start!important;
+}
+.luxury-hotel-heading .hotel-name-ar{
+  display:block!important;
+  color:#fff!important;
+  background:transparent!important;
+  padding:0!important;
+  font-size:clamp(20px,2vw,27px)!important;
+  font-weight:900!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  text-shadow:0 3px 12px #000!important;
+}
+.luxury-hotel-heading .hotel-name-en{
+  display:block!important;
+  color:var(--gold-light)!important;
+  background:transparent!important;
+  padding:0!important;
+  margin-top:5px!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  letter-spacing:1.6px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  text-shadow:0 2px 8px #000!important;
+}
+.luxury-hotel-heading .card-stars{
+  flex:0 0 auto!important;
+  display:flex!important;
+  color:#ffd45d!important;
+  background:rgba(5,5,5,.48)!important;
+  border:1px solid rgba(215,165,47,.85)!important;
+  border-radius:999px!important;
+  padding:6px 9px!important;
+  font-size:16px!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  text-shadow:0 2px 8px #000!important;
+}
+
+/* Buttons sit cleanly in one premium row */
+.luxury-hotel-card .hotel-card-body,
+.luxury-hotel-card .luxury-card-body{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  z-index:15!important;
+  padding:0 12px 12px!important;
+  background:transparent!important;
+  border:0!important;
+}
+.luxury-hotel-card .luxury-actions{
+  display:grid!important;
+  grid-template-columns:1.12fr 1fr 1fr 1fr!important;
+  direction:rtl!important;
+  gap:7px!important;
+  width:100%!important;
+  margin:0!important;
+}
+.luxury-hotel-card .luxury-actions .btn,
+.luxury-hotel-card .luxury-actions .services-open-home{
+  min-width:0!important;
+  min-height:43px!important;
+  padding:8px 8px!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:5px!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow-wrap:normal!important;
+  border-radius:9px!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  line-height:1.1!important;
+  backdrop-filter:blur(5px)!important;
+}
+.luxury-hotel-card .luxury-actions .book-now{
+  order:1!important;
+  background:linear-gradient(135deg,#f6d374,#dda82d)!important;
+  color:#201607!important;
+  border:1px solid #c99624!important;
+}
+.luxury-hotel-card .luxury-actions .location-btn{
+  order:2!important;background:rgba(7,7,7,.55)!important;color:#fff!important;border:1px solid rgba(215,165,47,.85)!important;
+}
+.luxury-hotel-card .luxury-actions .gallery-open-home{
+  order:3!important;background:rgba(7,7,7,.55)!important;color:#fff!important;border:1px solid rgba(215,165,47,.85)!important;
+}
+.luxury-hotel-card .luxury-actions .services-open-home{
+  order:4!important;background:rgba(7,7,7,.55)!important;color:#fff!important;border:1px solid rgba(215,165,47,.85)!important;
+}
+.luxury-hotel-card .luxury-actions .line-icon{width:15px!important;height:15px!important;color:var(--gold-light)!important}
+.luxury-hotel-card .luxury-actions .services-button-icon{color:var(--gold-light)!important}
+
+/* Favorite icon */
+.luxury-hotel-card .gallery-heart{
+  z-index:20!important;
+  top:16px!important;
+  right:16px!important;
+  width:48px!important;
+  height:48px!important;
+  border:1px solid var(--gold)!important;
+  background:rgba(5,5,5,.72)!important;
+  color:var(--gold-light)!important;
+  border-radius:50%!important;
+}
+
+/* Mobile remains clean and proportional */
+@media(max-width:1100px){
+  #makkah-hotels .hotel-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .luxury-hotel-media{height:300px!important}
+}
+@media(max-width:760px){
+  .home-main{width:94%!important;padding-top:18px!important}
+  .city-card{min-height:190px!important;border-radius:14px!important}
+  .city-card-overlay{width:94%!important;padding:22px 20px!important}
+  .city-card-overlay h3{font-size:30px!important}
+  .city-card-overlay p{font-size:13px!important}
+  #makkah-hotels .hotel-grid,#madinah-hotels .hotel-grid{grid-template-columns:1fr!important;width:100%!important}
+  .luxury-hotel-media{height:285px!important}
+  .luxury-hotel-heading{min-height:105px!important;padding:18px 14px 15px!important}
+  .luxury-hotel-heading .hotel-name-ar{font-size:21px!important}
+  .luxury-hotel-heading .hotel-name-en{font-size:10px!important}
+  .luxury-hotel-card .hotel-card-body,.luxury-hotel-card .luxury-card-body{padding:0 7px 7px!important}
+  .luxury-hotel-card .luxury-actions{gap:5px!important}
+  .luxury-hotel-card .luxury-actions .btn,.luxury-hotel-card .luxury-actions .services-open-home{min-height:39px!important;padding:6px 4px!important;font-size:10px!important}
+}
+@media(max-width:430px){
+  .city-card{min-height:175px!important}
+  .city-card-overlay{width:100%!important;padding:18px!important}
+  .city-card-overlay h3{font-size:25px!important}
+  .luxury-hotel-media{height:270px!important}
+  .luxury-hotel-heading .hotel-name-ar{font-size:19px!important}
+  .luxury-hotel-heading .card-stars{font-size:14px!important;padding:5px 7px!important}
+  .luxury-hotel-card .luxury-actions .btn,.luxury-hotel-card .luxury-actions .services-open-home{font-size:9px!important}
+}
