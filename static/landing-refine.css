@@ -1751,3 +1751,59 @@ html body .luxury-hotel-card .hotel-card-body{
    font-size:12px!important;
  }
 }
+
+/* FINAL LIGHT HOTEL CARDS — remove black card body */
+html body .luxury-hotel-card{
+  background:#f7f3eb!important;
+  border:1px solid #c99825!important;
+  box-shadow:0 18px 45px rgba(80,60,20,.14)!important;
+  overflow:hidden!important;
+}
+html body .luxury-hotel-card .luxury-card-body{
+  background:rgba(247,243,235,.96)!important;
+  color:#191611!important;
+  border-top:0!important;
+  padding:12px 14px 14px!important;
+}
+html body .luxury-hotel-card .luxury-hotel-heading{
+  background:linear-gradient(to top,rgba(20,16,10,.18),rgba(20,16,10,0))!important;
+}
+html body .luxury-hotel-card .hotel-name-ar{
+  color:#fff!important;
+  text-shadow:0 2px 8px rgba(0,0,0,.75)!important;
+}
+html body .luxury-hotel-card .hotel-name-en{
+  color:#e1ad35!important;
+  text-shadow:0 2px 5px rgba(0,0,0,.65)!important;
+}
+html body .luxury-hotel-card .hotel-rating-badge{
+  background:rgba(255,255,255,.9)!important;
+  color:#8a6518!important;
+  border:1px solid #c99825!important;
+}
+html body .luxury-hotel-card .card-stars{
+  color:#d39d20!important;
+  text-shadow:0 1px 4px rgba(0,0,0,.35)!important;
+}
+html body .luxury-hotel-card .luxury-actions .btn,
+html body .luxury-hotel-card .luxury-actions .services-open-home{
+  background:#fffdf8!important;
+  color:#3d321e!important;
+  border:1px solid #c99825!important;
+  box-shadow:0 2px 8px rgba(80,60,20,.07)!important;
+}
+html body .luxury-hotel-card .luxury-actions .services-open-home{
+  color:#3d321e!important;
+}
+html body .luxury-hotel-card .luxury-actions .services-button-icon{
+  color:#c99825!important;
+}
+html body .luxury-hotel-card .luxury-actions .book-now{
+  background:linear-gradient(135deg,#f8d878,#dba82e)!important;
+  color:#241b0d!important;
+  border-color:#c99825!important;
+}
+html body .luxury-hotel-card .luxury-actions .btn:hover,
+html body .luxury-hotel-card .luxury-actions .services-open-home:hover{
+  background:#f8f1df!important;
+}
