@@ -1083,3 +1083,30 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
 }
 .makkah-feature-copy{display:none!important}
 .makkah-feature:before,.makkah-feature:after{display:none!important}
+
+/* FINAL LUXURY HOTEL CARDS */
+.hotel-grid{gap:24px!important}
+.hotel-card{border:1px solid rgba(194,149,52,.48)!important;border-radius:18px!important;overflow:hidden!important;background:linear-gradient(180deg,#fff,#fbf8f0)!important;box-shadow:0 18px 45px rgba(28,21,10,.12)!important}
+.hotel-media{position:relative!important;height:300px!important;overflow:hidden!important;background:#111!important}
+.hotel-media .hotel-image{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important;transition:transform .45s ease!important}
+.hotel-card:hover .hotel-media .hotel-image{transform:scale(1.025)!important}
+.hotel-media:after{content:""!important;position:absolute!important;inset:0!important;background:linear-gradient(180deg,rgba(0,0,0,.02),rgba(0,0,0,.48))!important;pointer-events:none!important}
+.gallery-eye{position:absolute!important;top:18px!important;left:18px!important;z-index:5!important;width:48px!important;height:48px!important;border-radius:50%!important;border:1px solid #d6ad4d!important;background:rgba(8,8,7,.9)!important;color:#f6d98d!important;font-size:22px!important;cursor:pointer!important;display:grid!important;place-items:center!important}
+.hotel-card-body{padding:22px!important}
+.hotel-name-ar{font-size:26px!important;font-weight:900!important}
+.hotel-name-en{font-size:13px!important;letter-spacing:2px!important;color:#b07d18!important;font-weight:800!important}
+.card-stars{color:#c58f20!important;font-size:19px!important;letter-spacing:3px!important}
+.services-row{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:8px!important}
+.service-tag{min-height:58px!important;border:1px solid rgba(193,151,60,.4)!important;border-radius:10px!important;background:#fffdf8!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important}
+.primary-hotel-actions{display:grid!important;grid-template-columns:1fr 1fr 1.2fr!important;gap:10px!important}
+.primary-hotel-actions .btn{min-height:48px!important;justify-content:center!important;font-weight:800!important;border-radius:10px!important}
+.home-gallery-lightbox{position:fixed!important;inset:0!important;z-index:99999!important;background:rgba(3,4,5,.95)!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:18px!important;padding:30px!important}
+.home-gallery-lightbox[hidden]{display:none!important}
+.home-gallery-stage{width:min(1000px,82vw)!important;height:min(78vh,720px)!important;display:flex!important;align-items:center!important;justify-content:center!important;position:relative!important}
+.home-gallery-stage img{max-width:100%!important;max-height:100%!important;object-fit:contain!important;border:1px solid rgba(214,173,77,.7)!important;border-radius:12px!important;box-shadow:0 20px 80px rgba(0,0,0,.55)!important}
+.home-gallery-close,.home-gallery-prev,.home-gallery-next{border:1px solid #c99b35!important;background:rgba(10,10,9,.92)!important;color:#f5d88a!important;cursor:pointer!important;display:grid!important;place-items:center!important}
+.home-gallery-close{position:absolute!important;top:20px!important;right:24px!important;width:46px!important;height:46px!important;border-radius:50%!important;font-size:30px!important;z-index:2!important}
+.home-gallery-prev,.home-gallery-next{width:54px!important;height:54px!important;border-radius:50%!important;font-size:42px!important;line-height:1!important}
+.home-gallery-counter{position:absolute!important;bottom:14px!important;left:50%!important;transform:translateX(-50%)!important;padding:7px 12px!important;border-radius:20px!important;background:rgba(0,0,0,.72)!important;color:#f4d98c!important;font-weight:800!important}
+@media(max-width:900px){.hotel-grid{grid-template-columns:1fr!important}.hotel-media{height:280px!important}}
+@media(max-width:600px){.hotel-media{height:235px!important}.hotel-name-ar{font-size:22px!important}.services-row{grid-template-columns:repeat(2,1fr)!important}.primary-hotel-actions{grid-template-columns:1fr 1fr!important}.primary-hotel-actions .book-now{grid-column:1/-1}.home-gallery-lightbox{padding:10px!important;gap:5px!important}.home-gallery-stage{width:78vw!important;height:70vh!important}.home-gallery-prev,.home-gallery-next{width:42px!important;height:42px!important;font-size:30px!important}}
