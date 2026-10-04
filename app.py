@@ -105,6 +105,11 @@ def set_lang(code):
 @app.route("/")
 def home():
     c=db();hotels=c.execute("SELECT h.*,(SELECT image_url FROM hotel_images i WHERE i.hotel_id=h.id ORDER BY i.sort_order,i.id LIMIT 1) cover_image FROM hotels h WHERE h.active=1 ORDER BY h.sort_order,h.id").fetchall();today=datetime.utcnow().date().isoformat();offers=c.execute("SELECT o.*,h.name_ar,h.name_en FROM offers o LEFT JOIN hotels h ON h.id=o.hotel_id WHERE o.active=1 AND (o.end_date='' OR o.end_date IS NULL OR o.end_date>=?) ORDER BY o.pinned DESC,o.sort_order,o.id DESC LIMIT 6",(today,)).fetchall();settings={r["key"]:r["value"] for r in c.execute("SELECT * FROM settings").fetchall()};c.close();return render_template("home.html",hotels=hotels,offers=offers,settings=settings,user=current_user())
+@app.route("/hotel/<int:hid>/images")
+def hotel_images_api(hid):
+    c=db(); rows=c.execute("SELECT image_url FROM hotel_images WHERE hotel_id=? ORDER BY sort_order,id",(hid,)).fetchall(); c.close()
+    return jsonify({"images":[r["image_url"] for r in rows]})
+
 @app.route("/hotel/<int:hid>")
 def hotel_detail(hid):
     c=db();hotel=c.execute("SELECT * FROM hotels WHERE id=? AND active=1",(hid,)).fetchone()
