@@ -1899,3 +1899,175 @@ html body .luxury-hotel-card .luxury-actions .line-icon{
     font-size:11px!important;
   }
 }
+
+
+/* HARD OVERRIDE — hotel media and action area must never overlap */
+html body .luxury-hotel-card{
+  display:flex!important;
+  flex-direction:column!important;
+  height:auto!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  position:relative!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media{
+  position:relative!important;
+  display:block!important;
+  flex:none!important;
+  height:350px!important;
+  min-height:350px!important;
+  overflow:hidden!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .luxury-hotel-heading{
+  position:absolute!important;
+  inset-inline:0!important;
+  bottom:0!important;
+  top:auto!important;
+  height:auto!important;
+  min-height:105px!important;
+  padding:28px 18px 16px!important;
+  margin:0!important;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:flex-end!important;
+  justify-content:center!important;
+  gap:12px!important;
+  background:linear-gradient(to top,rgba(0,0,0,.48),transparent)!important;
+  z-index:20!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .hotel-name{
+  position:static!important;
+  flex:1 1 auto!important;
+  width:auto!important;
+  max-width:78%!important;
+  margin:0!important;
+  padding:0!important;
+  transform:none!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .hotel-name-ar{
+  display:block!important;
+  width:auto!important;
+  padding:0!important;
+  margin:0!important;
+  background:transparent!important;
+  color:#fff!important;
+  font-size:26px!important;
+  font-weight:900!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .hotel-name-en{
+  display:block!important;
+  width:auto!important;
+  padding:0!important;
+  margin:4px 0 0!important;
+  background:transparent!important;
+  color:#f1c452!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .card-stars{
+  position:static!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  margin:0!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  color:#f5c84f!important;
+  font-size:21px!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  z-index:22!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .hotel-rating-badge{
+  position:static!important;
+  flex:0 0 auto!important;
+  margin:0!important;
+  z-index:22!important;
+}
+html body .luxury-hotel-card .hotel-card-body,
+html body .luxury-hotel-card .luxury-card-body{
+  position:relative!important;
+  inset:auto!important;
+  flex:none!important;
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:12px 12px 14px!important;
+  background:rgba(8,8,8,.12)!important;
+  border:0!important;
+  z-index:30!important;
+  box-sizing:border-box!important;
+}
+html body .luxury-hotel-card .luxury-actions{
+  position:relative!important;
+  inset:auto!important;
+  display:grid!important;
+  grid-template-columns:1.18fr 1fr 1fr 1.18fr!important;
+  direction:rtl!important;
+  width:100%!important;
+  height:auto!important;
+  margin:0!important;
+  padding:0!important;
+  gap:9px!important;
+}
+html body .luxury-hotel-card .luxury-actions .btn,
+html body .luxury-hotel-card .luxury-actions .services-open-home{
+  position:static!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:48px!important;
+  height:48px!important;
+  margin:0!important;
+  padding:8px 9px!important;
+  box-sizing:border-box!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow:hidden!important;
+  border-radius:10px!important;
+  font-size:13px!important;
+  line-height:1!important;
+}
+html body .luxury-hotel-card .luxury-actions .book-now{order:1!important}
+html body .luxury-hotel-card .luxury-actions .location-btn{order:2!important}
+html body .luxury-hotel-card .luxury-actions .gallery-open-home{order:3!important}
+html body .luxury-hotel-card .luxury-actions .services-open-home{order:4!important}
+html body .luxury-hotel-card .luxury-actions .services-open-home{
+  background:rgba(0,0,0,.20)!important;
+  color:#fff!important;
+  border:1px solid #c99825!important;
+}
+@media(max-width:900px){
+  html body .luxury-hotel-card .luxury-hotel-media{
+    height:320px!important;
+    min-height:320px!important;
+  }
+}
+@media(max-width:600px){
+  html body .luxury-hotel-card .luxury-hotel-media{
+    height:285px!important;
+    min-height:285px!important;
+  }
+  html body .luxury-hotel-card .luxury-hotel-media .hotel-name-ar{font-size:20px!important}
+  html body .luxury-hotel-card .luxury-hotel-media .hotel-name-en{font-size:10px!important}
+  html body .luxury-hotel-card .luxury-hotel-media .card-stars{font-size:17px!important}
+  html body .luxury-hotel-card .luxury-actions{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:5px!important;
+  }
+  html body .luxury-hotel-card .luxury-actions .btn,
+  html body .luxury-hotel-card .luxury-actions .services-open-home{
+    min-height:44px!important;
+    height:44px!important;
+    padding:6px 4px!important;
+    font-size:10px!important;
+  }
+}
