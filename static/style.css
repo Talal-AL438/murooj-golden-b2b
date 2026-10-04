@@ -125,3 +125,43 @@ html body .luxury-hotel-card .luxury-actions .services-button-icon{color:#f3c95c
   .luxury-hotel-media{height:285px!important}
   .luxury-hotel-card .luxury-actions .btn{font-size:9px!important}
 }
+
+
+/* SCREENSHOT FIX — separate hotel information from action bar */
+.luxury-hotel-card{display:flex!important;flex-direction:column!important;min-height:0!important}
+.luxury-hotel-media{position:relative!important;height:330px!important;flex:0 0 330px!important}
+.luxury-hotel-heading{bottom:0!important;min-height:118px!important;padding:28px 18px 18px!important;align-items:flex-end!important}
+.luxury-hotel-heading .hotel-name{padding-bottom:3px!important}
+.luxury-hotel-heading .card-stars{margin-bottom:2px!important}
+.luxury-hotel-card .hotel-card-body,.luxury-hotel-card .luxury-card-body{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:10!important;flex:0 0 auto!important;padding:12px!important;background:#fff!important}
+.luxury-hotel-card .luxury-actions{position:relative!important;z-index:11!important}
+.luxury-hotel-card .gallery-heart{z-index:12!important;top:18px!important;right:18px!important}
+.luxury-hotel-card .hotel-name-ar{line-height:1.25!important}
+
+/* Cleaner destination section */
+.city-card{min-height:245px!important}
+.city-card-overlay{margin-inline-start:0!important}
+.section-view-all{font-size:13px!important}
+
+/* Desktop: balanced cards */
+@media(min-width:1101px){
+  #makkah-hotels .hotel-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;width:min(960px,100%)!important}
+  #madinah-hotels .hotel-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .luxury-hotel-media{height:350px!important;flex-basis:350px!important}
+}
+
+/* Tablet and mobile */
+@media(max-width:760px){
+  .city-card{min-height:210px!important}
+  .city-card-overlay{width:92%!important;padding:24px 20px!important}
+  .luxury-hotel-media{height:300px!important;flex-basis:300px!important}
+  .luxury-hotel-heading{min-height:105px!important;padding:22px 14px 15px!important}
+  .luxury-hotel-heading .hotel-name-ar{font-size:21px!important}
+  .luxury-hotel-card .hotel-card-body,.luxury-hotel-card .luxury-card-body{padding:10px!important}
+}
+@media(max-width:430px){
+  .luxury-hotel-media{height:275px!important;flex-basis:275px!important}
+  .luxury-hotel-heading .hotel-name-ar{font-size:19px!important}
+  .luxury-hotel-heading .card-stars{font-size:14px!important;padding:6px 8px!important}
+  .luxury-hotel-card .luxury-actions .btn{font-size:9px!important}
+}
