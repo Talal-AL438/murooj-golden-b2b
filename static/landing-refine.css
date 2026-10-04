@@ -1142,3 +1142,19 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
 #madinah-hotels{padding-top:8px!important}
 @media(max-width:900px){.luxury-hotel-grid{grid-template-columns:1fr!important}.luxury-hotel-media{height:300px!important}}
 @media(max-width:600px){.luxury-hotel-media{height:235px!important}.luxury-hotel-card .hotel-name-ar{font-size:22px!important}.luxury-hotel-card .services-row{grid-template-columns:repeat(2,1fr)!important}.luxury-hotel-card .luxury-actions{grid-template-columns:1fr 1fr!important}.luxury-hotel-card .luxury-actions .book-now{grid-column:1/-1}.luxury-hotel-card .hotel-card-body{padding:17px!important}}
+
+/* FINAL APPROVED POLISH */
+.luxury-hotel-card{min-height:620px!important}
+.luxury-hotel-media{height:300px!important}
+.luxury-hotel-media:after{background:linear-gradient(180deg,rgba(0,0,0,.02) 45%,rgba(0,0,0,.52) 100%)!important}
+.luxury-hotel-card .hotel-card-body{padding:22px 22px 20px!important}
+.luxury-hotel-card .hotel-name-ar{font-size:29px!important;text-shadow:0 2px 12px rgba(0,0,0,.65)!important}
+.luxury-hotel-card .hotel-name-en{font-size:13px!important}
+.luxury-hotel-card .card-stars{font-size:20px!important;margin:4px 0 14px!important}
+.luxury-hotel-card .services-row{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:9px!important;margin-bottom:18px!important}
+.luxury-hotel-card .service-tag{min-height:72px!important;font-size:12px!important}
+.luxury-hotel-card .luxury-actions{grid-template-columns:1fr 1.25fr 1.35fr!important;gap:10px!important}
+.luxury-hotel-card .luxury-actions .btn{min-height:52px!important;font-size:13px!important}
+.gallery-eye{width:54px!important;height:54px!important}
+@media(max-width:900px){.luxury-hotel-card{min-height:0!important}.luxury-hotel-media{height:300px!important}}
+@media(max-width:600px){.luxury-hotel-media{height:240px!important}.luxury-hotel-card .hotel-name-ar{font-size:23px!important}.luxury-hotel-card .services-row{grid-template-columns:repeat(2,1fr)!important}.luxury-hotel-card .luxury-actions{grid-template-columns:1fr 1fr!important}.luxury-hotel-card .luxury-actions .book-now{grid-column:1/-1!important}}
