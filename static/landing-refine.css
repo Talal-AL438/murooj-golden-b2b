@@ -1388,3 +1388,25 @@ html body .luxury-hotel-card .luxury-hotel-media .hotel-name-en{
 html body .luxury-hotel-card .luxury-hotel-media .hotel-rating-badge{
   background:rgba(0,0,0,.35)!important;
 }
+
+/* Bottom action labels — always one line */
+html body .luxury-hotel-card .luxury-actions .btn{
+  white-space:nowrap!important;
+  word-break:keep-all!important;
+  overflow-wrap:normal!important;
+  flex-wrap:nowrap!important;
+  line-height:1!important;
+  min-width:0!important;
+}
+html body .luxury-hotel-card .luxury-actions .btn svg{
+  flex:0 0 auto!important;
+}
+html body .luxury-hotel-card .luxury-actions .btn span{
+  white-space:nowrap!important;
+}
+@media(max-width:600px){
+  html body .luxury-hotel-card .luxury-actions .btn{
+    font-size:13px!important;
+    gap:6px!important;
+  }
+}
