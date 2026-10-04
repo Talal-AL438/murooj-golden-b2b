@@ -1242,3 +1242,8 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
 .luxury-hotel-card .luxury-actions .book-now{color:#201507!important}
 @media(max-width:1100px){.luxury-hotel-card .hotel-services-wrap>.hotel-tags.services-row{grid-template-columns:repeat(3,1fr)!important}}
 @media(max-width:600px){.luxury-hotel-card .hotel-services-wrap>.hotel-tags.services-row{grid-template-columns:repeat(2,1fr)!important}.luxury-hotel-card .luxury-actions{grid-template-columns:1fr 1fr!important}.luxury-hotel-card .luxury-actions .book-now{grid-column:1/-1!important}}
+
+/* Final lighter photo-to-title transition */
+.luxury-hotel-media:after{background:linear-gradient(180deg,rgba(0,0,0,0) 68%,rgba(0,0,0,.34) 100%)!important}
+.luxury-hotel-card .luxury-hotel-heading{background:linear-gradient(180deg,rgba(7,7,6,.62),rgba(7,7,6,.74))!important;backdrop-filter:blur(1px)!important}
+.luxury-hotel-card .hotel-card-body{background:linear-gradient(180deg,rgba(10,9,7,.96),rgba(5,5,4,.98))!important}
