@@ -1352,3 +1352,39 @@ html body .luxury-hotel-card .luxury-actions .gallery-open-home{
  html body .luxury-hotel-card .luxury-hotel-media .luxury-hotel-heading{min-height:90px!important;padding:0 14px 13px!important}
  html body .luxury-hotel-card .luxury-hotel-media .hotel-name{max-width:78%!important}
 }
+
+/* FINAL POLISH — title must float directly on the hotel photo */
+html body .luxury-hotel-card .luxury-hotel-media .luxury-hotel-heading,
+html body .luxury-hotel-card .luxury-hotel-media .hotel-name,
+html body .luxury-hotel-card .luxury-hotel-media .hotel-name-ar,
+html body .luxury-hotel-card .luxury-hotel-media .hotel-name-en{
+  background:none!important;
+  background-image:none!important;
+  background-color:transparent!important;
+  box-shadow:none!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .luxury-hotel-heading{
+  bottom:0!important;
+  padding-bottom:15px!important;
+  min-height:92px!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .hotel-name{
+  display:block!important;
+  width:max-content!important;
+  max-width:78%!important;
+  margin:0 auto!important;
+  padding:0!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .hotel-name-ar{
+  color:#fff!important;
+  font-weight:900!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.98),0 0 5px rgba(0,0,0,.7)!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .hotel-name-en{
+  color:#f2c552!important;
+  font-weight:900!important;
+  text-shadow:0 2px 9px rgba(0,0,0,.98)!important;
+}
+html body .luxury-hotel-card .luxury-hotel-media .hotel-rating-badge{
+  background:rgba(0,0,0,.35)!important;
+}
