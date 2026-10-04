@@ -1601,3 +1601,91 @@ html body .luxury-hotel-card .hotel-card-body{
    font-size:10px!important;
  }
 }
+
+/* FINAL — services are a single compact button with a premium popup */
+html body .luxury-hotel-card .hotel-services-wrap{display:none!important;}
+html body .luxury-hotel-card .services-open-home{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  width:100%!important;
+  min-height:52px!important;
+  margin:10px 0 14px!important;
+  padding:10px 18px!important;
+  border:1px solid #c99825!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.025)!important;
+  color:#fff!important;
+  font-size:15px!important;
+  font-weight:900!important;
+  white-space:nowrap!important;
+  cursor:pointer!important;
+}
+html body .luxury-hotel-card .services-open-home:hover{
+  background:rgba(218,177,72,.10)!important;
+}
+html body .luxury-hotel-card .services-button-icon{
+  color:#f3c95c!important;
+  font-size:16px!important;
+}
+html body .home-services-popover{
+  position:fixed!important;
+  inset:0!important;
+  z-index:10000!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:20px!important;
+  background:rgba(0,0,0,.68)!important;
+  backdrop-filter:blur(5px)!important;
+}
+html body .home-services-popover[hidden]{display:none!important;}
+html body .home-services-panel{
+  position:relative!important;
+  width:min(520px,92vw)!important;
+  padding:28px 24px 24px!important;
+  border:1px solid #c99825!important;
+  border-radius:18px!important;
+  background:#0b0b09!important;
+  box-shadow:0 25px 80px rgba(0,0,0,.55)!important;
+  text-align:center!important;
+}
+html body .home-services-title{
+  color:#f3c95c!important;
+  font-size:24px!important;
+  font-weight:900!important;
+  margin-bottom:18px!important;
+}
+html body .home-services-list{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+html body .home-service-item{
+  padding:13px 10px!important;
+  border:1px solid rgba(201,152,37,.65)!important;
+  border-radius:10px!important;
+  color:#fff!important;
+  background:rgba(255,255,255,.025)!important;
+  font-size:14px!important;
+  font-weight:800!important;
+}
+html body .home-services-close{
+  position:absolute!important;
+  top:10px!important;
+  left:12px!important;
+  width:34px!important;
+  height:34px!important;
+  border:1px solid #c99825!important;
+  border-radius:50%!important;
+  background:transparent!important;
+  color:#f3c95c!important;
+  font-size:23px!important;
+  cursor:pointer!important;
+}
+@media(max-width:600px){
+ html body .luxury-hotel-card .services-open-home{min-height:48px!important;font-size:14px!important;}
+ html body .home-services-panel{padding:25px 14px 18px!important;}
+ html body .home-services-list{grid-template-columns:1fr!important;}
+}
