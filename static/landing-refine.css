@@ -1247,3 +1247,15 @@ header nav>a:not(.nav-notification):hover::after{width:100%!important;inset-inli
 .luxury-hotel-media:after{background:linear-gradient(180deg,rgba(0,0,0,0) 68%,rgba(0,0,0,.34) 100%)!important}
 .luxury-hotel-card .luxury-hotel-heading{background:linear-gradient(180deg,rgba(7,7,6,.62),rgba(7,7,6,.74))!important;backdrop-filter:blur(1px)!important}
 .luxury-hotel-card .hotel-card-body{background:linear-gradient(180deg,rgba(10,9,7,.96),rgba(5,5,4,.98))!important}
+
+/* FINAL: very light name overlay so hotel photo remains visible */
+.luxury-hotel-card .luxury-hotel-media{height:315px!important}
+.luxury-hotel-card .luxury-hotel-heading{margin:-112px -22px 0!important;min-height:112px!important;padding:30px 26px 14px!important;background:linear-gradient(180deg,rgba(5,5,4,0) 0%,rgba(5,5,4,.10) 38%,rgba(5,5,4,.28) 100%)!important;border-bottom:0!important;z-index:4!important;position:relative!important}
+.luxury-hotel-card .luxury-hotel-heading:after{display:none!important}
+.luxury-hotel-card .hotel-card-body{background:linear-gradient(180deg,#070706 0,#050504 100%)!important}
+.luxury-hotel-card .hotel-name-ar{color:#fff8e8!important;text-shadow:0 2px 8px rgba(0,0,0,.75)!important;background:transparent!important;padding:0!important;box-shadow:none!important}
+.luxury-hotel-card .hotel-name-en{color:#f1c44f!important;text-shadow:0 2px 7px rgba(0,0,0,.8)!important}
+.luxury-hotel-card .hotel-rating-badge{position:absolute!important;right:25px!important;top:47px!important;padding:5px 13px!important;border:1px solid #d7ab43!important;border-radius:18px!important;background:rgba(5,5,4,.62)!important;color:#f6d37c!important;font-size:13px!important;font-weight:900!important;white-space:nowrap!important}
+.luxury-hotel-card .card-stars{display:none!important}
+.luxury-hotel-card .hotel-services-wrap{position:relative!important;z-index:5!important}
+@media(max-width:600px){.luxury-hotel-card .luxury-hotel-heading{margin:-92px -14px 0!important;min-height:92px!important;padding:26px 16px 12px!important}.luxury-hotel-card .hotel-rating-badge{right:16px!important;top:38px!important;font-size:11px!important;padding:4px 9px!important}.luxury-hotel-card .hotel-name-ar{font-size:22px!important}}
