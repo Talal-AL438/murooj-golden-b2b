@@ -10,7 +10,7 @@
   <button class="gallery-heart" type="button" aria-label="المفضلة">♡</button>
 </div>{% endif %}
 <div class="hotel-card-body luxury-card-body">
-  <div class="hotel-services-wrap">{{services(h.services)}}</div>
+  <button class="btn outline services-open-home" type="button" data-services="{{h.services|e}}"><span class="services-button-icon">✦</span>{{ 'الخدمات' if lang=='ar' else 'Services' }}</button>
   <div class="hotel-actions primary-hotel-actions luxury-actions">
     {% if user and user['role']=='agency' %}<a class="btn gold book-now" href="{{url_for('new_request',hotel=h.id,city=h.city)}}">{{ 'طلب الحجز' if lang=='ar' else ('Pesan Sekarang' if lang=='id' else ('Tempah Sekarang' if lang=='ms' else 'Booking Request')) }}</a>{% else %}<a class="btn gold book-now" href="{{url_for('login')}}">{{ 'طلب الحجز' if lang=='ar' else 'Booking Request' }}</a>{% endif %}
     <button class="btn outline gallery-open-home" type="button" data-gallery="{{h.id}}">{{icon('eye')}} {{ 'عرض الصور' if lang=='ar' else 'View Photos' }}</button>
@@ -24,7 +24,7 @@
   <button class="gallery-heart" type="button" aria-label="المفضلة">♡</button>
 </div>{% endif %}
 <div class="hotel-card-body luxury-card-body">
-  <div class="hotel-services-wrap">{{services(h.services)}}</div>
+  <button class="btn outline services-open-home" type="button" data-services="{{h.services|e}}"><span class="services-button-icon">✦</span>{{ 'الخدمات' if lang=='ar' else 'Services' }}</button>
   <div class="hotel-actions primary-hotel-actions luxury-actions">
     {% if user and user['role']=='agency' %}<a class="btn gold book-now" href="{{url_for('new_request',hotel=h.id,city=h.city)}}">{{ 'طلب الحجز' if lang=='ar' else ('Pesan Sekarang' if lang=='id' else ('Tempah Sekarang' if lang=='ms' else 'Booking Request')) }}</a>{% else %}<a class="btn gold book-now" href="{{url_for('login')}}">{{ 'طلب الحجز' if lang=='ar' else 'Booking Request' }}</a>{% endif %}
     <button class="btn outline gallery-open-home" type="button" data-gallery="{{h.id}}">{{icon('eye')}} {{ 'عرض الصور' if lang=='ar' else 'View Photos' }}</button>
@@ -39,6 +39,15 @@
   box.innerHTML='<button class="home-gallery-close" aria-label="Close">×</button><button class="home-gallery-prev" aria-label="Previous">‹</button><div class="home-gallery-stage"><img alt=""><div class="home-gallery-counter"></div></div><button class="home-gallery-next" aria-label="Next">›</button>';
   document.body.appendChild(box);
   const img=box.querySelector('img'), counter=box.querySelector('.home-gallery-counter'); let items=[],idx=0;
+  const servicesBox=document.createElement('div'); servicesBox.className='home-services-popover'; servicesBox.hidden=true;
+  servicesBox.innerHTML='<div class="home-services-panel"><button class="home-services-close" type="button" aria-label="Close">×</button><div class="home-services-title">الخدمات</div><div class="home-services-list"></div></div>';
+  document.body.appendChild(servicesBox);
+  const servicesList=servicesBox.querySelector('.home-services-list');
+  function openServices(raw){servicesList.innerHTML='';(raw||'').split('|').filter(Boolean).slice(0,12).forEach(x=>{const b=document.createElement('div');b.className='home-service-item';b.textContent=x;servicesList.appendChild(b);});servicesBox.hidden=false;}
+  function closeServices(){servicesBox.hidden=true;}
+  document.querySelectorAll('.services-open-home').forEach(b=>b.addEventListener('click',()=>openServices(b.dataset.services)));
+  servicesBox.querySelector('.home-services-close').onclick=closeServices;
+  servicesBox.addEventListener('click',e=>{if(e.target===servicesBox)closeServices();});
   function render(){if(!items.length)return;img.src=items[idx];counter.textContent=(idx+1)+' / '+items.length;}
   async function open(id){try{const r=await fetch('/hotel/'+id+'/images');const d=await r.json();items=d.images||[];if(!items.length){location.href='/hotel/'+id;return;}idx=0;render();box.hidden=false;document.body.classList.add('lightbox-active');}catch(e){location.href='/hotel/'+id;}}
   function close(){box.hidden=true;document.body.classList.remove('lightbox-active');}
