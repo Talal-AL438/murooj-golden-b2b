@@ -1410,3 +1410,30 @@ html body .luxury-hotel-card .luxury-actions .btn span{
     gap:6px!important;
   }
 }
+
+/* Star classification badge — clean, readable pill */
+html body .luxury-hotel-card .luxury-hotel-media .hotel-rating-badge{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:max-content!important;
+  min-width:64px!important;
+  height:30px!important;
+  box-sizing:border-box!important;
+  padding:0 10px!important;
+  border:1px solid #e0b64e!important;
+  border-radius:18px!important;
+  background:rgba(5,5,4,.68)!important;
+  color:#f8d681!important;
+  font-size:12px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  overflow:visible!important;
+  z-index:20!important;
+}
+@media(max-width:600px){
+ html body .luxury-hotel-card .luxury-hotel-media .hotel-rating-badge{
+   min-width:58px!important;height:27px!important;padding:0 8px!important;font-size:10px!important;
+ }
+}
