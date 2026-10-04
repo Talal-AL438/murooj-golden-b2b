@@ -1689,3 +1689,65 @@ html body .home-services-close{
  html body .home-services-panel{padding:25px 14px 18px!important;}
  html body .home-services-list{grid-template-columns:1fr!important;}
 }
+
+/* FINAL CARD ACTIONS — services button matches View Photos */
+html body .luxury-hotel-card .luxury-actions{
+  display:grid!important;
+  grid-template-columns:1.15fr 1fr 1fr 1.15fr!important;
+  gap:10px!important;
+  align-items:stretch!important;
+  margin-top:12px!important;
+}
+html body .luxury-hotel-card .luxury-actions .btn,
+html body .luxury-hotel-card .luxury-actions .services-open-home{
+  width:100%!important;
+  min-width:0!important;
+  min-height:48px!important;
+  margin:0!important;
+  padding:9px 8px!important;
+  box-sizing:border-box!important;
+  border-radius:10px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  white-space:nowrap!important;
+  font-size:14px!important;
+  font-weight:900!important;
+}
+html body .luxury-hotel-card .luxury-actions .services-open-home{
+  background:transparent!important;
+  color:#fff!important;
+  border:1px solid #c99825!important;
+  cursor:pointer!important;
+}
+html body .luxury-hotel-card .luxury-actions .services-button-icon{
+  color:#f3c95c!important;
+  font-size:14px!important;
+}
+html body .luxury-hotel-card .luxury-actions .book-now{
+  order:4!important;
+}
+html body .luxury-hotel-card .luxury-actions .gallery-open-home{
+  order:3!important;
+}
+html body .luxury-hotel-card .luxury-actions .location-btn{
+  order:2!important;
+}
+html body .luxury-hotel-card .luxury-actions .services-open-home{
+  order:1!important;
+}
+html body .luxury-hotel-card .hotel-card-body{
+  padding-bottom:16px!important;
+}
+@media(max-width:600px){
+ html body .luxury-hotel-card .luxury-actions{
+   grid-template-columns:1fr 1fr!important;
+   gap:8px!important;
+ }
+ html body .luxury-hotel-card .luxury-actions .btn,
+ html body .luxury-hotel-card .luxury-actions .services-open-home{
+   min-height:46px!important;
+   font-size:12px!important;
+ }
+}
