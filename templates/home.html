@@ -10,8 +10,8 @@
   <button class="gallery-heart" type="button" aria-label="المفضلة">♡</button>
 </div>{% endif %}
 <div class="hotel-card-body luxury-card-body">
-  <button class="btn outline services-open-home" type="button" data-services="{{h.services|e}}"><span class="services-button-icon">✦</span>{{ 'الخدمات' if lang=='ar' else 'Services' }}</button>
   <div class="hotel-actions primary-hotel-actions luxury-actions">
+    <button class="btn outline services-open-home" type="button" data-services="{{h.services|e}}"><span class="services-button-icon">✦</span>{{ 'الخدمات' if lang=='ar' else 'Services' }}</button>
     {% if user and user['role']=='agency' %}<a class="btn gold book-now" href="{{url_for('new_request',hotel=h.id,city=h.city)}}">{{ 'طلب الحجز' if lang=='ar' else ('Pesan Sekarang' if lang=='id' else ('Tempah Sekarang' if lang=='ms' else 'Booking Request')) }}</a>{% else %}<a class="btn gold book-now" href="{{url_for('login')}}">{{ 'طلب الحجز' if lang=='ar' else 'Booking Request' }}</a>{% endif %}
     <button class="btn outline gallery-open-home" type="button" data-gallery="{{h.id}}">{{icon('eye')}} {{ 'عرض الصور' if lang=='ar' else 'View Photos' }}</button>
     {% if h.map_url %}<a class="btn location-btn" target="_blank" rel="noopener" href="{{h.map_url}}">{{icon('pin')}} {{T.location}}</a>{% else %}<span class="btn location-btn disabled">{{icon('pin')}} {{T.location}}</span>{% endif %}
