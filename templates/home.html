@@ -24,7 +24,7 @@
 {% set card_image = h.cover_image or ('https://st.muslim.uz/cache/7/9/4/4/9/79449059f8e1fa96eb363bc0bdfca9e7acb0aaad.jpeg' if h.city=='Madinah' else '/static/makkah-night-approved.jpg') %}<div class="hotel-media luxury-hotel-media"><img class="hotel-image" src="{{card_image}}" alt="{{h.name_ar}}">
   <div class="luxury-hotel-heading"><h3 class="hotel-name" translate="no"><span class="hotel-name-ar">{{h.name_ar}}</span><span class="hotel-name-en">{{h.name_en}}</span></h3><div class="card-stars" aria-label="{{h.stars or 3}} نجوم">{{"★" * (h.stars or 3)}}</div></div>
   <button class="gallery-heart" type="button" aria-label="المفضلة">♡</button>
-</div>{% endif %}
+</div>
 <div class="hotel-card-body luxury-card-body">
   <div class="hotel-actions primary-hotel-actions luxury-actions">
     {% if user and user['role']=='agency' %}<a class="btn gold book-now" href="{{url_for('new_request',hotel=h.id,city=h.city)}}">{{ 'طلب الحجز' if lang=='ar' else ('Pesan Sekarang' if lang=='id' else ('Tempah Sekarang' if lang=='ms' else 'Booking Request')) }}</a>{% else %}<a class="btn gold book-now" href="{{url_for('login')}}">{{ 'طلب الحجز' if lang=='ar' else 'Booking Request' }}</a>{% endif %}
@@ -38,7 +38,7 @@
 {% set card_image = h.cover_image or ('https://st.muslim.uz/cache/7/9/4/4/9/79449059f8e1fa96eb363bc0bdfca9e7acb0aaad.jpeg' if h.city=='Madinah' else '/static/makkah-night-approved.jpg') %}<div class="hotel-media luxury-hotel-media"><img class="hotel-image" src="{{card_image}}" alt="{{h.name_ar}}">
   <div class="luxury-hotel-heading"><h3 class="hotel-name" translate="no"><span class="hotel-name-ar">{{h.name_ar}}</span><span class="hotel-name-en">{{h.name_en}}</span></h3><div class="card-stars">{{"★" * (h.stars or 3)}}</div></div>
   <button class="gallery-heart" type="button" aria-label="المفضلة">♡</button>
-</div>{% endif %}
+</div>
 <div class="hotel-card-body luxury-card-body">
   <div class="hotel-actions primary-hotel-actions luxury-actions">
     {% if user and user['role']=='agency' %}<a class="btn gold book-now" href="{{url_for('new_request',hotel=h.id,city=h.city)}}">{{ 'طلب الحجز' if lang=='ar' else ('Pesan Sekarang' if lang=='id' else ('Tempah Sekarang' if lang=='ms' else 'Booking Request')) }}</a>{% else %}<a class="btn gold book-now" href="{{url_for('login')}}">{{ 'طلب الحجز' if lang=='ar' else 'Booking Request' }}</a>{% endif %}
