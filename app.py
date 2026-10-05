@@ -49,11 +49,11 @@ def init_db():
         conn.execute("DELETE FROM hotel_images")
         conn.execute("DELETE FROM hotels")
         catalog=[
-            ("فندق ندى أجياد","NADA AJYAD HOTEL","Makkah","https://maps.app.goo.gl/PzgRgz23LRDex1Wq7?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,1),
-            ("فندق سواعد الخير","SAWAEED AL KHAIR HOTEL","Makkah","https://maps.app.goo.gl/GcA7zZYftYcuYx9N6?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,2),
-            ("فندق ديار البيت","DIYAR AL BAYT HOTEL","Makkah","","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,3),
-            ("فندق أزهار سلسبيل","AZHAR SALSABEEL HOTEL","Madinah","","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,1),
-            ("فندق سلسبيل الذهبي","SALSABEEL AL DHAHABI HOTEL","Madinah","","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,2),
+            ("فندق ندى أجياد","NADA AJYAD HOTEL","Makkah","https://maps.app.goo.gl/PzgRgz23LRDex1Wq7?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,1,1),
+            ("فندق سواعد الخير","SAWAEED AL KHAIR HOTEL","Makkah","https://maps.app.goo.gl/GcA7zZYftYcuYx9N6?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,1,2),
+            ("فندق ديار البيت","DIYAR AL BAYT HOTEL","Makkah","","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,1,3),
+            ("فندق أزهار سلسبيل","AZHAR SALSABEEL HOTEL","Madinah","","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,1,1),
+            ("فندق سلسبيل الذهبي","SALSABEEL AL DHAHABI HOTEL","Madinah","","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,1,2),
         ]
         for row in catalog:
             conn.execute("INSERT INTO hotels(name_ar,name_en,city,map_url,services,meals,stars,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)",row+(now,))
