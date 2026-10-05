@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 import sqlite3, os
+from threading import Lock
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -16,7 +17,11 @@ LANGS={
 "ms":{"portal":"Portal B2B Murooj Golden","home":"Utama","hotels":"Hotel","offers":"Tawaran","quick_request":"Permintaan Pantas","login":"Log Masuk","register":"Daftar Agensi","logout":"Log Keluar","account":"Akaun Saya","admin":"Pentadbir","hero":"Rakan Hotel Dipercayai Anda di Makkah dan Madinah","sub":"Portal B2B untuk agensi pelancongan, Haji dan Umrah.","makkah":"Makkah","madinah":"Madinah","view":"Lihat Hotel","location":"Lokasi","send_request":"Hantar Permintaan","agency_name":"Nama Agensi","country":"Negara","contact_name":"Nama Pegawai","whatsapp":"Nombor WhatsApp","email":"E-mel","password":"Kata Laluan","privacy":"Saya bersetuju dengan Terma dan Dasar Privasi","marketing":"Saya bersetuju menerima tawaran dan kemas kini pemasaran melalui WhatsApp","create_account":"Cipta Akaun","checkin":"Daftar Masuk","checkout":"Daftar Keluar","rooms":"Bilangan Bilik","persons":"Bilangan Orang","nationality":"Kewarganegaraan Kumpulan","meal":"Pelan Makanan","notes":"Catatan","status":"Status","repeat":"Ulang Permintaan","sent":"Dihantar","contacted":"Dihubungi melalui WhatsApp","closed":"Ditutup","submit":"Hantar","search":"Cari","new_requests":"Permintaan Baharu","agencies":"Agensi","reports":"Laporan","employees":"Pengguna & Kebenaran","settings":"Tetapan","audit":"Log Aktiviti","save":"Simpan","add":"Tambah","edit":"Edit","hide":"Sembunyi","show":"Tunjuk","language":"Bahasa","any_hotel":"Mana-mana Hotel Tersedia","room_only":"Tanpa Makanan","indo_fb":"Papan Penuh Indonesia","malay_fb":"Papan Penuh Malaysia","success_request":"Permintaan anda berjaya dihantar kepada Murooj Golden. Pasukan tempahan akan menghubungi anda melalui WhatsApp untuk mengesahkan ketersediaan dan harga.","welcome":"Selamat datang","special_offers":"Tawaran Istimewa","city":"Bandar","hotel":"Hotel","actions":"Tindakan","date":"Tarikh","job_title":"Jawatan","mobile":"Telefon","role":"Peranan","active":"Aktif","suspended":"Digantung","verified":"Disahkan","category":"Kategori","last_request":"Permintaan Terakhir","request_count":"Jumlah Permintaan","registration_date":"Tarikh Daftar","no_active_offers":"Tiada tawaran aktif buat masa ini"}}
 
 def db():
-    conn=sqlite3.connect(DB_PATH);conn.row_factory=sqlite3.Row;return conn
+    conn=sqlite3.connect(DB_PATH, timeout=30)
+    conn.row_factory=sqlite3.Row
+    conn.execute("PRAGMA busy_timeout=30000")
+    conn.execute("PRAGMA journal_mode=WAL")
+    return conn
 
 def init_db():
     conn=db();conn.executescript("""
@@ -65,8 +70,17 @@ def init_db():
             elif h["name_en"]=="SAWAEED AL KHAIR HOTEL":conn.execute("INSERT INTO hotel_images(hotel_id,image_url,sort_order,created_at) VALUES(?,?,?,?)",(h["id"],"/static/سواعد الخير.jfif",1,now))
     conn.commit();conn.close()
 
+_DB_INIT_LOCK=Lock()
+_DB_READY=False
+
 @app.before_request
-def ensure():init_db()
+def ensure():
+    global _DB_READY
+    if _DB_READY:return
+    with _DB_INIT_LOCK:
+        if not _DB_READY:
+            init_db()
+            _DB_READY=True
 def t():return LANGS.get(session.get("lang","ar"),LANGS["ar"])
 def current_user():
     uid=session.get("user_id")
