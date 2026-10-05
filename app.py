@@ -17,14 +17,16 @@ LANGS={
 "ms":{"portal":"Portal B2B Murooj Golden","home":"Utama","hotels":"Hotel","offers":"Tawaran","quick_request":"Permintaan Pantas","login":"Log Masuk","register":"Daftar Agensi","logout":"Log Keluar","account":"Akaun Saya","admin":"Pentadbir","hero":"Rakan Hotel Dipercayai Anda di Makkah dan Madinah","sub":"Portal B2B untuk agensi pelancongan, Haji dan Umrah.","makkah":"Makkah","madinah":"Madinah","view":"Lihat Hotel","location":"Lokasi","send_request":"Hantar Permintaan","agency_name":"Nama Agensi","country":"Negara","contact_name":"Nama Pegawai","whatsapp":"Nombor WhatsApp","email":"E-mel","password":"Kata Laluan","privacy":"Saya bersetuju dengan Terma dan Dasar Privasi","marketing":"Saya bersetuju menerima tawaran dan kemas kini pemasaran melalui WhatsApp","create_account":"Cipta Akaun","checkin":"Daftar Masuk","checkout":"Daftar Keluar","rooms":"Bilangan Bilik","persons":"Bilangan Orang","nationality":"Kewarganegaraan Kumpulan","meal":"Pelan Makanan","notes":"Catatan","status":"Status","repeat":"Ulang Permintaan","sent":"Dihantar","contacted":"Dihubungi melalui WhatsApp","closed":"Ditutup","submit":"Hantar","search":"Cari","new_requests":"Permintaan Baharu","agencies":"Agensi","reports":"Laporan","employees":"Pengguna & Kebenaran","settings":"Tetapan","audit":"Log Aktiviti","save":"Simpan","add":"Tambah","edit":"Edit","hide":"Sembunyi","show":"Tunjuk","language":"Bahasa","any_hotel":"Mana-mana Hotel Tersedia","room_only":"Tanpa Makanan","indo_fb":"Papan Penuh Indonesia","malay_fb":"Papan Penuh Malaysia","success_request":"Permintaan anda berjaya dihantar kepada Murooj Golden. Pasukan tempahan akan menghubungi anda melalui WhatsApp untuk mengesahkan ketersediaan dan harga.","welcome":"Selamat datang","special_offers":"Tawaran Istimewa","city":"Bandar","hotel":"Hotel","actions":"Tindakan","date":"Tarikh","job_title":"Jawatan","mobile":"Telefon","role":"Peranan","active":"Aktif","suspended":"Digantung","verified":"Disahkan","category":"Kategori","last_request":"Permintaan Terakhir","request_count":"Jumlah Permintaan","registration_date":"Tarikh Daftar","no_active_offers":"Tiada tawaran aktif buat masa ini"}}
 
 def db():
-    conn=sqlite3.connect(DB_PATH, timeout=30)
+    conn=sqlite3.connect(DB_PATH, timeout=60)
     conn.row_factory=sqlite3.Row
     conn.execute("PRAGMA busy_timeout=30000")
-    conn.execute("PRAGMA journal_mode=WAL")
     return conn
 
 def init_db():
-    conn=db();conn.executescript("""
+    conn=db()
+    conn.execute("PRAGMA busy_timeout=60000")
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.executescript("""
     CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY,value TEXT);
     CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,email TEXT UNIQUE NOT NULL,password_hash TEXT NOT NULL,role TEXT NOT NULL DEFAULT 'agency',name TEXT,job_title TEXT,mobile TEXT,language TEXT DEFAULT 'ar',active INTEGER DEFAULT 1,created_at TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS agencies (id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER UNIQUE NOT NULL,agency_name TEXT NOT NULL,country TEXT NOT NULL,contact_name TEXT NOT NULL,whatsapp TEXT NOT NULL,category TEXT DEFAULT 'New',verified INTEGER DEFAULT 0,internal_notes TEXT DEFAULT '',marketing_consent INTEGER DEFAULT 1,created_at TEXT NOT NULL,FOREIGN KEY(user_id) REFERENCES users(id));
