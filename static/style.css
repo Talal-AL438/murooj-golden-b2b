@@ -519,3 +519,45 @@ html body .luxury-hotel-card .luxury-actions .services-button-icon{color:#f3c95c
   .approved-destination-overlay h2{font-size:28px}
   .approved-destination-overlay p{font-size:12px}
 }
+
+
+/* === APPROVED FINAL: destination card above its own hotel list === */
+.home-main > .home-section .city-card{
+  display:flex!important;
+  width:min(1280px,100%)!important;
+  min-height:245px!important;
+  margin:0 auto 20px!important;
+  align-items:center!important;
+}
+.city-card-makkah{
+  background-image:
+    linear-gradient(90deg,rgba(0,0,0,.58) 0%,rgba(0,0,0,.38) 38%,rgba(0,0,0,.12) 72%,rgba(0,0,0,.06) 100%),
+    url('https://c.myholidays.com/packages/b7c590ec-8f4f-4033-a3a9-77bc8486393f/original/6f9ce3a1-acf4-4e6e-bbad-598d7409eb6b.webp')!important;
+  background-size:cover!important;
+  background-position:center!important;
+}
+.city-card-madinah{
+  background-image:
+    linear-gradient(90deg,rgba(0,0,0,.58) 0%,rgba(0,0,0,.38) 38%,rgba(0,0,0,.12) 72%,rgba(0,0,0,.06) 100%),
+    url('https://www.madaninews.id/wp-content/uploads/2024/02/Al-Masjid-an-Nabawi-The-Prophets-Mosque-Medina-1.jpg')!important;
+  background-size:cover!important;
+  background-position:center!important;
+}
+.city-card-overlay{
+  width:min(700px,72%)!important;
+  padding:30px 42px!important;
+  background:rgba(0,0,0,.20)!important;
+  border-radius:14px!important;
+  backdrop-filter:blur(2px)!important;
+}
+.city-card-overlay h3{
+  font-size:clamp(31px,3.5vw,50px)!important;
+}
+.city-card-overlay p{font-size:15px!important}
+@media(max-width:760px){
+  .home-main > .home-section .city-card{min-height:210px!important}
+  .city-card-overlay{width:92%!important;padding:24px 20px!important;background:rgba(0,0,0,.18)!important}
+}
+@media(max-width:430px){
+  .home-main > .home-section .city-card{min-height:190px!important}
+}
