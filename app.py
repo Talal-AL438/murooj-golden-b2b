@@ -33,6 +33,29 @@ def init_db():
     hotel_columns={r["name"] for r in conn.execute("PRAGMA table_info(hotels)").fetchall()}
     if "stars" not in hotel_columns:conn.execute("ALTER TABLE hotels ADD COLUMN stars INTEGER DEFAULT 3")
     for k,v in {"company_name":"مروج الذهبية للاستثمار","brand":"MUROOJ GOLDEN","whatsapp":"966550558014","email":"talal_alaqely@icloud.com","mail_sender_name":"MUROOJ GOLDEN","mail_sender_email":"","announcement":"","announcement_active":"0","announcement_target":"all","announcement_start":"","announcement_end":"","announcement_whatsapp":"0"}.items():conn.execute("INSERT OR IGNORE INTO settings(key,value) VALUES (?,?)",(k,v))
+    # One-time clean catalog migration for the live B2B launch. Preserves agency/user accounts.
+    if conn.execute("SELECT value FROM settings WHERE key='clean_launch_v1'").fetchone() is None:
+        now=datetime.utcnow().isoformat()
+        conn.execute("DELETE FROM notifications")
+        conn.execute("DELETE FROM requests")
+        conn.execute("DELETE FROM offers")
+        conn.execute("DELETE FROM hotel_images")
+        conn.execute("DELETE FROM hotels")
+        catalog=[
+            ("فندق ندى أجياد","NADA AJYAD HOTEL","Makkah","https://maps.app.goo.gl/PzgRgz23LRDex1Wq7?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,1),
+            ("فندق سواعد الخير","SAWAEED AL KHAIR HOTEL","Makkah","https://maps.app.goo.gl/GcA7zZYftYcuYx9N6?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,2),
+            ("فندق ديار البيت","DIYAR AL BAYT HOTEL","Makkah","","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,3),
+            ("فندق أزهار سلسبيل","AZHAR SALSABEEL HOTEL","Madinah","","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,1),
+            ("فندق سلسبيل الذهبي","SALSABEEL AL DHAHABI HOTEL","Madinah","","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",3,2),
+        ]
+        for row in catalog:
+            conn.execute("INSERT INTO hotels(name_ar,name_en,city,map_url,services,meals,stars,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?,?)",row+(now,))
+        ids={r["name_en"]:r["id"] for r in conn.execute("SELECT id,name_en FROM hotels").fetchall()}
+        conn.execute("INSERT INTO hotel_images(hotel_id,image_url,sort_order,created_at) VALUES(?,?,?,?)",(ids["NADA AJYAD HOTEL"],"/static/ندى.jfif",1,now))
+        conn.execute("INSERT INTO hotel_images(hotel_id,image_url,sort_order,created_at) VALUES(?,?,?,?)",(ids["SAWAEED AL KHAIR HOTEL"],"/static/سواعد الخير.jfif",1,now))
+        conn.execute("INSERT INTO settings(key,value) VALUES('clean_launch_v1','1')")
+        conn.commit()
+
     if conn.execute("SELECT COUNT(*) c FROM hotels").fetchone()["c"]==0:
         now=datetime.utcnow().isoformat();conn.execute("INSERT INTO hotels(name_ar,name_en,city,map_url,services,meals,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?)",("فندق ندى أجياد","NADA AJYAD HOTEL","Makkah","https://maps.app.goo.gl/PzgRgz23LRDex1Wq7?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",1,1,now));conn.execute("INSERT INTO hotels(name_ar,name_en,city,map_url,services,meals,active,sort_order,created_at) VALUES(?,?,?,?,?,?,?,?,?)",("فندق سواعد الخير","SAWAEED AL KHAIR HOTEL","Makkah","https://maps.app.goo.gl/GcA7zZYftYcuYx9N6?g_st=iw","Wi‑Fi|استقبال 24 ساعة|مصاعد|تكييف|مطعم|تنظيف الغرف|ثلاجة|تلفزيون","RO|F.B Indo|F.B Malaysian",1,2,now))
     if conn.execute("SELECT COUNT(*) c FROM hotel_images").fetchone()["c"]==0:
