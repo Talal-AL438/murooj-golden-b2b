@@ -3090,3 +3090,44 @@ html body .home-main > .home-section .luxury-hotel-card .luxury-actions .service
   html body .home-main > .home-section .city-card-overlay p{font-size:12px!important}
   html body .home-main > .home-section .luxury-hotel-card .luxury-hotel-media{height:285px!important;min-height:285px!important}
 }
+
+
+/* FINAL APPROVED VISUAL — natural photos, no black overlays */
+html body .home-main > .home-section .city-card{
+  background-color:transparent!important;
+  filter:none!important;
+}
+html body .home-main > .home-section .city-card::before,
+html body .home-main > .home-section .city-card::after{
+  display:none!important;
+  content:none!important;
+}
+html body .home-main > .home-section .city-card-overlay{
+  background:transparent!important;
+  backdrop-filter:none!important;
+  text-shadow:none!important;
+}
+html body .home-main > .home-section .city-card-overlay h3,
+html body .home-main > .home-section .city-card-overlay p{
+  text-shadow:0 2px 5px rgba(0,0,0,.35)!important;
+}
+
+/* Hotel photos must remain clear and natural */
+html body .home-main > .home-section .luxury-hotel-card .luxury-hotel-media::after,
+html body .home-main > .home-section .luxury-hotel-card .luxury-hotel-media::before{
+  display:none!important;
+  content:none!important;
+}
+html body .home-main > .home-section .luxury-hotel-card .hotel-image{
+  filter:none!important;
+  opacity:1!important;
+  transform:none!important;
+}
+html body .home-main > .home-section .luxury-hotel-card .luxury-hotel-heading{
+  background:transparent!important;
+}
+html body .home-main > .home-section .luxury-hotel-card .hotel-name-ar,
+html body .home-main > .home-section .luxury-hotel-card .hotel-name-en,
+html body .home-main > .home-section .luxury-hotel-card .card-stars{
+  text-shadow:0 2px 6px rgba(0,0,0,.65)!important;
+}
