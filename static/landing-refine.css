@@ -3131,3 +3131,62 @@ html body .home-main > .home-section .luxury-hotel-card .hotel-name-en,
 html body .home-main > .home-section .luxury-hotel-card .card-stars{
   text-shadow:0 2px 6px rgba(0,0,0,.65)!important;
 }
+
+
+/* FINAL APPROVED — natural photographs, no black image overlays */
+.city-card-makkah,
+.city-card-madinah{
+  background-image:none!important;
+  background-color:transparent!important;
+}
+.city-card-makkah{
+  background-image:url('https://c.myholidays.com/packages/b7c590ec-8f4f-4033-a3a9-77bc8486393f/original/6f9ce3a1-acf4-4e6e-bbad-598d7409eb6b.webp')!important;
+}
+.city-card-madinah{
+  background-image:url('https://www.madaninews.id/wp-content/uploads/2024/02/Al-Masjid-an-Nabawi-The-Prophets-Mosque-Medina-1.jpg')!important;
+}
+.city-card::before,
+.city-card::after{
+  display:none!important;
+  background:none!important;
+}
+.city-card-overlay{
+  background:transparent!important;
+  backdrop-filter:none!important;
+  box-shadow:none!important;
+  text-shadow:0 2px 8px rgba(0,0,0,.55)!important;
+}
+.city-card-overlay h3,
+.city-card-overlay p{
+  text-shadow:0 2px 8px rgba(0,0,0,.55)!important;
+}
+
+/* Hotel cards: show the real hotel photograph without a black gradient */
+.luxury-hotel-media:after{
+  display:none!important;
+  background:none!important;
+}
+.luxury-hotel-media .hotel-image{
+  filter:none!important;
+}
+.luxury-hotel-card{
+  background:#fff!important;
+}
+.luxury-hotel-heading{
+  background:linear-gradient(to bottom,transparent 0%,rgba(0,0,0,.16) 100%)!important;
+}
+.luxury-hotel-heading .hotel-name-ar,
+.luxury-hotel-heading .hotel-name-en{
+  text-shadow:0 2px 7px rgba(0,0,0,.72)!important;
+}
+.luxury-hotel-heading .card-stars{
+  background:rgba(255,255,255,.10)!important;
+  text-shadow:0 2px 6px rgba(0,0,0,.65)!important;
+}
+.luxury-hotel-card .luxury-actions .location-btn,
+.luxury-hotel-card .luxury-actions .gallery-open-home,
+.luxury-hotel-card .luxury-actions .services-open-home{
+  background:rgba(255,255,255,.92)!important;
+  color:#3a2b12!important;
+  backdrop-filter:none!important;
+}
