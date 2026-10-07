@@ -3199,3 +3199,30 @@ html body .home-main > .home-section .luxury-hotel-card .card-stars{
 @media (min-width:901px) and (max-width:1100px){
   html body #makkah-hotels .hotel-grid{width:94%!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
+/* FIX: explicit hotel grid targets */
+html body #makkah-grid{
+  width:min(1120px,94%)!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:22px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+html body #madinah-grid{
+  width:min(760px,94%)!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:22px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+@media(max-width:1100px){
+  html body #makkah-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+  html body #makkah-grid,
+  html body #madinah-grid{
+    width:96%!important;
+    grid-template-columns:1fr!important;
+  }
+}
