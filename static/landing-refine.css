@@ -3302,3 +3302,43 @@ html body #madinah-hotels{
   html body .city-section-divider h2{font-size:28px!important}
   html body .city-divider-kicker{font-size:9px!important;letter-spacing:2.5px!important}
 }
+
+/* FINAL SECTION HEADER ALIGNMENT */
+html body #makkah-hotels.section-head,
+html body #madinah-hotels .section-head{
+  position:relative!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:118px!important;
+  padding:22px 180px 22px 180px!important;
+}
+html body #makkah-hotels.section-head > div,
+html body #madinah-hotels .section-head > div{
+  width:100%!important;
+  text-align:center!important;
+}
+html body #makkah-hotels .section-view-all,
+html body #madinah-hotels .section-view-all{
+  position:absolute!important;
+  right:18px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+  white-space:nowrap!important;
+  z-index:2!important;
+}
+@media(max-width:760px){
+  html body #makkah-hotels.section-head,
+  html body #madinah-hotels .section-head{
+    display:flex!important;
+    flex-direction:column!important;
+    min-height:0!important;
+    padding:20px 14px 18px!important;
+    gap:12px!important;
+  }
+  html body #makkah-hotels .section-view-all,
+  html body #madinah-hotels .section-view-all{
+    position:static!important;
+    transform:none!important;
+  }
+}
