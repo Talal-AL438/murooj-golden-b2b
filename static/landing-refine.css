@@ -3226,3 +3226,79 @@ html body #madinah-grid{
     grid-template-columns:1fr!important;
   }
 }
+
+/* FINAL CITY SECTION STRUCTURE */
+html body .city-section-divider{
+  width:min(1120px,94%)!important;
+  margin:78px auto 34px!important;
+  padding:28px 20px 24px!important;
+  position:relative!important;
+  text-align:center!important;
+  border-top:1px solid rgba(201,151,47,.38)!important;
+  border-bottom:1px solid rgba(201,151,47,.38)!important;
+  background:linear-gradient(180deg,rgba(201,151,47,.035),rgba(255,255,255,0))!important;
+}
+html body .city-section-divider::before,
+html body .city-section-divider::after{
+  content:""!important;
+  position:absolute!important;
+  top:-2px!important;
+  width:110px!important;
+  height:2px!important;
+  background:#c9972f!important;
+}
+html body .city-section-divider::before{left:calc(50% - 110px)!important}
+html body .city-section-divider::after{right:calc(50% - 110px)!important}
+html body .city-divider-kicker{
+  display:block!important;
+  color:#c9972f!important;
+  font-size:11px!important;
+  font-weight:900!important;
+  letter-spacing:4px!important;
+  margin-bottom:8px!important;
+}
+html body .city-section-divider h2{
+  margin:0!important;
+  color:#17130e!important;
+  font-size:clamp(30px,3.2vw,44px)!important;
+  font-weight:900!important;
+  line-height:1.15!important;
+}
+html body .city-divider-line{
+  display:block!important;
+  width:58px!important;
+  height:2px!important;
+  margin:14px auto 14px!important;
+  background:#c9972f!important;
+}
+html body .city-section-divider .section-view-all{
+  position:static!important;
+  display:inline-flex!important;
+  transform:none!important;
+  margin:0!important;
+  padding:9px 16px!important;
+  border:1px solid #c9972f!important;
+  border-radius:7px!important;
+  background:#fffdf8!important;
+  color:#6d501d!important;
+  font-size:12px!important;
+  font-weight:800!important;
+}
+html body #makkah-hotels{
+  margin-bottom:0!important;
+  padding-bottom:0!important;
+}
+html body #madinah-hotels{
+  margin-top:0!important;
+  padding-top:0!important;
+  border-top:0!important;
+}
+@media(max-width:760px){
+  html body .city-section-divider{
+    width:94%!important;
+    margin:52px auto 26px!important;
+    padding:22px 14px 20px!important;
+  }
+  html body .city-section-divider h2{font-size:28px!important}
+  html body .city-divider-kicker{font-size:9px!important;letter-spacing:2.5px!important}
+}
