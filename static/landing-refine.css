@@ -3342,3 +3342,22 @@ html body #madinah-hotels .section-view-all{
     transform:none!important;
   }
 }
+
+/* HOTEL PHOTOS REMOVED — READY FOR LATER UPLOAD */
+html body .hotel-media-empty{
+  position:relative!important;
+  overflow:hidden!important;
+  background:linear-gradient(145deg,#0b0b0b,#17130d)!important;
+}
+html body .hotel-media-empty .hotel-image-placeholder{
+  width:100%!important;
+  height:100%!important;
+  min-height:260px!important;
+  background:linear-gradient(145deg,#090909,#18140d)!important;
+}
+html body .hotel-media-empty .luxury-hotel-heading{
+  background:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.88) 100%)!important;
+}
+@media(max-width:760px){
+  html body .hotel-media-empty .hotel-image-placeholder{min-height:220px!important}
+}
