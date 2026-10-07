@@ -3508,3 +3508,14 @@ html body .makkah-reference-divider .city-real-icon-image{
 html body .madinah-reference-divider .city-real-icon-image{
   object-position:center 42%!important;
 }
+
+/* ICON-FREE CITY DIVIDERS */
+html body .city-reference-icon{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  box-shadow:none!important;
+}
