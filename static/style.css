@@ -992,3 +992,14 @@ html body .luxury-hotel-card .luxury-actions .services-button-icon{color:#f3c95c
 #hotels #madinah-hotels .section-head:after{content:"";display:block;width:72px;height:2px;margin:14px auto 0;background:linear-gradient(90deg,transparent,var(--gold-light),transparent)}
 #hotels #makkah-hotels + .grid,
 #hotels #madinah-hotels .hotel-grid{margin-top:0!important}
+
+/* HARD REMOVE DESTINATION CARDS — FINAL */
+#hotels .city-card,
+#hotels .city-split-card,
+#hotels .city-text-card,
+#hotels .city-card-makkah,
+#hotels .city-card-madinah{display:none!important;width:0!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important;overflow:hidden!important}
+#hotels .hotels-catalog,
+#hotels.hotels-catalog{padding-top:0!important}
+#hotels #makkah-hotels{margin-bottom:18px!important}
+#hotels #madinah-hotels{margin-top:46px!important}
