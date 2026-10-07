@@ -3443,3 +3443,21 @@ html body #makkah-grid,html body #madinah-grid{margin-top:0!important}
   html body .city-reference-content{grid-column:1!important;grid-row:2!important;min-width:0!important}
   html body .city-reference-button{grid-column:1!important;grid-row:3!important}
 }
+
+/* PREMIUM CITY ICONS */
+html body .city-reference-icon{
+  width:112px!important;
+  height:78px!important;
+  margin:0 auto!important;
+}
+html body .city-reference-icon svg{
+  width:112px!important;
+  height:78px!important;
+  filter:drop-shadow(0 4px 5px rgba(0,0,0,.12))!important;
+}
+html body .makkah-reference-divider .city-reference-icon{
+  transform:translateY(2px)!important;
+}
+html body .madinah-reference-divider .city-reference-icon{
+  transform:translateY(2px)!important;
+}
