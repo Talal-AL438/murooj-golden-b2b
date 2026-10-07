@@ -3491,3 +3491,20 @@ html body .madinah-reference-divider .city-real-icon-image{
 @media(max-width:760px){
   html body .city-reference-icon{width:96px!important;height:72px!important}
 }
+
+/* LANDMARK PHOTO CROP FIX */
+html body .city-reference-icon{
+  width:108px!important;
+  height:72px!important;
+  border-radius:9px!important;
+}
+html body .city-real-icon-image{
+  object-fit:cover!important;
+  object-position:center!important;
+}
+html body .makkah-reference-divider .city-real-icon-image{
+  object-position:center 52%!important;
+}
+html body .madinah-reference-divider .city-real-icon-image{
+  object-position:center 42%!important;
+}
