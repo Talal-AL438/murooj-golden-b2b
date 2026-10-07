@@ -940,3 +940,14 @@ html body .luxury-hotel-card .luxury-actions .services-button-icon{color:#f3c95c
 #hotels .city-split-card .city-card-photo{grid-column:2!important;grid-row:1!important;min-width:0!important;min-height:300px!important;overflow:hidden!important;background:#111!important}
 #hotels .city-split-card .city-card-photo img{width:100%!important;height:100%!important;display:block!important;object-fit:cover!important;object-position:center!important;filter:none!important;opacity:1!important}
 @media(max-width:700px){#hotels .city-split-card{grid-template-columns:1fr!important;min-height:0!important}#hotels .city-split-card .city-card-copy{grid-column:1!important;grid-row:1!important;min-height:185px!important;padding:25px 22px!important;align-items:flex-end!important}#hotels .city-split-card .city-card-photo{grid-column:1!important;grid-row:2!important;min-height:220px!important;height:220px!important}#hotels .city-split-card .city-card-copy h3{font-size:30px!important}}
+
+/* APPROVED CARD PROPORTION POLISH */
+#hotels .city-split-card{grid-template-columns:50% 50%!important;min-height:260px!important;height:260px!important}
+#hotels .city-split-card .city-card-copy{min-width:0!important;overflow:hidden!important}
+#hotels .city-split-card .city-card-photo{min-height:260px!important;height:260px!important}
+#hotels .city-split-card .city-card-photo img{object-fit:cover!important;object-position:center center!important}
+@media(max-width:700px){
+  #hotels .city-split-card{height:auto!important;min-height:0!important}
+  #hotels .city-split-card .city-card-copy{min-height:185px!important;height:auto!important}
+  #hotels .city-split-card .city-card-photo{height:220px!important;min-height:220px!important}
+}
