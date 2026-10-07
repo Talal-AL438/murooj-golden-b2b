@@ -951,3 +951,32 @@ html body .luxury-hotel-card .luxury-actions .services-button-icon{color:#f3c95c
   #hotels .city-split-card .city-card-copy{min-height:185px!important;height:auto!important}
   #hotels .city-split-card .city-card-photo{height:220px!important;min-height:220px!important}
 }
+
+/* APPROVED COMPACT TEXT-ONLY MAKKAH CARD */
+#hotels .city-text-card{
+  width:min(860px,92%)!important;
+  min-height:0!important;
+  margin:0 auto 28px!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+#hotels .city-text-card .city-card-copy{
+  min-height:150px!important;
+  padding:26px 34px!important;
+  border:1px solid rgba(201,151,47,.9)!important;
+  border-radius:16px!important;
+  background:linear-gradient(145deg,#080808,#17130c)!important;
+  box-shadow:0 12px 28px rgba(20,14,5,.12)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  align-items:center!important;
+  text-align:center!important;
+}
+#hotels .city-text-card .city-card-copy small{font-size:10px!important;letter-spacing:3px!important;color:var(--gold-light)!important}
+#hotels .city-text-card .city-card-copy h3{margin:6px 0 0!important;font-size:clamp(27px,3vw,40px)!important;line-height:1.15!important}
+#hotels .city-text-card .city-card-line{margin:10px 0 8px!important;width:55px!important}
+#hotels .city-text-card .city-card-copy p{font-size:13px!important;line-height:1.6!important}
