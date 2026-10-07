@@ -3461,3 +3461,33 @@ html body .makkah-reference-divider .city-reference-icon{
 html body .madinah-reference-divider .city-reference-icon{
   transform:translateY(2px)!important;
 }
+
+/* REAL LANDMARK PHOTOS */
+html body .city-reference-icon{
+  width:118px!important;
+  height:88px!important;
+  overflow:hidden!important;
+  border-radius:10px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  background:#fffdf8!important;
+  box-shadow:0 5px 14px rgba(0,0,0,.10)!important;
+  border:1px solid rgba(199,153,54,.38)!important;
+}
+html body .city-real-icon-image{
+  width:100%!important;
+  height:100%!important;
+  display:block!important;
+  object-fit:cover!important;
+  object-position:center!important;
+}
+html body .makkah-reference-divider .city-real-icon-image{
+  object-position:center 48%!important;
+}
+html body .madinah-reference-divider .city-real-icon-image{
+  object-position:center 38%!important;
+}
+@media(max-width:760px){
+  html body .city-reference-icon{width:96px!important;height:72px!important}
+}
