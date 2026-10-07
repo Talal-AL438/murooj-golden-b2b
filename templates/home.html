@@ -6,7 +6,7 @@
 {% set target=settings.get('announcement_target','all') %}{% set country=(agency_country or '')|lower %}{% set target_ok=(target=='all' or (target=='indonesia' and 'indonesia' in country) or (target=='malaysia' and 'malaysia' in country)) %}{% if settings.announcement_active=='1' and settings.announcement and target_ok %}<div class="notice"><b>{{settings.announcement}}</b>{% if settings.get('announcement_whatsapp')=='1' %} <a class="btn small dark" target="_blank" rel="noopener" href="https://wa.me/{{settings.whatsapp}}?text={{settings.announcement|urlencode}}">WhatsApp</a>{% endif %}</div>{% endif %}
 
 <section id="hotels" class="home-section hotels-catalog"><div id="makkah-hotels" class="section-head premium-head city-section-head makkah-section-head"><a class="section-view-all" href="#makkah-hotels">{{ 'عرض جميع فنادق مكة' if lang=='ar' else 'View all Makkah hotels' }}</a><div><small>MUROOJ GOLDEN HOTELS</small><h2>{{T.hotels}} — {{T.makkah}}</h2><span class="head-line"></span></div></div><div id="makkah-grid" class="grid hotel-grid">{% for h in hotels %}{% if h.city=='Makkah' %}<article class="card hotel-card luxury-hotel-card" id="hotel-{{h.id}}" data-hotel-id="{{h.id}}">
-{% set card_image = h.cover_image or ('https://st.muslim.uz/cache/7/9/4/4/9/79449059f8e1fa96eb363bc0bdfca9e7acb0aaad.jpeg' if h.city=='Madinah' else '/static/makkah-night-approved.jpg') %}<div class="hotel-media luxury-hotel-media"><img class="hotel-image" src="{{card_image}}" alt="{{h.name_ar}}">
+<div class="hotel-media luxury-hotel-media hotel-media-empty"><div class="hotel-image-placeholder" aria-hidden="true"></div>
   <div class="luxury-hotel-heading"><h3 class="hotel-name" translate="no"><span class="hotel-name-ar">{{h.name_ar}}</span><span class="hotel-name-en">{{h.name_en}}</span></h3><div class="card-stars" aria-label="{{h.stars or 3}} نجوم">{{"★" * (h.stars or 3)}}</div></div>
   <button class="gallery-heart" type="button" aria-label="المفضلة">♡</button>
 </div>
@@ -26,7 +26,7 @@
   <a class="section-view-all" href="#madinah-hotels">{{ 'عرض جميع فنادق المدينة' if lang=='ar' else 'View all Madinah hotels' }}</a>
 </div>
 <section id="madinah-hotels" class="home-section city-section-madinah"><div id="madinah-grid" class="grid hotel-grid">{% set md=namespace(count=0) %}{% for h in hotels %}{% if h.city=='Madinah' %}{% set md.count=md.count+1 %}<article class="card hotel-card luxury-hotel-card" id="hotel-{{h.id}}" data-hotel-id="{{h.id}}">
-{% set card_image = h.cover_image or ('https://st.muslim.uz/cache/7/9/4/4/9/79449059f8e1fa96eb363bc0bdfca9e7acb0aaad.jpeg' if h.city=='Madinah' else '/static/makkah-night-approved.jpg') %}<div class="hotel-media luxury-hotel-media"><img class="hotel-image" src="{{card_image}}" alt="{{h.name_ar}}">
+<div class="hotel-media luxury-hotel-media hotel-media-empty"><div class="hotel-image-placeholder" aria-hidden="true"></div>
   <div class="luxury-hotel-heading"><h3 class="hotel-name" translate="no"><span class="hotel-name-ar">{{h.name_ar}}</span><span class="hotel-name-en">{{h.name_en}}</span></h3><div class="card-stars">{{"★" * (h.stars or 3)}}</div></div>
   <button class="gallery-heart" type="button" aria-label="المفضلة">♡</button>
 </div>
