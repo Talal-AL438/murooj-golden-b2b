@@ -3692,3 +3692,9 @@ html body #makkah-hotels.city-reference-divider .section-view-all{
  .hero-city-links{grid-template-columns:1fr!important;gap:8px!important;margin-top:2px!important}
  .hero-city-link{min-height:44px!important;font-size:13px!important}
 }
+
+/* City quick-jump: keep the first hotel cards visible below the fixed header */
+#makkah-grid,#madinah-grid{scroll-margin-top:110px!important}
+@media(max-width:600px){
+  #makkah-grid,#madinah-grid{scroll-margin-top:86px!important}
+}
