@@ -15,7 +15,7 @@
     <p>{{ 'اختر الفندق المناسب ثم أرسل طلب الحجز مباشرة.' if lang=='ar' else 'Choose the suitable hotel and send your booking request directly.' }}</p>
   </div>
   <div class="city-reference-rule"></div>
-  <a class="section-view-all city-reference-button" href="#makkah-grid">{{ 'عرض جميع فنادق مكة' if lang=='ar' else 'View all Makkah hotels' }}</a>
+  
 </div><div id="makkah-grid" class="grid hotel-grid">{% for h in hotels %}{% if h.city=='Makkah' %}<article class="card hotel-card luxury-hotel-card" id="hotel-{{h.id}}" data-hotel-id="{{h.id}}">
 <div class="hotel-media luxury-hotel-media hotel-media-empty"><div class="hotel-image-placeholder" aria-hidden="true"></div>
   <div class="luxury-hotel-heading"><h3 class="hotel-name" translate="no"><span class="hotel-name-ar">{{h.name_ar}}</span><span class="hotel-name-en">{{h.name_en}}</span></h3><div class="card-stars" aria-label="{{h.stars or 3}} نجوم">{{"★" * (h.stars or 3)}}</div></div>
@@ -40,7 +40,7 @@
     <p>{{ 'اختر الفندق المناسب ثم أرسل طلب الحجز مباشرة.' if lang=='ar' else 'Choose the suitable hotel and send your booking request directly.' }}</p>
   </div>
   <div class="city-reference-rule"></div>
-  <a class="section-view-all city-reference-button" href="#madinah-grid">{{ 'عرض جميع فنادق المدينة' if lang=='ar' else 'View all Madinah hotels' }}</a>
+  
 </div>
 <section id="madinah-hotels" class="home-section city-section-madinah"><div id="madinah-grid" class="grid hotel-grid">{% set md=namespace(count=0) %}{% for h in hotels %}{% if h.city=='Madinah' %}{% set md.count=md.count+1 %}<article class="card hotel-card luxury-hotel-card" id="hotel-{{h.id}}" data-hotel-id="{{h.id}}">
 <div class="hotel-media luxury-hotel-media hotel-media-empty"><div class="hotel-image-placeholder" aria-hidden="true"></div>
