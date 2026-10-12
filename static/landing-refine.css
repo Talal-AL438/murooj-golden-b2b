@@ -3646,3 +3646,40 @@ html body #makkah-hotels.city-reference-divider .section-view-all{
     font-size:11px!important;
   }
 }
+
+/* HERO CITY SHORTCUTS */
+.hero-city-links{
+  width:min(360px,90%);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:2px;
+}
+.hero-city-link{
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 10px;
+  box-sizing:border-box;
+  border:1px solid #c9972f;
+  border-radius:8px;
+  background:rgba(201,151,47,.08);
+  color:#f1d27a;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:800;
+  white-space:nowrap;
+  transition:.2s ease;
+}
+.hero-city-link:hover{
+  background:#c9972f;
+  color:#111;
+}
+@media(max-width:900px){
+  .hero-city-links{width:min(360px,92%);}
+}
+@media(max-width:480px){
+  .hero-city-links{grid-template-columns:1fr;gap:8px;}
+  .hero-city-link{min-height:42px;font-size:12px;}
+}
